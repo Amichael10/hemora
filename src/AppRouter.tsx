@@ -14,6 +14,7 @@ import Records from "@/pages/records";
 import Directory from "@/pages/directory";
 import Emergency from "@/pages/emergency";
 import AuthCallback from "@/pages/auth-callback";
+import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function Routes() {
@@ -28,6 +29,7 @@ function Routes() {
       <Route path="/records" component={Records} />
       <Route path="/directory" component={Directory} />
       <Route path="/emergency" component={Emergency} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );
