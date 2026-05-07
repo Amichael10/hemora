@@ -383,16 +383,7 @@ export default function Crisis() {
             </motion.div>
           )}
 
-          {step === "success" && (
-            <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col flex-1 p-6 items-center justify-center text-center bg-primary/[0.03] min-h-[70vh]">
-              <img src={botanicalImage} alt="Botanical" className="w-48 h-48 mb-8 object-contain opacity-70" />
-              <h2 className="h-display text-primary mb-3">Log saved.</h2>
-              <p className="body-md mb-10 px-4">
-                Thank you for recording this. Keeping track helps you understand patterns and get better care.
-              </p>
-              <Button size="xl" className="w-full" onClick={() => setStep("history")}>View History</Button>
-            </motion.div>
-          )}
+          {/* success step removed — toast shown instead */}
 
           {step === "history" && (
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
