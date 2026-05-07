@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getProfileByUser, ApiError } from "@workspace/api-client-react";
 
 interface ProfileContextType {
-  profileId: number;
-  setProfileId: (id: number) => void;
+  profileId: string;
+  setProfileId: (id: string) => void;
   /** True while we're resolving a profile for the current auth session. */
   resolving: boolean;
   /** True when we have an authenticated user but no linked profile yet. */
@@ -13,11 +13,11 @@ interface ProfileContextType {
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
-const FALLBACK_PROFILE_ID = 1;
+const FALLBACK_PROFILE_ID = "";
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const [profileId, setProfileId] = useState<number>(FALLBACK_PROFILE_ID);
+  const [profileId, setProfileId] = useState<string>(FALLBACK_PROFILE_ID);
   const [resolving, setResolving] = useState<boolean>(true);
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean>(false);
 
