@@ -124,6 +124,24 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
+  /* Brand surface tokens (Kindred) */
+  --brand-teal: 195 47% 42%;          /* #39839F */
+  --brand-teal-deep: 199 53% 33%;     /* #256680 */
+  --brand-oxblood: 348 56% 31%;       /* #7B2335 */
+  --brand-surface: 213 26% 92%;       /* #E5EBF0 */
+  --brand-cream: 132 11% 96%;         /* #F2F5F2 */
+
+  --gradient-brand: linear-gradient(180deg,
+    hsl(var(--brand-teal)) 0%,
+    hsl(195 40% 58%) 28%,
+    hsl(195 30% 78%) 52%,
+    hsl(var(--brand-cream)) 78%,
+    hsl(0 0% 100%) 100%);
+  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-surface)) 0%, hsl(0 0% 100%) 100%);
+
+  --shadow-brand: 0 10px 30px -10px hsl(var(--brand-teal) / 0.35);
+  --shadow-card-soft: 0 1px 4px hsl(0 0% 0% / 0.04), 0 2px 8px hsl(0 0% 0% / 0.03);
+
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
 
   /* Fallback for older browsers */
@@ -219,6 +237,29 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  /* Unified typography scale */
+  h1, h2, h3, h4 { @apply font-serif tracking-tight text-foreground; font-feature-settings: "ss01"; }
+}
+
+@layer components {
+  /* Page title — used at the top of any tabbed page */
+  .h-page    { @apply font-serif font-semibold text-[1.5rem] leading-tight tracking-[-0.5px] text-primary; }
+  .h-display { @apply font-serif font-semibold text-[1.875rem] leading-[1.15] tracking-[-0.5px]; }
+  .h-section { @apply font-serif font-semibold text-[1.125rem] leading-tight tracking-[-0.25px] text-foreground; }
+  /* Small all-caps eyebrow above sections */
+  .eyebrow   { @apply text-[11px] font-bold uppercase tracking-[2px] text-primary/60; }
+  .eyebrow-on-dark { @apply text-[11px] font-bold uppercase tracking-[2px] text-white/70; }
+  .body-md   { @apply text-sm leading-relaxed text-muted-foreground; }
+  .label-xs  { @apply text-[11px] font-medium text-muted-foreground; }
+
+  /* Reusable surfaces */
+  .surface-card { @apply rounded-2xl bg-card text-card-foreground border border-border/50 shadow-sm; }
+  .surface-soft { @apply rounded-2xl border border-border/40; background: var(--gradient-brand-soft); }
+  .glass-pill   { @apply rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:opacity-80 disabled:opacity-50;
+                  background: rgba(255,255,255,0.22); backdrop-filter: blur(8px); }
+  .glass-pill-ghost { @apply rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90;
+                  background: rgba(255,255,255,0.12); }
 }
 
 /**
