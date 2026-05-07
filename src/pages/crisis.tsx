@@ -134,14 +134,14 @@ export default function Crisis() {
               <div className="w-20 h-20 bg-accent/10 text-accent rounded-2xl flex items-center justify-center mb-8 shadow-sm">
                 <HealthIcon outline={HeartCardiogramOutline} filled={HeartCardiogramFilled} width="40" height="40" />
               </div>
-              <h1 className="font-serif text-[1.875rem] text-primary font-semibold mb-3 leading-[1.2] tracking-[-0.5px]">
+              <h1 className="h-display text-primary mb-3">
                 You're doing your best.<br />We're here with you.
               </h1>
-              <p className="text-muted-foreground text-sm mb-12">Log what you're feeling so we can help you track patterns.</p>
+              <p className="body-md mb-12">Log what you're feeling so we can help you track patterns.</p>
               <div className="w-full space-y-3">
-                <Button className="w-full h-14 text-base font-semibold shadow-sm" onClick={() => setStep("pain")} data-testid="btn-start-log">Start log</Button>
-                <Button variant="outline" className="w-full h-14 text-base border-accent/30 text-accent hover:bg-accent/5" onClick={() => setLocation("/emergency")} data-testid="btn-urgent-care">Need urgent care?</Button>
-                <Button variant="ghost" className="mt-2 text-sm text-muted-foreground" onClick={() => setStep("history")}>View History</Button>
+                <Button size="xl" className="w-full" onClick={() => setStep("pain")} data-testid="btn-start-log">Start log</Button>
+                <Button size="xl" variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/5" onClick={() => setLocation("/emergency")} data-testid="btn-urgent-care">Need urgent care?</Button>
+                <Button variant="ghost" className="mt-2 text-muted-foreground" onClick={() => setStep("history")}>View History</Button>
               </div>
             </motion.div>
           )}
@@ -266,7 +266,8 @@ export default function Crisis() {
                 </div>
 
                 <Button
-                  className="w-full h-14 text-base font-semibold rounded-full bg-white text-foreground hover:bg-white/95 disabled:opacity-50 shadow-lg"
+                  size="xl"
+                  className="w-full rounded-full bg-white text-foreground hover:bg-white/95 shadow-lg"
                   disabled={!painLevel}
                   onClick={() => setStep("location")}
                   data-testid="btn-pain-continue"
@@ -283,8 +284,8 @@ export default function Crisis() {
           {step === "location" && (
             <motion.div key="location" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
               <StepDots current={2} total={5} onStepClick={goToStep} />
-              <h2 className="font-serif text-[1.5rem] text-primary font-semibold mb-2 text-center tracking-[-0.5px]">Where does it hurt?</h2>
-              <p className="text-center text-muted-foreground text-sm mb-4">Tap the area on the body</p>
+              <h2 className="h-page text-center mb-2">Where does it hurt?</h2>
+              <p className="text-center body-md mb-4">Tap the area on the body</p>
               <div className="flex-1 flex items-start justify-center">
                 <BodyPainPicker
                   gender={profile?.gender ?? null}
@@ -294,59 +295,59 @@ export default function Crisis() {
                   onOtherChange={setOtherLocationText}
                 />
               </div>
-              <Button className="w-full h-14 text-base font-semibold mt-6 shadow-sm" onClick={() => setStep("triggers")}>Next</Button>
+              <Button size="xl" className="w-full mt-6" onClick={() => setStep("triggers")}>Next</Button>
             </motion.div>
           )}
 
           {step === "triggers" && (
             <motion.div key="triggers" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
               <StepDots current={3} total={5} onStepClick={goToStep} />
-              <h2 className="font-serif text-[1.5rem] text-primary font-semibold mb-2 text-center tracking-[-0.5px]">Any known triggers?</h2>
-              <p className="text-center text-muted-foreground text-sm mb-8">Select all that apply</p>
+              <h2 className="h-page text-center mb-2">Any known triggers?</h2>
+              <p className="text-center body-md mb-8">Select all that apply</p>
               <div className="flex flex-wrap gap-2 justify-center mb-auto">
                 {["Cold Weather", "Stress", "Infection", "Dehydration", "Exertion", "Missed meds", "Other"].map(trig => {
                   const isSelected = triggers.includes(trig);
                   return (
-                    <Button key={trig} variant={isSelected ? "default" : "outline"} className={`rounded-xl h-11 px-5 text-sm font-medium shadow-sm ${isSelected ? "" : "bg-card"}`} onClick={() => toggleArrayItem(setTriggers, trig)}>{trig}</Button>
+                    <Button key={trig} size="pill" variant={isSelected ? "default" : "outline"} className={isSelected ? "" : "bg-card"} onClick={() => toggleArrayItem(setTriggers, trig)}>{trig}</Button>
                   );
                 })}
               </div>
-              <Button className="w-full h-14 text-base font-semibold mt-8 shadow-sm" onClick={() => setStep("relief")}>Next</Button>
+              <Button size="xl" className="w-full mt-8" onClick={() => setStep("relief")}>Next</Button>
             </motion.div>
           )}
 
           {step === "relief" && (
             <motion.div key="relief" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
               <StepDots current={4} total={5} onStepClick={goToStep} />
-              <h2 className="font-serif text-[1.5rem] text-primary font-semibold mb-2 text-center tracking-[-0.5px]">What has helped so far?</h2>
-              <p className="text-center text-muted-foreground text-sm mb-8">Select all that apply</p>
+              <h2 className="h-page text-center mb-2">What has helped so far?</h2>
+              <p className="text-center body-md mb-8">Select all that apply</p>
               <div className="flex flex-wrap gap-2 justify-center mb-auto">
                 {["Rest", "Fluids", "Pain meds", "Warm bath", "Massage", "Nothing yet"].map(help => {
                   const isSelected = whatHelped.includes(help);
                   return (
-                    <Button key={help} variant={isSelected ? "default" : "outline"} className={`rounded-xl h-11 px-5 text-sm font-medium shadow-sm ${isSelected ? "" : "bg-card"}`} onClick={() => toggleArrayItem(setWhatHelped, help)}>{help}</Button>
+                    <Button key={help} size="pill" variant={isSelected ? "default" : "outline"} className={isSelected ? "" : "bg-card"} onClick={() => toggleArrayItem(setWhatHelped, help)}>{help}</Button>
                   );
                 })}
               </div>
-              <Button className="w-full h-14 text-base font-semibold mt-8 shadow-sm" onClick={() => setStep("hospital")}>Next</Button>
+              <Button size="xl" className="w-full mt-8" onClick={() => setStep("hospital")}>Next</Button>
             </motion.div>
           )}
 
           {step === "hospital" && (
             <motion.div key="hospital" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
               <StepDots current={5} total={5} onStepClick={goToStep} />
-              <h2 className="font-serif text-[1.5rem] text-primary font-semibold mb-8 text-center tracking-[-0.5px]">Did this require a hospital visit?</h2>
+              <h2 className="h-page text-center mb-8">Did this require a hospital visit?</h2>
               <div className="space-y-3 mb-auto">
-                <Button variant={hospitalVisit === true ? "default" : "outline"} className="w-full h-14 text-base justify-between px-6 shadow-sm" onClick={() => setHospitalVisit(true)}>
+                <Button size="xl" variant={hospitalVisit === true ? "default" : "outline"} className="w-full justify-between" onClick={() => setHospitalVisit(true)}>
                   <span className="font-medium">Yes, visited hospital</span>
                   {hospitalVisit === true && <Check size={20} />}
                 </Button>
-                <Button variant={hospitalVisit === false ? "default" : "outline"} className="w-full h-14 text-base justify-between px-6 shadow-sm" onClick={() => setHospitalVisit(false)}>
+                <Button size="xl" variant={hospitalVisit === false ? "default" : "outline"} className="w-full justify-between" onClick={() => setHospitalVisit(false)}>
                   <span className="font-medium">No, managed at home</span>
                   {hospitalVisit === false && <Check size={20} />}
                 </Button>
               </div>
-              <Button className="w-full h-14 text-base font-semibold mt-8 shadow-sm" disabled={hospitalVisit === null || createLog.isPending} onClick={handleSave}>
+              <Button size="xl" className="w-full mt-8" disabled={hospitalVisit === null || createLog.isPending} onClick={handleSave}>
                 {createLog.isPending ? "Saving..." : "Save Log"}
               </Button>
             </motion.div>
@@ -355,19 +356,19 @@ export default function Crisis() {
           {step === "success" && (
             <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col flex-1 p-6 items-center justify-center text-center bg-primary/[0.03] min-h-[70vh]">
               <img src={botanicalImage} alt="Botanical" className="w-48 h-48 mb-8 object-contain opacity-70" />
-              <h2 className="font-serif text-[2rem] text-primary font-semibold mb-3 tracking-[-0.5px] leading-[1.2]">Log saved.</h2>
-              <p className="text-muted-foreground mb-10 px-4 text-sm leading-relaxed">
+              <h2 className="h-display text-primary mb-3">Log saved.</h2>
+              <p className="body-md mb-10 px-4">
                 Thank you for recording this. Keeping track helps you understand patterns and get better care.
               </p>
-              <Button className="w-full h-14 text-base font-semibold shadow-sm" onClick={() => setStep("history")}>View History</Button>
+              <Button size="xl" className="w-full" onClick={() => setStep("history")}>View History</Button>
             </motion.div>
           )}
 
           {step === "history" && (
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
               <div className="flex items-center justify-between mb-6">
-                <h1 className="font-serif text-[1.5rem] text-primary font-semibold tracking-[-0.5px]">Crisis History</h1>
-                <Button size="icon" variant="outline" onClick={() => setStep("entry")} className="h-9 w-9 shadow-sm">
+                <h1 className="h-page">Crisis History</h1>
+                <Button size="icon" variant="soft" onClick={() => setStep("entry")}>
                   <Plus size={16} />
                 </Button>
               </div>
