@@ -426,6 +426,26 @@ export const useCreateEmergencyContact = () => {
 };
 export const useDeleteEmergencyContact = () => useDeleteRow("emergency_contacts", "emergency-contacts");
 
+// ---- Provider suggestions (admin review) ----
+export const useCreateProviderSuggestion = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ data }: any) => {
+      const { data: auth } = await supabase.auth.getUser();
+      const { data: row, error } = await (supabase.from("provider_suggestions") as any).insert({
+        user_id: auth.user?.id ?? null,
+        name: data.name, type: data.type ?? "hospital",
+        country: data.country ?? null, state: data.state ?? null, city: data.city ?? null,
+        phone: data.phone ?? null, email: data.email ?? null, website: data.website ?? null,
+        notes: data.notes ?? data.about ?? null,
+      }).select().single();
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: ["provider-suggestions"] });
+      return row;
+    },
+  }) as UseMutationResult<any, Error, any>;
+};
+
 // Get single med / record helpers
 export const useGetMedication = (id?: any, opts?: any) => {
   const enabled = (opts?.query?.enabled ?? true) && !!id;
