@@ -74,43 +74,43 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 132 11% 96%;       /* near-white sage #F2F5F2 */
-  --foreground: 0 0% 5%;           /* near-black ink #0D0D0D */
-  --primary: 195 47% 42%;          /* artxis teal-blue #39839F */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 213 26% 92%;        /* light blue-gray #E5EBF0 */
-  --secondary-foreground: 0 0% 5%;
-  --muted: 132 11% 92%;            /* sage #E9EEEA */
-  --muted-foreground: 0 0% 35%;
-  --accent: 195 47% 42%;           /* same teal-blue accent */
-  --accent-foreground: 0 0% 100%;
-  --destructive: 348 56% 40%;
-  --destructive-foreground: 0 0% 100%;
+  --background: 36 33% 97%;        /* warm cream #FBF8F4 */
+  --foreground: 320 18% 12%;       /* deep plum-ink */
+  --primary: 322 37% 26%;          /* deep plum #5B2A4A */
+  --primary-foreground: 36 33% 97%;
+  --secondary: 30 25% 93%;         /* warm sand */
+  --secondary-foreground: 320 18% 12%;
+  --muted: 30 22% 94%;             /* soft cream */
+  --muted-foreground: 320 10% 38%;
+  --accent: 19 53% 55%;            /* terracotta #C9784E */
+  --accent-foreground: 36 33% 97%;
+  --destructive: 6 64% 44%;
+  --destructive-foreground: 36 33% 97%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 5%;
-  --card-border: 213 20% 88%;
-  --border: 213 20% 88%;
-  --input: 213 20% 86%;
-  --ring: 195 47% 42%;
+  --card-foreground: 320 18% 12%;
+  --card-border: 30 18% 88%;
+  --border: 30 18% 88%;
+  --input: 30 18% 86%;
+  --ring: 322 37% 26%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 5%;
-  --popover-border: 213 20% 88%;
-  --sidebar: 0 0% 5%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 0 0% 15%;
-  --sidebar-primary: 195 47% 42%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 0 0% 12%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 195 47% 60%;
-  --chart-1: 195 47% 42%;
-  --chart-2: 348 56% 40%;
-  --chart-3: 213 26% 70%;
-  --chart-4: 195 30% 65%;
-  --chart-5: 132 11% 75%;
+  --popover-foreground: 320 18% 12%;
+  --popover-border: 30 18% 88%;
+  --sidebar: 322 37% 16%;
+  --sidebar-foreground: 36 33% 97%;
+  --sidebar-border: 322 25% 22%;
+  --sidebar-primary: 19 53% 55%;
+  --sidebar-primary-foreground: 36 33% 97%;
+  --sidebar-accent: 322 30% 22%;
+  --sidebar-accent-foreground: 36 33% 97%;
+  --sidebar-ring: 19 53% 65%;
+  --chart-1: 322 37% 26%;
+  --chart-2: 19 53% 55%;
+  --chart-3: 30 25% 75%;
+  --chart-4: 322 22% 55%;
+  --chart-5: 36 20% 80%;
 
-  --app-font-sans: 'Red Hat Display', system-ui, sans-serif;
-  --app-font-serif: 'Red Hat Display', system-ui, sans-serif;
+  --app-font-sans: 'Inter', 'Red Hat Display', system-ui, sans-serif;
+  --app-font-serif: 'Fraunces', 'Red Hat Display', Georgia, serif;
   --app-font-mono: Menlo, monospace;
   --radius: 0.75rem; /* 12px — Kraken standard */
   --shadow-2xs: rgba(0,0,0,0.03) 0px 1px 4px;
@@ -124,23 +124,22 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Brand surface tokens (Kindred) */
-  --brand-teal: 195 47% 42%;          /* #39839F */
-  --brand-teal-deep: 199 53% 33%;     /* #256680 */
-  --brand-oxblood: 348 56% 31%;       /* #7B2335 */
-  --brand-surface: 213 26% 92%;       /* #E5EBF0 */
-  --brand-cream: 132 11% 96%;         /* #F2F5F2 */
+  /* Brand surface tokens (Kindred — Plum / Cream / Terracotta) */
+  --brand-plum: 322 37% 26%;          /* #5B2A4A */
+  --brand-plum-deep: 322 40% 18%;     /* deeper plum */
+  --brand-terracotta: 19 53% 55%;     /* #C9784E */
+  --brand-surface: 30 25% 93%;        /* warm sand */
+  --brand-cream: 36 33% 97%;          /* #FBF8F4 */
 
   --gradient-brand: linear-gradient(180deg,
-    hsl(var(--brand-teal-deep)) 0%,
-    hsl(var(--brand-teal)) 22%,
-    hsl(195 38% 62%) 44%,
-    hsl(195 25% 82%) 64%,
-    hsl(var(--background)) 88%,
+    hsl(var(--brand-plum-deep)) 0%,
+    hsl(var(--brand-plum)) 28%,
+    hsl(322 25% 50%) 55%,
+    hsl(30 25% 85%) 78%,
     hsl(var(--background)) 100%);
   --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-surface)) 0%, hsl(0 0% 100%) 100%);
 
-  --shadow-brand: 0 10px 30px -10px hsl(var(--brand-teal) / 0.35);
+  --shadow-brand: 0 10px 30px -10px hsl(var(--brand-plum) / 0.35);
   --shadow-card-soft: 0 1px 4px hsl(0 0% 0% / 0.04), 0 2px 8px hsl(0 0% 0% / 0.03);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
@@ -184,40 +183,40 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 0 0% 5%;          /* near-black */
-  --foreground: 0 0% 96%;
-  --primary: 195 47% 52%;
-  --primary-foreground: 0 0% 5%;
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 0 0% 96%;
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 70%;
-  --accent: 195 47% 52%;
-  --accent-foreground: 0 0% 5%;
-  --destructive: 348 56% 50%;
-  --destructive-foreground: 0 0% 96%;
-  --card: 0 0% 8%;
-  --card-foreground: 0 0% 96%;
-  --card-border: 0 0% 18%;
-  --border: 0 0% 18%;
-  --input: 0 0% 22%;
-  --ring: 195 47% 52%;
-  --popover: 0 0% 8%;
-  --popover-foreground: 0 0% 96%;
-  --popover-border: 0 0% 18%;
-  --sidebar: 0 0% 8%;
-  --sidebar-foreground: 0 0% 96%;
-  --sidebar-border: 0 0% 18%;
-  --sidebar-primary: 195 47% 52%;
-  --sidebar-primary-foreground: 0 0% 5%;
-  --sidebar-accent: 0 0% 18%;
-  --sidebar-accent-foreground: 0 0% 96%;
-  --sidebar-ring: 195 47% 52%;
-  --chart-1: 195 47% 52%;
-  --chart-2: 348 56% 50%;
-  --chart-3: 213 26% 70%;
-  --chart-4: 195 30% 65%;
-  --chart-5: 132 11% 60%;
+  --background: 322 20% 7%;
+  --foreground: 36 25% 94%;
+  --primary: 19 60% 60%;            /* terracotta lifts in dark mode */
+  --primary-foreground: 322 20% 7%;
+  --secondary: 322 18% 14%;
+  --secondary-foreground: 36 25% 94%;
+  --muted: 322 14% 14%;
+  --muted-foreground: 36 15% 70%;
+  --accent: 19 60% 60%;
+  --accent-foreground: 322 20% 7%;
+  --destructive: 6 64% 52%;
+  --destructive-foreground: 36 25% 94%;
+  --card: 322 18% 11%;
+  --card-foreground: 36 25% 94%;
+  --card-border: 322 14% 20%;
+  --border: 322 14% 20%;
+  --input: 322 14% 22%;
+  --ring: 19 60% 60%;
+  --popover: 322 18% 11%;
+  --popover-foreground: 36 25% 94%;
+  --popover-border: 322 14% 20%;
+  --sidebar: 322 25% 9%;
+  --sidebar-foreground: 36 25% 94%;
+  --sidebar-border: 322 18% 18%;
+  --sidebar-primary: 19 60% 60%;
+  --sidebar-primary-foreground: 322 20% 7%;
+  --sidebar-accent: 322 18% 18%;
+  --sidebar-accent-foreground: 36 25% 94%;
+  --sidebar-ring: 19 60% 60%;
+  --chart-1: 19 60% 60%;
+  --chart-2: 322 37% 50%;
+  --chart-3: 30 25% 70%;
+  --chart-4: 322 22% 55%;
+  --chart-5: 36 20% 65%;
 
   --shadow-2xs: rgba(0,0,0,0.04) 0px 1px 4px;
   --shadow-xs:  rgba(16,24,40,0.05) 0px 1px 4px;
