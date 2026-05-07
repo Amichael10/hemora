@@ -492,6 +492,7 @@ export default function Crisis() {
                           </div>
                         </CardContent>
                       </Card>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
