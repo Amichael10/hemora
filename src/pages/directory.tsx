@@ -16,7 +16,6 @@ import {
   useGetProfile,
   useUpdateProfile,
   useUpdateProvider,
-  useCreateProvider,
   useCreateProviderSuggestion,
   getListProvidersQueryKey,
   getGetProfileQueryKey,
