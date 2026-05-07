@@ -88,6 +88,7 @@ const ALL_STATES = "__all_states__";
 export default function Directory() {
   const { profileId } = useProfile();
   const { data: profile } = useGetProfile(profileId);
+  const [, setLocation] = useLocation();
 
   const profileCountry = profile?.country ?? null;
   const defaultCountry = profileCountry ?? DEFAULT_COUNTRY;
