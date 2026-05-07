@@ -147,22 +147,22 @@ function Hero() {
             "radial-gradient(60% 50% at 80% 0%, hsl(var(--brand-gold) / 0.18), transparent 60%), radial-gradient(50% 60% at 0% 30%, hsl(var(--brand-teal) / 0.10), transparent 70%)",
         }}
       />
-      <div className="mx-auto max-w-6xl px-5 sm:px-8 pt-16 pb-20 lg:pt-24 lg:pb-28 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center">
+      <div className="mx-auto max-w-4xl px-5 sm:px-8 pt-16 pb-12 lg:pt-24 lg:pb-16 text-center">
         <motion.div {...fadeUp}>
           <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border/60 px-3 py-1 text-xs text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             For families touched by sickle cell
           </div>
-          <h1 className="mt-5 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
+          <h1 className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
             Care that stays with you,{" "}
             <span className="italic text-primary">between appointments.</span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed">
+          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Kindred helps you log crises, stay on top of meds, keep records in one place,
             and find sickle-cell-aware care — on your phone, anywhere.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Button size="lg" onClick={() => setLocation("/signup")}>
               Open the app <ArrowRight size={16} />
             </Button>
@@ -171,16 +171,50 @@ function Hero() {
             </Button>
           </div>
 
-          <div className="mt-8 flex items-center gap-5 text-xs text-muted-foreground">
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
             <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
             <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
           </div>
         </motion.div>
 
-        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}>
+        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="mt-14 lg:mt-16">
           <PhoneMockup />
         </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function Context() {
+  const stats = [
+    { n: "20M+", label: "people worldwide live with sickle cell disease.", source: "WHO" },
+    { n: "100K", label: "Americans are estimated to be living with SCD today.", source: "CDC" },
+    { n: "1 in 365", label: "Black or African American babies is born with SCD.", source: "CDC" },
+  ];
+  return (
+    <section className="py-20 lg:py-24 border-y border-border/50 bg-muted/30">
+      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+        <motion.div {...fadeUp} className="text-center max-w-2xl mx-auto">
+          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
+            You're not managing this alone — <span className="italic text-muted-foreground">millions of families are too.</span>
+          </h2>
+        </motion.div>
+        <div className="mt-12 grid sm:grid-cols-3 gap-6">
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.n}
+              {...fadeUp}
+              transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+              className="rounded-2xl bg-card border border-border/60 p-6 text-center"
+            >
+              <div className="font-serif text-4xl sm:text-5xl text-primary tracking-tight">{s.n}</div>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.label}</p>
+              <div className="mt-3 text-[10px] uppercase tracking-wider text-muted-foreground/70">Source: {s.source}</div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -486,6 +520,7 @@ export default function Landing() {
       <Nav />
       <main>
         <Hero />
+        <Context />
         <Features />
         <HowItWorks />
         <Stories />
