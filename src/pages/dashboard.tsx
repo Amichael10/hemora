@@ -105,7 +105,7 @@ export default function Dashboard() {
 
   return (
     <MobileAppShell>
-      <div className="flex flex-col min-h-full -mb-20 pb-24" style={{ background: "var(--gradient-brand)" }}>
+      <div className="flex flex-col flex-1 min-h-[100dvh]" style={{ background: "var(--gradient-brand)" }}>
 
         {/* ── Slim header (on gradient) ────────────────────────── */}
         <div className="flex justify-between items-center px-5 pt-11 pb-4 relative">
