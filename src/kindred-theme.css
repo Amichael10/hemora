@@ -127,9 +127,9 @@
   --spacing: 0.25rem;
 
   /* Brand surface tokens (Kindred — Teal) */
-  --brand-teal: 184 72% 38%;
-  --brand-teal-deep: 184 78% 28%;
-  --brand-teal-soft: 184 60% 92%;
+  --brand-teal: 192 80% 42%;
+  --brand-teal-deep: 198 85% 32%;
+  --brand-teal-soft: 192 70% 92%;
   --brand-surface: 210 20% 96%;
   --brand-cream: 0 0% 100%;
 
