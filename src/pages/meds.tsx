@@ -96,12 +96,10 @@ export default function Meds() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="h-page">Medications</h1>
+          <Button size="icon" variant="soft" data-testid="btn-add-med" onClick={() => setLocation("/meds/new")}>
+            <Plus size={16} />
+          </Button>
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="soft" data-testid="btn-add-med">
-                <Plus size={16} />
-              </Button>
-            </SheetTrigger>
             <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
               <SheetHeader>
                 <SheetTitle className="h-section text-primary">Add Medication</SheetTitle>
