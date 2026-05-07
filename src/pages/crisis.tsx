@@ -267,7 +267,7 @@ export default function Crisis() {
 
                 <Button
                   size="xl"
-                  className="w-full rounded-full bg-white text-foreground hover:bg-white/95 shadow-lg"
+                  className="w-full bg-white text-foreground hover:bg-white/95 shadow-lg"
                   disabled={!painLevel}
                   onClick={() => setStep("location")}
                   data-testid="btn-pain-continue"
