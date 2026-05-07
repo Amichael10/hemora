@@ -356,18 +356,19 @@ export default function Crisis() {
 
           {step === "triggers" && (() => {
             const TRIGGERS = [
-              { key: "Cold Weather", emoji: "🥶", bg: "#3B7FB8", caption: "Cold can constrict blood flow" },
-              { key: "Stress",       emoji: "😩", bg: "#7A5CA8", caption: "Stress takes a toll on the body" },
-              { key: "Infection",    emoji: "🤢", bg: "#5C9B5C", caption: "Infections can trigger crises" },
-              { key: "Dehydration",  emoji: "💧", bg: "#3FA6B8", caption: "Hydration helps cells flow" },
-              { key: "Exertion",     emoji: "😤", bg: "#C97A4A", caption: "Push gentle, rest often" },
-              { key: "Missed meds",  emoji: "💊", bg: "#A85C7A", caption: "Routine matters — set a reminder" },
-              { key: "Other",        emoji: "🩺", bg: "#3D6B6B", caption: "Note it for your team" },
+              { key: "Cold Weather", anim: lottieCold,        bg: "#3B7FB8", caption: "Cold can constrict blood flow" },
+              { key: "Stress",       anim: lottieStress,      bg: "#7A5CA8", caption: "Stress takes a toll on the body" },
+              { key: "Infection",    anim: lottieInfection,   bg: "#5C9B5C", caption: "Infections can trigger crises" },
+              { key: "Dehydration",  anim: lottieDehydration, bg: "#3FA6B8", caption: "Hydration helps cells flow" },
+              { key: "Exertion",     anim: lottieExertion,    bg: "#C97A4A", caption: "Push gentle, rest often" },
+              { key: "Missed meds",  anim: lottieMissed,      bg: "#A85C7A", caption: "Routine matters — set a reminder" },
+              { key: "Other",        anim: lottieOther,       bg: "#3D6B6B", caption: "Note it for your team" },
             ] as const;
             const DEFAULT_BG = "#3D6B6B";
             const lastKey = triggers[triggers.length - 1];
             const focused = TRIGGERS.find(t => t.key === lastKey) ?? null;
             const bgColor = focused?.bg ?? DEFAULT_BG;
+            const showOtherInput = triggers.includes("Other");
             return (
               <motion.div
                 key="triggers"
@@ -375,9 +376,16 @@ export default function Crisis() {
                 animate={{ opacity: 1, backgroundColor: bgColor }}
                 exit={{ opacity: 0, transition: { duration: 0.2 } }}
                 transition={{ backgroundColor: { duration: 0.5, ease: "easeInOut" }, opacity: { duration: 0.3 } }}
-                className="flex-1 flex flex-col px-6 pt-10 pb-8 z-10 relative"
+                className="flex-1 flex flex-col px-6 pt-10 pb-8 z-10 relative min-h-[100dvh]"
                 style={{ backgroundColor: bgColor }}
               >
+                <motion.div
+                  aria-hidden
+                  animate={{ backgroundColor: bgColor }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-x-0 -bottom-40 h-40 -z-10 pointer-events-none"
+                  style={{ backgroundColor: bgColor }}
+                />
                 <button
                   type="button"
                   onClick={() => setStep("location")}
@@ -395,13 +403,19 @@ export default function Crisis() {
                 <div className="flex-1 flex flex-col items-center justify-center">
                   <motion.div
                     key={focused?.key ?? "empty"}
-                    initial={{ scale: 0.7, opacity: 0, rotate: -8 }}
-                    animate={{ scale: 1, opacity: focused ? 1 : 0.5, rotate: 0 }}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: focused ? 1 : 0.55 }}
                     transition={{ type: "spring", stiffness: 220, damping: 16 }}
-                    className="text-[7rem] leading-none mb-4 select-none"
+                    className="w-44 h-44 flex items-center justify-center mb-2"
                     style={{ filter: focused ? "drop-shadow(0 12px 24px rgba(0,0,0,0.25))" : "none" }}
                   >
-                    {focused?.emoji ?? "🩺"}
+                    <Lottie
+                      animationData={focused?.anim ?? lottieOther}
+                      loop
+                      autoplay
+                      className="w-full h-full"
+                      rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+                    />
                   </motion.div>
                   <AnimatePresence mode="wait">
                     <motion.p
@@ -424,14 +438,16 @@ export default function Crisis() {
                       <button
                         key={t.key}
                         onClick={() => toggleArrayItem(setTriggers, t.key)}
-                        className="flex flex-col items-center gap-1 py-3 px-2 rounded-2xl transition-all"
+                        className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-2xl transition-all"
                         style={{
                           background: isSelected ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.08)",
                           border: `1.5px solid ${isSelected ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.12)"}`,
                           transform: isSelected ? "translateY(-2px)" : "translateY(0)",
                         }}
                       >
-                        <span className="text-2xl leading-none">{t.emoji}</span>
+                        <div className="w-9 h-9">
+                          <Lottie animationData={t.anim} loop autoplay className="w-full h-full" />
+                        </div>
                         <span
                           className="text-[11px] font-semibold tracking-wide text-center"
                           style={{ color: isSelected ? "#FFFFFF" : "rgba(255,255,255,0.75)" }}
@@ -442,6 +458,28 @@ export default function Crisis() {
                     );
                   })}
                 </div>
+
+                <AnimatePresence>
+                  {showOtherInput && (
+                    <motion.div
+                      key="other-input"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="mb-4 overflow-hidden"
+                    >
+                      <input
+                        type="text"
+                        value={otherTriggerText}
+                        onChange={(e) => setOtherTriggerText(e.target.value)}
+                        placeholder="Describe your trigger..."
+                        className="w-full px-4 py-3 rounded-xl bg-white/15 border border-white/30 text-white placeholder:text-white/60 text-sm focus:outline-none focus:bg-white/20 focus:border-white/50 backdrop-blur-sm"
+                        autoFocus
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <Button
                   size="xl"
