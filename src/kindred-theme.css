@@ -74,42 +74,42 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Reference-inspired: vibrant brand color used sparingly on a clean
-     near-white canvas. Brand = teal (Kindred). Surfaces stay light/neutral. */
-  --background: 210 20% 98%;       /* near-white app canvas */
-  --foreground: 200 25% 12%;       /* deep ink */
-  --primary: 184 72% 38%;          /* Kindred teal */
+  /* Reference-inspired banking look: vibrant royal blue brand on a
+     light canvas, with a two-section gradient/sheet split. */
+  --background: 210 25% 98%;       /* near-white app canvas */
+  --foreground: 215 30% 12%;       /* deep ink */
+  --primary: 214 88% 48%;          /* royal blue */
   --primary-foreground: 0 0% 100%;
-  --secondary: 200 25% 96%;        /* very light neutral */
-  --secondary-foreground: 200 25% 12%;
-  --muted: 210 20% 96%;
-  --muted-foreground: 200 10% 42%;
-  --accent: 184 72% 38%;           /* same teal — used sparingly */
+  --secondary: 214 30% 96%;        /* very light neutral */
+  --secondary-foreground: 215 30% 12%;
+  --muted: 214 25% 96%;
+  --muted-foreground: 215 12% 42%;
+  --accent: 214 88% 48%;
   --accent-foreground: 0 0% 100%;
   --destructive: 6 70% 50%;
   --destructive-foreground: 0 0% 100%;
   --card: 0 0% 100%;
   --card-foreground: 200 25% 12%;
-  --card-border: 210 18% 92%;
-  --border: 210 18% 92%;
-  --input: 210 18% 90%;
-  --ring: 184 72% 38%;
+  --card-border: 214 22% 92%;
+  --border: 214 22% 92%;
+  --input: 214 22% 90%;
+  --ring: 214 88% 48%;
   --popover: 0 0% 100%;
   --popover-foreground: 200 25% 12%;
-  --popover-border: 210 18% 92%;
-  --sidebar: 184 72% 38%;          /* teal sidebar like the reference brand surface */
+  --popover-border: 214 22% 92%;
+  --sidebar: 214 88% 48%;
   --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 184 60% 32%;
+  --sidebar-border: 214 70% 38%;
   --sidebar-primary: 0 0% 100%;
-  --sidebar-primary-foreground: 184 72% 38%;
-  --sidebar-accent: 184 65% 32%;
+  --sidebar-primary-foreground: 214 88% 48%;
+  --sidebar-accent: 214 70% 38%;
   --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 184 72% 60%;
-  --chart-1: 184 72% 38%;
-  --chart-2: 184 60% 60%;
+  --sidebar-ring: 214 88% 65%;
+  --chart-1: 214 88% 48%;
+  --chart-2: 214 70% 65%;
   --chart-3: 210 20% 85%;
-  --chart-4: 200 25% 35%;
-  --chart-5: 184 30% 80%;
+  --chart-4: 215 30% 35%;
+  --chart-5: 214 35% 80%;
 
   --app-font-sans: 'Inter', 'Red Hat Display', system-ui, sans-serif;
   --app-font-serif: 'Fraunces', 'Red Hat Display', Georgia, serif;
@@ -126,22 +126,25 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Brand surface tokens (Kindred — Teal) */
-  --brand-teal: 192 80% 42%;
-  --brand-teal-deep: 198 85% 32%;
-  --brand-teal-soft: 192 70% 92%;
-  --brand-surface: 210 20% 96%;
+  /* Brand surface tokens (Kindred — Royal Blue) */
+  --brand-blue: 214 88% 52%;
+  --brand-blue-deep: 218 85% 38%;
+  --brand-blue-bright: 210 95% 60%;
+  --brand-blue-soft: 214 70% 94%;
+  /* Back-compat aliases (some components still read --brand-teal*) */
+  --brand-teal: 214 88% 52%;
+  --brand-teal-deep: 218 85% 38%;
+  --brand-teal-soft: 214 70% 94%;
+  --brand-surface: 214 25% 96%;
   --brand-cream: 0 0% 100%;
 
-  --gradient-brand: linear-gradient(180deg,
-    hsl(var(--brand-teal-deep)) 0%,
-    hsl(var(--brand-teal)) 35%,
-    hsl(184 55% 70%) 65%,
-    hsl(var(--brand-teal-soft)) 85%,
-    hsl(var(--background)) 100%);
-  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-teal-soft)) 0%, hsl(0 0% 100%) 100%);
+  --gradient-brand: linear-gradient(165deg,
+    hsl(var(--brand-blue-deep)) 0%,
+    hsl(var(--brand-blue)) 50%,
+    hsl(var(--brand-blue-bright)) 100%);
+  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-blue-soft)) 0%, hsl(0 0% 100%) 100%);
 
-  --shadow-brand: 0 10px 30px -10px hsl(var(--brand-teal) / 0.35);
+  --shadow-brand: 0 14px 36px -14px hsl(var(--brand-blue) / 0.45);
   --shadow-card-soft: 0 1px 4px hsl(0 0% 0% / 0.04), 0 2px 8px hsl(0 0% 0% / 0.03);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
