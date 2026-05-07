@@ -74,42 +74,42 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Reference-inspired banking look: vibrant royal blue brand on a
-     light canvas, with a two-section gradient/sheet split. */
-  --background: 210 25% 98%;       /* near-white app canvas */
-  --foreground: 215 30% 12%;       /* deep ink */
-  --primary: 214 88% 48%;          /* royal blue */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 214 30% 96%;        /* very light neutral */
-  --secondary-foreground: 215 30% 12%;
-  --muted: 214 25% 96%;
-  --muted-foreground: 215 12% 42%;
-  --accent: 214 88% 48%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 6 70% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --card: 0 0% 100%;
-  --card-foreground: 200 25% 12%;
-  --card-border: 214 22% 92%;
-  --border: 214 22% 92%;
-  --input: 214 22% 90%;
-  --ring: 214 88% 48%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 200 25% 12%;
-  --popover-border: 214 22% 92%;
-  --sidebar: 214 88% 48%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 214 70% 38%;
-  --sidebar-primary: 0 0% 100%;
-  --sidebar-primary-foreground: 214 88% 48%;
-  --sidebar-accent: 214 70% 38%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 214 88% 65%;
-  --chart-1: 214 88% 48%;
-  --chart-2: 214 70% 65%;
-  --chart-3: 210 20% 85%;
-  --chart-4: 215 30% 35%;
-  --chart-5: 214 35% 80%;
+  /* Protective Crescent — cream canvas, deep teal surfaces, gold accent,
+     sickle red reserved for primary CTAs / urgent moments. */
+  --background: 38 56% 90%;        /* cream #f4ead8 */
+  --foreground: 186 35% 12%;       /* deep ink-teal */
+  --primary: 347 55% 43%;          /* sickle red #a8324a */
+  --primary-foreground: 42 65% 95%;
+  --secondary: 184 33% 18%;        /* deep teal */
+  --secondary-foreground: 42 65% 95%;
+  --muted: 38 40% 86%;
+  --muted-foreground: 184 18% 32%;
+  --accent: 36 50% 57%;            /* gold #c9a35a */
+  --accent-foreground: 184 33% 14%;
+  --destructive: 347 60% 40%;
+  --destructive-foreground: 42 65% 95%;
+  --card: 42 65% 95%;              /* cream-card #fbf5e7 */
+  --card-foreground: 186 35% 12%;
+  --card-border: 38 30% 80%;
+  --border: 38 30% 82%;
+  --input: 38 30% 82%;
+  --ring: 347 55% 43%;
+  --popover: 42 65% 95%;
+  --popover-foreground: 186 35% 12%;
+  --popover-border: 38 30% 80%;
+  --sidebar: 184 33% 18%;
+  --sidebar-foreground: 42 65% 95%;
+  --sidebar-border: 184 30% 12%;
+  --sidebar-primary: 36 50% 57%;
+  --sidebar-primary-foreground: 184 33% 14%;
+  --sidebar-accent: 184 30% 24%;
+  --sidebar-accent-foreground: 42 65% 95%;
+  --sidebar-ring: 36 50% 57%;
+  --chart-1: 184 33% 22%;          /* teal */
+  --chart-2: 36 50% 57%;           /* gold */
+  --chart-3: 347 55% 43%;          /* red */
+  --chart-4: 184 25% 45%;
+  --chart-5: 38 40% 78%;
 
   --app-font-sans: 'Inter', 'Red Hat Display', system-ui, sans-serif;
   --app-font-serif: 'Fraunces', 'Red Hat Display', Georgia, serif;
@@ -126,25 +126,32 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Brand surface tokens (Kindred — Royal Blue) */
-  --brand-blue: 214 88% 52%;
-  --brand-blue-deep: 218 85% 38%;
-  --brand-blue-bright: 210 95% 60%;
-  --brand-blue-soft: 214 70% 94%;
-  /* Back-compat aliases (some components still read --brand-teal*) */
-  --brand-teal: 214 88% 52%;
-  --brand-teal-deep: 218 85% 38%;
-  --brand-teal-soft: 214 70% 94%;
-  --brand-surface: 214 25% 96%;
-  --brand-cream: 0 0% 100%;
+  /* Brand surface tokens (Kindred — Protective Crescent) */
+  --brand-teal: 184 33% 18%;
+  --brand-teal-deep: 184 35% 12%;
+  --brand-teal-bright: 184 30% 28%;
+  --brand-teal-soft: 184 22% 86%;
+  --brand-gold: 36 50% 57%;
+  --brand-gold-soft: 38 60% 86%;
+  --brand-red: 347 55% 43%;
+  --brand-red-deep: 347 60% 32%;
+  --brand-cream: 38 56% 90%;
+  --brand-cream-card: 42 65% 95%;
+  /* Back-compat aliases */
+  --brand-blue: 184 33% 18%;
+  --brand-blue-deep: 184 35% 12%;
+  --brand-blue-bright: 184 30% 28%;
+  --brand-blue-soft: 184 22% 86%;
+  --brand-surface: 42 65% 95%;
 
   --gradient-brand: linear-gradient(165deg,
-    hsl(var(--brand-blue-deep)) 0%,
-    hsl(var(--brand-blue)) 50%,
-    hsl(var(--brand-blue-bright)) 100%);
-  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-blue-soft)) 0%, hsl(0 0% 100%) 100%);
+    hsl(var(--brand-teal-deep)) 0%,
+    hsl(var(--brand-teal)) 55%,
+    hsl(var(--brand-teal-bright)) 100%);
+  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-cream-card)) 0%, hsl(var(--brand-cream)) 100%);
+  --gradient-warm: linear-gradient(140deg, hsl(var(--brand-gold)) 0%, hsl(var(--brand-red)) 100%);
 
-  --shadow-brand: 0 14px 36px -14px hsl(var(--brand-blue) / 0.45);
+  --shadow-brand: 0 14px 36px -14px hsl(var(--brand-teal) / 0.45);
   --shadow-card-soft: 0 1px 4px hsl(0 0% 0% / 0.04), 0 2px 8px hsl(0 0% 0% / 0.03);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
@@ -188,40 +195,40 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 200 30% 7%;
-  --foreground: 210 20% 95%;
-  --primary: 184 65% 55%;
-  --primary-foreground: 200 30% 7%;
-  --secondary: 200 20% 14%;
-  --secondary-foreground: 210 20% 95%;
-  --muted: 200 18% 14%;
-  --muted-foreground: 210 15% 70%;
-  --accent: 184 65% 55%;
-  --accent-foreground: 200 30% 7%;
-  --destructive: 6 70% 55%;
-  --destructive-foreground: 0 0% 100%;
-  --card: 200 22% 11%;
-  --card-foreground: 210 20% 95%;
-  --card-border: 200 15% 20%;
-  --border: 200 15% 20%;
-  --input: 200 15% 22%;
-  --ring: 184 65% 55%;
-  --popover: 200 22% 11%;
-  --popover-foreground: 210 20% 95%;
-  --popover-border: 200 15% 20%;
-  --sidebar: 184 72% 30%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 184 60% 24%;
-  --sidebar-primary: 0 0% 100%;
-  --sidebar-primary-foreground: 184 72% 30%;
-  --sidebar-accent: 184 60% 22%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 184 65% 55%;
-  --chart-1: 184 65% 55%;
-  --chart-2: 184 50% 70%;
-  --chart-3: 210 15% 60%;
-  --chart-4: 200 25% 40%;
-  --chart-5: 184 30% 50%;
+  --background: 184 35% 8%;
+  --foreground: 38 40% 92%;
+  --primary: 347 60% 52%;
+  --primary-foreground: 42 65% 95%;
+  --secondary: 184 30% 16%;
+  --secondary-foreground: 38 40% 92%;
+  --muted: 184 25% 14%;
+  --muted-foreground: 38 18% 70%;
+  --accent: 36 55% 60%;
+  --accent-foreground: 184 35% 10%;
+  --destructive: 347 60% 52%;
+  --destructive-foreground: 42 65% 95%;
+  --card: 184 30% 12%;
+  --card-foreground: 38 40% 92%;
+  --card-border: 184 22% 22%;
+  --border: 184 22% 22%;
+  --input: 184 22% 22%;
+  --ring: 36 55% 60%;
+  --popover: 184 30% 12%;
+  --popover-foreground: 38 40% 92%;
+  --popover-border: 184 22% 22%;
+  --sidebar: 184 35% 10%;
+  --sidebar-foreground: 38 40% 92%;
+  --sidebar-border: 184 30% 16%;
+  --sidebar-primary: 36 55% 60%;
+  --sidebar-primary-foreground: 184 35% 10%;
+  --sidebar-accent: 184 30% 18%;
+  --sidebar-accent-foreground: 38 40% 92%;
+  --sidebar-ring: 36 55% 60%;
+  --chart-1: 36 55% 60%;
+  --chart-2: 184 30% 50%;
+  --chart-3: 347 60% 52%;
+  --chart-4: 38 30% 75%;
+  --chart-5: 184 25% 35%;
 
   --shadow-2xs: rgba(0,0,0,0.04) 0px 1px 4px;
   --shadow-xs:  rgba(16,24,40,0.05) 0px 1px 4px;
@@ -408,7 +415,7 @@
 }
 /* Body picker region focus ring (keyboard a11y) */
 .kindred-body-region { cursor: pointer; outline: none; }
-.kindred-body-region:focus-visible { outline: 3px solid #7B2335; outline-offset: 4px; }
+.kindred-body-region:focus-visible { outline: 3px solid #a8324a; outline-offset: 4px; }
 
 /* Hide horizontal scrollbar on chip rows — content is still scrollable via touch/wheel/drag */
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
