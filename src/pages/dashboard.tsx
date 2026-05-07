@@ -108,10 +108,10 @@ export default function Dashboard() {
       <div className="flex flex-col min-h-full -mb-20 pb-20 bg-background">
         {/* ── TOP SECTION: teal brand on gradient ─────────────── */}
         <div
-          className="relative pb-10"
+          className="relative pb-20"
           style={{
             background:
-              "linear-gradient(180deg, hsl(var(--brand-teal-deep)) 0%, hsl(var(--brand-teal)) 100%)",
+              "linear-gradient(160deg, hsl(var(--brand-teal-deep)) 0%, hsl(var(--brand-teal)) 60%, hsl(192 70% 55%) 100%)",
           }}
         >
         {/* Slim header */}
@@ -245,7 +245,7 @@ export default function Dashboard() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="sheet-surface flex flex-col gap-5 px-4 pt-6 pb-6 -mt-6 relative z-10"
+          className="sheet-surface flex flex-col gap-5 px-4 pt-7 pb-6 -mt-10 relative z-10"
         >
           {/* Today's schedule */}
           <motion.div variants={itemVariants}>
