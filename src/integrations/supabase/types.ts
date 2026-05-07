@@ -304,16 +304,20 @@ export type Database = {
           email: string | null
           hospital: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           name: string
           notes: string | null
           phone: string | null
           saved: boolean | null
           services: Json | null
           specialty: string | null
+          state: string | null
           type: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           verified: boolean | null
+          website: string | null
         }
         Insert: {
           address?: string | null
@@ -323,16 +327,20 @@ export type Database = {
           email?: string | null
           hospital?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name: string
           notes?: string | null
           phone?: string | null
           saved?: boolean | null
           services?: Json | null
           specialty?: string | null
+          state?: string | null
           type?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           verified?: boolean | null
+          website?: string | null
         }
         Update: {
           address?: string | null
@@ -342,16 +350,20 @@ export type Database = {
           email?: string | null
           hospital?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name?: string
           notes?: string | null
           phone?: string | null
           saved?: boolean | null
           services?: Json | null
           specialty?: string | null
+          state?: string | null
           type?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           verified?: boolean | null
+          website?: string | null
         }
         Relationships: []
       }
