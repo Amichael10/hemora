@@ -17,7 +17,10 @@ export type Database = {
       care_records: {
         Row: {
           created_at: string
+          date_of_record: string | null
+          document_title: string | null
           file_url: string | null
+          hospital_clinic: string | null
           id: string
           notes: string | null
           provider_name: string | null
@@ -30,7 +33,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          date_of_record?: string | null
+          document_title?: string | null
           file_url?: string | null
+          hospital_clinic?: string | null
           id?: string
           notes?: string | null
           provider_name?: string | null
@@ -43,7 +49,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          date_of_record?: string | null
+          document_title?: string | null
           file_url?: string | null
+          hospital_clinic?: string | null
           id?: string
           notes?: string | null
           provider_name?: string | null
@@ -59,33 +68,39 @@ export type Database = {
       crisis_logs: {
         Row: {
           created_at: string
+          hospital_visit: boolean | null
           id: string
           notes: string | null
           occurred_at: string
           pain_level: string
           pain_locations: Json | null
-          triggers: string | null
+          triggers: Json | null
           user_id: string
+          what_helped: Json | null
         }
         Insert: {
           created_at?: string
+          hospital_visit?: boolean | null
           id?: string
           notes?: string | null
           occurred_at?: string
           pain_level: string
           pain_locations?: Json | null
-          triggers?: string | null
+          triggers?: Json | null
           user_id: string
+          what_helped?: Json | null
         }
         Update: {
           created_at?: string
+          hospital_visit?: boolean | null
           id?: string
           notes?: string | null
           occurred_at?: string
           pain_level?: string
           pain_locations?: Json | null
-          triggers?: string | null
+          triggers?: Json | null
           user_id?: string
+          what_helped?: Json | null
         }
         Relationships: []
       }
@@ -93,6 +108,7 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
+          full_name: string | null
           id: string
           is_primary: boolean | null
           name: string
@@ -104,6 +120,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email?: string | null
+          full_name?: string | null
           id?: string
           is_primary?: boolean | null
           name: string
@@ -115,6 +132,7 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string | null
+          full_name?: string | null
           id?: string
           is_primary?: boolean | null
           name?: string
@@ -131,6 +149,7 @@ export type Database = {
           id: string
           medication_id: string
           notes: string | null
+          scheduled_at: string | null
           status: string
           taken_at: string
           user_id: string
@@ -140,6 +159,7 @@ export type Database = {
           id?: string
           medication_id: string
           notes?: string | null
+          scheduled_at?: string | null
           status?: string
           taken_at?: string
           user_id: string
@@ -149,6 +169,7 @@ export type Database = {
           id?: string
           medication_id?: string
           notes?: string | null
+          scheduled_at?: string | null
           status?: string
           taken_at?: string
           user_id?: string
@@ -167,10 +188,13 @@ export type Database = {
         Row: {
           created_at: string
           dosage: string | null
+          dose: string | null
           frequency: string | null
           id: string
           name: string
           notes: string | null
+          reminder_enabled: boolean | null
+          reminder_time: string | null
           schedule_time: string | null
           status: string | null
           updated_at: string
@@ -179,10 +203,13 @@ export type Database = {
         Insert: {
           created_at?: string
           dosage?: string | null
+          dose?: string | null
           frequency?: string | null
           id?: string
           name: string
           notes?: string | null
+          reminder_enabled?: boolean | null
+          reminder_time?: string | null
           schedule_time?: string | null
           status?: string | null
           updated_at?: string
@@ -191,10 +218,13 @@ export type Database = {
         Update: {
           created_at?: string
           dosage?: string | null
+          dose?: string | null
           frequency?: string | null
           id?: string
           name?: string
           notes?: string | null
+          reminder_enabled?: boolean | null
+          reminder_time?: string | null
           schedule_time?: string | null
           status?: string | null
           updated_at?: string
@@ -211,9 +241,11 @@ export type Database = {
           created_at: string
           date_of_birth: string | null
           full_name: string | null
+          gender: string | null
           genotype: string | null
           height_cm: number | null
           id: string
+          scd_status: string | null
           setup_for: string | null
           sex: string | null
           state: string | null
@@ -229,9 +261,11 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           full_name?: string | null
+          gender?: string | null
           genotype?: string | null
           height_cm?: number | null
           id?: string
+          scd_status?: string | null
           setup_for?: string | null
           sex?: string | null
           state?: string | null
@@ -247,9 +281,11 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           full_name?: string | null
+          gender?: string | null
           genotype?: string | null
           height_cm?: number | null
           id?: string
+          scd_status?: string | null
           setup_for?: string | null
           sex?: string | null
           state?: string | null
@@ -262,6 +298,8 @@ export type Database = {
       providers: {
         Row: {
           address: string | null
+          city: string | null
+          country: string | null
           created_at: string
           email: string | null
           hospital: string | null
@@ -269,12 +307,18 @@ export type Database = {
           name: string
           notes: string | null
           phone: string | null
+          saved: boolean | null
+          services: Json | null
           specialty: string | null
+          type: string | null
           updated_at: string
           user_id: string
+          verified: boolean | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           hospital?: string | null
@@ -282,12 +326,18 @@ export type Database = {
           name: string
           notes?: string | null
           phone?: string | null
+          saved?: boolean | null
+          services?: Json | null
           specialty?: string | null
+          type?: string | null
           updated_at?: string
           user_id: string
+          verified?: boolean | null
         }
         Update: {
           address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           hospital?: string | null
@@ -295,9 +345,13 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string | null
+          saved?: boolean | null
+          services?: Json | null
           specialty?: string | null
+          type?: string | null
           updated_at?: string
           user_id?: string
+          verified?: boolean | null
         }
         Relationships: []
       }
