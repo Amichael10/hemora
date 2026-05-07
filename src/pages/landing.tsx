@@ -138,7 +138,7 @@ function Hero() {
   const [, setLocation] = useLocation();
   return (
     <section className="relative overflow-hidden">
-      {/* Soft cream base + subtle gold halo */}
+      {/* Dub-style guide lines + soft halo */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
@@ -147,6 +147,19 @@ function Hero() {
             "radial-gradient(60% 50% at 80% 0%, hsl(var(--brand-gold) / 0.18), transparent 60%), radial-gradient(50% 60% at 0% 30%, hsl(var(--brand-teal) / 0.10), transparent 70%)",
         }}
       />
+      {/* Vertical guide lines */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="mx-auto max-w-6xl h-full px-5 sm:px-8 relative">
+          <div className="absolute inset-y-0 left-5 sm:left-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
+          <div className="absolute inset-y-0 right-5 sm:right-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
+          <div className="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent" />
+        </div>
+      </div>
+      {/* Horizontal guide lines */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-full">
+        <div className="absolute top-[88px] inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      </div>
       <div className="mx-auto max-w-4xl px-5 sm:px-8 pt-16 pb-12 lg:pt-24 lg:pb-16 text-center">
         <motion.div {...fadeUp}>
           <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border/60 px-3 py-1 text-xs text-muted-foreground">
@@ -188,18 +201,30 @@ function Hero() {
 
 function Context() {
   const stats = [
-    { n: "20M+", label: "people worldwide live with sickle cell disease.", source: "WHO" },
-    { n: "100K", label: "Americans are estimated to be living with SCD today.", source: "CDC" },
-    { n: "1 in 365", label: "Black or African American babies is born with SCD.", source: "CDC" },
+    { n: "75%", label: "of all sickle cell births globally happen in sub-Saharan Africa.", source: "WHO" },
+    { n: "300K+", label: "babies are born with sickle cell disease in Africa each year.", source: "WHO" },
+    { n: "1 in 4", label: "Nigerians carries the sickle cell trait — the highest burden worldwide.", source: "WHO Africa" },
   ];
   return (
-    <section className="py-20 lg:py-24 border-y border-border/50 bg-muted/30">
+    <section className="relative py-20 lg:py-24 border-y border-border/50 bg-muted/30 overflow-hidden">
+      {/* Vertical guide lines */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="mx-auto max-w-5xl h-full px-5 sm:px-8 relative">
+          <div className="absolute inset-y-0 left-5 sm:left-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
+          <div className="absolute inset-y-0 right-5 sm:right-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
+          <div className="hidden sm:block absolute inset-y-0 left-1/3 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent" />
+          <div className="hidden sm:block absolute inset-y-0 left-2/3 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent" />
+        </div>
+      </div>
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         <motion.div {...fadeUp} className="text-center max-w-2xl mx-auto">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
-            You're not managing this alone — <span className="italic text-muted-foreground">millions of families are too.</span>
+            Africa carries the heaviest weight — <span className="italic text-muted-foreground">and the strongest community.</span>
           </h2>
+          <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+            Kindred is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
+          </p>
         </motion.div>
         <div className="mt-12 grid sm:grid-cols-3 gap-6">
           {stats.map((s, i) => (
