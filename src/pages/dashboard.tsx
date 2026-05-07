@@ -148,6 +148,32 @@ export default function Dashboard() {
           animate="show"
           className="flex flex-col gap-4 pb-6"
         >
+          {/* ── Mood check-in ────────────────────────────────── */}
+          <motion.div variants={itemVariants} className="mx-4">
+            <p className="eyebrow mb-2.5">How are you feeling?</p>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { id: "great", emoji: "😊", label: "Great" },
+                { id: "ok", emoji: "🙂", label: "Ok" },
+                { id: "tired", emoji: "😴", label: "Tired" },
+                { id: "pain", emoji: "😣", label: "In pain" },
+              ].map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    if (m.id === "pain") setLocation("/crisis");
+                    else toast({ title: `Logged: ${m.label}` });
+                  }}
+                  className="flex flex-col items-center gap-1 py-2.5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow"
+                  data-testid={`mood-${m.id}`}
+                >
+                  <span className="text-xl leading-none">{m.emoji}</span>
+                  <span className="text-[11px] font-medium text-foreground">{m.label}</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
           {/* ── Hero medication (on gradient, no card) ───────── */}
           <motion.div variants={itemVariants} className="px-6 pt-2 pb-4 relative">
             {loadingSummary ? (

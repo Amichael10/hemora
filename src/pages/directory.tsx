@@ -472,6 +472,26 @@ export default function Directory() {
           )}
         </div>
 
+        {/* Map preview */}
+        <div className="mb-4 overflow-hidden rounded-2xl border border-border/60 shadow-sm bg-card">
+          <iframe
+            title="Care directory map"
+            aria-label="Map of providers"
+            className="w-full h-44 block"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(
+              [
+                state !== ALL_STATES ? state : "",
+                country !== ALL_COUNTRIES ? country : "",
+                "sickle cell clinic",
+              ]
+                .filter(Boolean)
+                .join(" ")
+            )}&z=11&output=embed`}
+          />
+        </div>
+
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
