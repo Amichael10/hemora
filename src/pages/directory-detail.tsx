@@ -32,7 +32,7 @@ export default function DirectoryDetail() {
     <MobileAppShell>
       <div className="flex flex-col min-h-full">
         <div
-          className="px-5 pt-11 pb-8 relative"
+          className="px-5 pt-11 pb-12 relative"
           style={{ background: "var(--gradient-brand)" }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -70,7 +70,7 @@ export default function DirectoryDetail() {
           )}
         </div>
 
-        <div className="px-5 -mt-4 pb-10 space-y-3">
+        <div className="px-5 pt-4 pb-10 space-y-3">
           {isLoading || !provider ? (
             <Card className="border-none shadow-sm">
               <CardContent className="p-5 space-y-3">
