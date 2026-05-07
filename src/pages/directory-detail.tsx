@@ -32,7 +32,7 @@ export default function DirectoryDetail() {
     <MobileAppShell>
       <div className="flex flex-col min-h-full">
         <div
-          className="px-5 pt-11 pb-12 relative"
+          className="px-5 pt-11 pb-16 relative"
           style={{ background: "var(--gradient-brand)" }}
         >
           <div className="flex items-center justify-between mb-5">
