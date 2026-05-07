@@ -124,6 +124,26 @@ export default function Crisis() {
     }
   };
 
+  const getPainEmoji = (level: string) => {
+    switch (level) {
+      case "mild": return emojiMild;
+      case "moderate": return emojiModerate;
+      case "severe": return emojiSevere;
+      case "worst": return emojiWorst;
+      default: return emojiMild;
+    }
+  };
+
+  const getPainAccent = (level: string) => {
+    switch (level) {
+      case "mild": return "from-green-400/15 to-green-400/0 border-l-green-400";
+      case "moderate": return "from-yellow-400/15 to-yellow-400/0 border-l-yellow-400";
+      case "severe": return "from-orange-400/15 to-orange-400/0 border-l-orange-500";
+      case "worst": return "from-destructive/15 to-destructive/0 border-l-destructive";
+      default: return "from-muted to-transparent border-l-border";
+    }
+  };
+
   return (
     <MobileAppShell hideNav={flowStepHideNav}>
       <div className="min-h-full flex flex-col pb-8">
@@ -393,43 +413,85 @@ export default function Crisis() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {logs?.map((log) => (
-                    <Card key={log.id} className="border-none shadow-sm overflow-hidden" data-testid={`crisis-card-${log.id}`}>
-                      <div className="flex">
-                        <div className={`w-1 ${log.painLevel === 'worst' || log.painLevel === 'severe' ? 'bg-destructive' : log.painLevel === 'moderate' ? 'bg-orange-400' : 'bg-green-400'}`} />
-                        <CardContent className="p-4 flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                              <Clock size={14} />
-                              {new Date(log.occurredAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {logs?.map((log, idx) => (
+                    <motion.div
+                      key={log.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.04, duration: 0.25 }}
+                    >
+                      <Card
+                        className={`border-0 border-l-4 shadow-sm overflow-hidden bg-gradient-to-r ${getPainAccent(log.painLevel)} hover:shadow-md transition-shadow`}
+                        data-testid={`crisis-card-${log.id}`}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="shrink-0 w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm">
+                              <img
+                                src={getPainEmoji(log.painLevel)}
+                                alt={log.painLevel}
+                                className="w-8 h-8 object-contain"
+                              />
                             </div>
-                            <Badge variant="outline" className={`border-none text-[10px] px-2 py-0.5 font-medium ${getPainColor(log.painLevel)}`}>
-                              {log.painLevel}
-                            </Badge>
-                          </div>
-                          <div className="space-y-1.5 mt-3">
-                            {log.painLocations && log.painLocations.length > 0 && (
-                              <div className="flex gap-2">
-                                <span className="font-medium text-foreground w-16 text-xs shrink-0">Location</span>
-                                <span className="text-muted-foreground text-xs">{log.painLocations.join(", ")}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <p className="font-serif font-semibold text-foreground capitalize tracking-tight">
+                                  {log.painLevel} pain
+                                </p>
+                                <Badge
+                                  variant="outline"
+                                  className={`border-none text-[10px] px-2 py-0.5 font-medium ${getPainColor(log.painLevel)}`}
+                                >
+                                  {log.painLevel}
+                                </Badge>
                               </div>
-                            )}
-                            {log.triggers && log.triggers.length > 0 && (
-                              <div className="flex gap-2">
-                                <span className="font-medium text-foreground w-16 text-xs shrink-0">Trigger</span>
-                                <span className="text-muted-foreground text-xs">{log.triggers.join(", ")}</span>
+                              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3">
+                                <Clock size={12} />
+                                {new Date(log.occurredAt).toLocaleDateString(undefined, {
+                                  month: 'short', day: 'numeric', year: 'numeric',
+                                })}
+                                <span>·</span>
+                                {new Date(log.occurredAt).toLocaleTimeString(undefined, {
+                                  hour: 'numeric', minute: '2-digit',
+                                })}
                               </div>
-                            )}
-                            {log.hospitalVisit && (
-                              <div className="flex gap-1.5 items-center text-accent mt-2 font-semibold text-xs">
-                                <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="14" height="14" active />
-                                Hospital visit required
-                              </div>
-                            )}
+
+                              {log.painLocations && log.painLocations.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mb-1.5">
+                                  {log.painLocations.slice(0, 4).map((loc) => (
+                                    <span
+                                      key={loc}
+                                      className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 text-foreground/80 border border-border/40"
+                                    >
+                                      {loc}
+                                    </span>
+                                  ))}
+                                  {log.painLocations.length > 4 && (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 text-muted-foreground border border-border/40">
+                                      +{log.painLocations.length - 4}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {log.triggers && log.triggers.length > 0 && (
+                                <p className="text-[11px] text-muted-foreground">
+                                  <span className="font-medium text-foreground/80">Triggers: </span>
+                                  {log.triggers.join(", ")}
+                                </p>
+                              )}
+
+                              {log.hospitalVisit && (
+                                <div className="flex gap-1.5 items-center text-accent mt-2.5 font-semibold text-xs bg-accent/10 px-2 py-1 rounded-lg w-fit">
+                                  <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="14" height="14" active />
+                                  Hospital visit required
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </CardContent>
-                      </div>
-                    </Card>
+                      </Card>
+                    </motion.div>
                   ))}
                 </div>
               )}
