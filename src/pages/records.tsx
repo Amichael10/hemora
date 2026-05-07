@@ -133,12 +133,13 @@ export default function Records() {
               <HealthIcon outline={MedicalRecordsOutline} filled={MedicalRecordsFilled} width="48" height="48" />
             </div>
             <p className="text-sm mb-4">No records found.</p>
-            <Button variant="soft" onClick={() => setOpen(true)}>Add Record</Button>
+            <Button variant="soft" onClick={() => setLocation("/records/new")}>Add Record</Button>
           </div>
         ) : (
           <div className="space-y-3">
             {filteredRecords?.map((record) => (
-              <Card key={record.id} className="group border-none shadow-sm hover:shadow-md transition-shadow" data-testid={`record-card-${record.id}`}>
+              <Link key={record.id} href={`/records/${record.id}`}>
+              <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`record-card-${record.id}`}>
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
@@ -168,6 +169,7 @@ export default function Records() {
                   )}
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}
