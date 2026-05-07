@@ -205,6 +205,14 @@ export default function Crisis() {
                 className="flex-1 flex flex-col px-6 pt-10 pb-8 z-10"
                 style={{ backgroundColor: bgColor }}
               >
+                <button
+                  type="button"
+                  onClick={() => setStep("history")}
+                  aria-label="Back"
+                  className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
+                >
+                  <ChevronLeft size={18} />
+                </button>
                 <motion.div
                   aria-hidden
                   initial={{ opacity: 0 }}
@@ -259,14 +267,14 @@ export default function Crisis() {
                           <p className="text-sm text-white/80 mt-1.5 italic">"{selected.caption}"</p>
                         </>
                       ) : (
-                        <p className="text-base text-white/70 italic">Tap a dot below</p>
+                        <p className="text-base text-white/70 italic mb-2">Tap a face below to start</p>
                       )}
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
                 {/* Emoji + label picker row */}
-                <div className="grid grid-cols-4 gap-2 mb-6">
+                <div className="grid grid-cols-4 gap-2 mb-10">
                   {PAIN_FACES.map((face) => {
                     const isActive = painLevel === face.level;
                     return (
