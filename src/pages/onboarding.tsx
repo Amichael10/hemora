@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/select";
 import kindredWordmark from "@assets/Wordmark_1778055009011.png";
 import botanical from "@/assets/images/botanical-illustration.png";
-import family from "@/assets/images/african-family-illustration.png";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/context/ProfileContext";
 import { useAuth } from "@/context/AuthContext";
