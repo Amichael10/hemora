@@ -127,6 +127,16 @@ export default function Dashboard() {
     return [...meds].sort((a, b) => (a.reminderTime || "99:99").localeCompare(b.reminderTime || "99:99"));
   }, [meds]);
 
+  const missingProfileFields = useMemo(() => {
+    if (!profile) return [] as string[];
+    const m: string[] = [];
+    if (!profile.dateOfBirth) m.push("date of birth");
+    if (!profile.gender) m.push("gender");
+    if (!profile.scdStatus) m.push("genotype");
+    if (!profile.country) m.push("location");
+    return m;
+  }, [profile]);
+
   const totalToday = sortedMeds.length;
   const doneToday = sortedMeds.filter((m) => takenTodayIds.has(m.id)).length;
   const activeMeds = meds?.length ?? 0;
@@ -270,6 +280,28 @@ export default function Dashboard() {
         >
           {/* drag handle */}
           <div className="mx-auto w-10 h-1 rounded-full bg-border -mt-3" />
+
+          {/* Complete-profile reminder */}
+          {missingProfileFields.length > 0 && (
+            <motion.button
+              variants={itemVariants}
+              onClick={() => setLocation("/onboarding")}
+              className="w-full text-left rounded-2xl border border-primary/20 bg-primary/5 p-4 flex items-center gap-3 hover:bg-primary/10 transition-colors"
+              data-testid="banner-complete-profile"
+            >
+              <div className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                <Plus size={18} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-foreground">Finish your profile</p>
+                <p className="text-[12px] text-muted-foreground truncate">
+                  Add your {missingProfileFields.slice(0, 2).join(" & ")}
+                  {missingProfileFields.length > 2 ? " and more" : ""} for better guidance.
+                </p>
+              </div>
+              <ArrowRight size={14} />
+            </motion.button>
+          )}
 
           {/* Next dose */}
           <motion.section variants={itemVariants}>
