@@ -17,9 +17,8 @@ import { CrisisLogPainLevel } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { ClockCircleLinear as Clock, CheckCircleBold as Check, AddCircleLinear as Plus } from "solar-icon-set";
+import { ClockCircleLinear as Clock, CheckCircleBold as Check, AddCircleLinear as Plus, AltArrowLeftLinear as ChevronLeft } from "solar-icon-set";
 import Lottie from "lottie-react";
-import botanicalImage from "@/assets/images/botanical-illustration.png";
 import emojiMild from "@/assets/images/emoji-mild.png";
 import emojiModerate from "@/assets/images/emoji-moderate.png";
 import emojiSevere from "@/assets/images/emoji-severe.png";
@@ -28,6 +27,7 @@ import lottieMild from "@/assets/lottie/1f60a.json";
 import lottieModerate from "@/assets/lottie/1f614.json";
 import lottieSevere from "@/assets/lottie/1f613.json";
 import lottieWorst from "@/assets/lottie/1f621.json";
+import { useToast } from "@/hooks/use-toast";
 import {
   HeartPulseBold as HeartCardiogramFilled,
   DangerTriangleBold as AccidentFilled,
@@ -75,8 +75,9 @@ function StepDots({
 export default function Crisis() {
   const { profileId } = useProfile();
   const [, setLocation] = useLocation();
-  const [step, setStep] = useState<Step>("entry");
+  const [step, setStep] = useState<Step>("history");
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: logs, isLoading: isLoadingLogs } = useListCrisisLogs(
     { profileId },
@@ -110,7 +111,16 @@ export default function Crisis() {
       : locations;
     createLog.mutate(
       { data: { profileId, occurredAt: new Date().toISOString(), painLevel, painLocations: finalLocations, triggers, whatHelped, hospitalVisit: hospitalVisit || false } },
-      { onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) }); setStep("success"); } }
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) });
+          toast({ title: "Log saved", description: "Thanks for tracking — it helps you see patterns." });
+          // reset + go back to history
+          setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText("");
+          setStep("history");
+        },
+        onError: (e: any) => toast({ title: "Couldn't save log", description: e?.message ?? "Please try again", variant: "destructive" }),
+      }
     );
   };
 
