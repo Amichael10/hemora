@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,6 +61,7 @@ function AdherenceHeart({ percent }: { percent: number }) {
 
 export default function Meds() {
   const { profileId } = useProfile();
+  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -94,39 +96,9 @@ export default function Meds() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="h-page">Medications</h1>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="soft" data-testid="btn-add-med">
-                <Plus size={16} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
-              <SheetHeader>
-                <SheetTitle className="h-section text-primary">Add Medication</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={handleAddMed} className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Name</Label>
-                  <Input value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Hydroxyurea" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Dose</Label>
-                  <Input value={dose} onChange={e => setDose(e.target.value)} placeholder="e.g. 500mg" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Frequency</Label>
-                  <Input value={frequency} onChange={e => setFrequency(e.target.value)} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Reminder Time</Label>
-                  <Input type="time" value={reminderTime} onChange={e => setReminderTime(e.target.value)} />
-                </div>
-                <Button type="submit" size="xl" className="w-full mt-4" disabled={createMed.isPending}>
-                  {createMed.isPending ? "Adding..." : "Save Medication"}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+          <Button size="icon" variant="soft" data-testid="btn-add-med" onClick={() => setLocation("/meds/new")}>
+            <Plus size={16} />
+          </Button>
         </div>
 
         <Card className="border-none shadow-sm bg-card mb-6 overflow-hidden">
@@ -157,12 +129,13 @@ export default function Meds() {
               <HealthIcon outline={MedicinesOutline} filled={MedicinesFilled} width="48" height="48" />
             </div>
             <p className="text-sm mb-4">No medications added yet.</p>
-            <Button variant="soft" onClick={() => setOpen(true)}>Add Medication</Button>
+            <Button variant="soft" onClick={() => setLocation("/meds/new")}>Add Medication</Button>
           </div>
         ) : (
           <div className="space-y-3">
             {meds?.map((med) => (
-              <Card key={med.id} className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`med-card-${med.id}`}>
+              <Link key={med.id} href={`/meds/${med.id}`}>
+              <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`med-card-${med.id}`}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
@@ -193,6 +166,7 @@ export default function Meds() {
                   <ChevronRight size={16} color="rgba(115,115,115,0.5)" />
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}

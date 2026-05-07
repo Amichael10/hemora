@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,7 @@ import {
 
 export default function Records() {
   const { profileId } = useProfile();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("all");
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -88,39 +90,9 @@ export default function Records() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="h-page">Care Records</h1>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="soft" data-testid="btn-add-record">
-                <Plus size={16} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
-              <SheetHeader>
-                <SheetTitle className="h-section text-primary">Add Record</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={handleAddRecord} className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input value={title} onChange={e => setTitle(e.target.value)} required placeholder="e.g. Blood Work" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Hospital / Clinic</Label>
-                  <Input value={hospital} onChange={e => setHospital(e.target.value)} placeholder="e.g. General Hospital" />
-                </div>
-                <div className="space-y-2 flex flex-col">
-                  <Label>Type</Label>
-                  <div className="flex gap-2">
-                    {["visit", "lab", "doc"].map(t => (
-                      <Button key={t} type="button" variant={type === t ? "default" : "outline"} onClick={() => setType(t as CreateCareRecordBodyType)} className="flex-1 capitalize">{t}</Button>
-                    ))}
-                  </div>
-                </div>
-                <Button type="submit" size="xl" className="w-full mt-4" disabled={createRecord.isPending}>
-                  {createRecord.isPending ? "Adding..." : "Save Record"}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+          <Button size="icon" variant="soft" data-testid="btn-add-record" onClick={() => setLocation("/records/new")}>
+            <Plus size={16} />
+          </Button>
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
@@ -161,12 +133,13 @@ export default function Records() {
               <HealthIcon outline={MedicalRecordsOutline} filled={MedicalRecordsFilled} width="48" height="48" />
             </div>
             <p className="text-sm mb-4">No records found.</p>
-            <Button variant="soft" onClick={() => setOpen(true)}>Add Record</Button>
+            <Button variant="soft" onClick={() => setLocation("/records/new")}>Add Record</Button>
           </div>
         ) : (
           <div className="space-y-3">
             {filteredRecords?.map((record) => (
-              <Card key={record.id} className="group border-none shadow-sm hover:shadow-md transition-shadow" data-testid={`record-card-${record.id}`}>
+              <Link key={record.id} href={`/records/${record.id}`}>
+              <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`record-card-${record.id}`}>
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
@@ -196,6 +169,7 @@ export default function Records() {
                   )}
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}

@@ -165,7 +165,7 @@ export default function Dashboard() {
               </div>
             </Link>
             <button
-              onClick={() => setLocation("/profile")}
+              onClick={() => setLocation("/settings")}
               aria-label="Settings"
               className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/10 hover:bg-white/15 transition-colors"
             >
