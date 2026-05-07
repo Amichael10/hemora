@@ -26,7 +26,7 @@ export default function AuthCallback() {
       try {
         const profile = await getProfileByUser(user.id);
         if (cancelled) return;
-        setProfileId(profile.id);
+        setProfileId(String(profile.id));
         setLocation("/dashboard");
       } catch (err) {
         if (cancelled) return;
