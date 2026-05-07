@@ -136,11 +136,11 @@ export default function Crisis() {
 
   const getPainAccent = (level: string) => {
     switch (level) {
-      case "mild": return "from-green-400/15 to-green-400/0 border-l-green-400";
-      case "moderate": return "from-yellow-400/15 to-yellow-400/0 border-l-yellow-400";
-      case "severe": return "from-orange-400/15 to-orange-400/0 border-l-orange-500";
-      case "worst": return "from-destructive/15 to-destructive/0 border-l-destructive";
-      default: return "from-muted to-transparent border-l-border";
+      case "mild": return "border-l-green-500";
+      case "moderate": return "border-l-yellow-500";
+      case "severe": return "border-l-orange-500";
+      case "worst": return "border-l-destructive";
+      default: return "border-l-border";
     }
   };
 
@@ -421,12 +421,12 @@ export default function Crisis() {
                       transition={{ delay: idx * 0.04, duration: 0.25 }}
                     >
                       <Card
-                        className={`border-0 border-l-4 shadow-sm overflow-hidden bg-gradient-to-r ${getPainAccent(log.painLevel)} hover:shadow-md transition-shadow`}
+                        className={`bg-card border border-border border-l-4 ${getPainAccent(log.painLevel)} rounded-none shadow-none hover:bg-muted/30 transition-colors`}
                         data-testid={`crisis-card-${log.id}`}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
-                            <div className="shrink-0 w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm">
+                            <div className="shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center">
                               <img
                                 src={getPainEmoji(log.painLevel)}
                                 alt={log.painLevel}
@@ -461,13 +461,13 @@ export default function Crisis() {
                                   {log.painLocations.slice(0, 4).map((loc: string) => (
                                     <span
                                       key={loc}
-                                      className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 text-foreground/80 border border-border/40"
+                                      className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-foreground/80"
                                     >
                                       {loc}
                                     </span>
                                   ))}
                                   {log.painLocations.length > 4 && (
-                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 text-muted-foreground border border-border/40">
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                                       +{log.painLocations.length - 4}
                                     </span>
                                   )}
