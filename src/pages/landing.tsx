@@ -11,13 +11,12 @@ import {
   ShieldCheckBold as Shield,
   BellBold as Bell,
   ChartSquareBold as Chart,
-  AppleBold as Apple,
-  PlayBold as Play,
   ArrowRightLinear as ArrowRight,
   CheckCircleBold as Check,
   StarBold as Star,
   PhoneBold as Phone,
 } from "solar-icon-set";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
@@ -392,10 +391,10 @@ function Download() {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button size="lg" variant="glass" onClick={() => setLocation("/signup")}>
-                <Apple size={18} /> App Store
+                <FaApple size={18} /> App Store
               </Button>
               <Button size="lg" variant="glass" onClick={() => setLocation("/signup")}>
-                <Play size={18} /> Google Play
+                <FaGooglePlay size={16} /> Google Play
               </Button>
               <Button size="lg" className="bg-accent text-secondary hover:bg-accent/90" onClick={() => setLocation("/signup")}>
                 Install web app <ArrowRight size={16} />
