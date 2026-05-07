@@ -261,21 +261,21 @@ function Hero() {
         }}
       />
       <div className="px-6 sm:px-10 pt-20 pb-16 lg:pt-28 lg:pb-20 text-center">
-        <motion.div {...fadeUp} className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
+        <div className="max-w-4xl mx-auto">
+          <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             For families touched by sickle cell
           </div>
-          <h1 className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
-            Care that stays with you,{" "}
-            <span className="italic text-primary">between appointments.</span>
+          <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
+            <span className="inline-block">Care that stays with you,</span>{" "}
+            <span className="inline-block italic text-primary">between appointments.</span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Kindred helps you log crises, stay on top of meds, keep records in one place,
             and find sickle-cell-aware care — on your phone, anywhere.
           </p>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center gap-3">
             <Button size="lg" onClick={() => setLocation("/signup")}>
               Open the app <ArrowRight size={16} />
             </Button>
@@ -284,16 +284,16 @@ function Hero() {
             </Button>
           </div>
 
-          <div className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
+          <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
             <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
             <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="mt-14 lg:mt-20 px-6 sm:px-10">
+        <div data-anim="hero-mockup" className="mt-14 lg:mt-20 px-6 sm:px-10">
           <DesktopMockup />
-        </motion.div>
+        </div>
       </div>
     </Section>
   );
