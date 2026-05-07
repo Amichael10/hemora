@@ -510,7 +510,8 @@ export default function Directory() {
                   data-testid={`provider-card-${provider.id}`}
                 >
                   <CardContent className="p-5">
-                    <div className="flex items-start gap-4 mb-4">
+                    <Link href={`/directory/${provider.id}`}>
+                    <a className="flex items-start gap-4 mb-4 cursor-pointer" data-testid={`provider-link-${provider.id}`}>
                       <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <span
                           className="relative inline-flex shrink-0"
@@ -597,7 +598,8 @@ export default function Directory() {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </a>
+                    </Link>
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
