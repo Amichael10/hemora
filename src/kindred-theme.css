@@ -74,40 +74,42 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 36 33% 97%;        /* warm cream #FBF8F4 */
-  --foreground: 320 18% 12%;       /* deep plum-ink */
-  --primary: 322 37% 26%;          /* deep plum #5B2A4A */
-  --primary-foreground: 36 33% 97%;
-  --secondary: 30 25% 93%;         /* warm sand */
-  --secondary-foreground: 320 18% 12%;
-  --muted: 30 22% 94%;             /* soft cream */
-  --muted-foreground: 320 10% 38%;
-  --accent: 19 53% 55%;            /* terracotta #C9784E */
-  --accent-foreground: 36 33% 97%;
-  --destructive: 6 64% 44%;
-  --destructive-foreground: 36 33% 97%;
+  /* Reference-inspired: vibrant brand color used sparingly on a clean
+     near-white canvas. Brand = teal (Kindred). Surfaces stay light/neutral. */
+  --background: 210 20% 98%;       /* near-white app canvas */
+  --foreground: 200 25% 12%;       /* deep ink */
+  --primary: 184 72% 38%;          /* Kindred teal */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 200 25% 96%;        /* very light neutral */
+  --secondary-foreground: 200 25% 12%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 200 10% 42%;
+  --accent: 184 72% 38%;           /* same teal — used sparingly */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 6 70% 50%;
+  --destructive-foreground: 0 0% 100%;
   --card: 0 0% 100%;
-  --card-foreground: 320 18% 12%;
-  --card-border: 30 18% 88%;
-  --border: 30 18% 88%;
-  --input: 30 18% 86%;
-  --ring: 322 37% 26%;
+  --card-foreground: 200 25% 12%;
+  --card-border: 210 18% 92%;
+  --border: 210 18% 92%;
+  --input: 210 18% 90%;
+  --ring: 184 72% 38%;
   --popover: 0 0% 100%;
-  --popover-foreground: 320 18% 12%;
-  --popover-border: 30 18% 88%;
-  --sidebar: 322 37% 16%;
-  --sidebar-foreground: 36 33% 97%;
-  --sidebar-border: 322 25% 22%;
-  --sidebar-primary: 19 53% 55%;
-  --sidebar-primary-foreground: 36 33% 97%;
-  --sidebar-accent: 322 30% 22%;
-  --sidebar-accent-foreground: 36 33% 97%;
-  --sidebar-ring: 19 53% 65%;
-  --chart-1: 322 37% 26%;
-  --chart-2: 19 53% 55%;
-  --chart-3: 30 25% 75%;
-  --chart-4: 322 22% 55%;
-  --chart-5: 36 20% 80%;
+  --popover-foreground: 200 25% 12%;
+  --popover-border: 210 18% 92%;
+  --sidebar: 184 72% 38%;          /* teal sidebar like the reference brand surface */
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 184 60% 32%;
+  --sidebar-primary: 0 0% 100%;
+  --sidebar-primary-foreground: 184 72% 38%;
+  --sidebar-accent: 184 65% 32%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 184 72% 60%;
+  --chart-1: 184 72% 38%;
+  --chart-2: 184 60% 60%;
+  --chart-3: 210 20% 85%;
+  --chart-4: 200 25% 35%;
+  --chart-5: 184 30% 80%;
 
   --app-font-sans: 'Inter', 'Red Hat Display', system-ui, sans-serif;
   --app-font-serif: 'Fraunces', 'Red Hat Display', Georgia, serif;
@@ -124,22 +126,22 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Brand surface tokens (Kindred — Plum / Cream / Terracotta) */
-  --brand-plum: 322 37% 26%;          /* #5B2A4A */
-  --brand-plum-deep: 322 40% 18%;     /* deeper plum */
-  --brand-terracotta: 19 53% 55%;     /* #C9784E */
-  --brand-surface: 30 25% 93%;        /* warm sand */
-  --brand-cream: 36 33% 97%;          /* #FBF8F4 */
+  /* Brand surface tokens (Kindred — Teal) */
+  --brand-teal: 184 72% 38%;
+  --brand-teal-deep: 184 78% 28%;
+  --brand-teal-soft: 184 60% 92%;
+  --brand-surface: 210 20% 96%;
+  --brand-cream: 0 0% 100%;
 
   --gradient-brand: linear-gradient(180deg,
-    hsl(var(--brand-plum-deep)) 0%,
-    hsl(var(--brand-plum)) 28%,
-    hsl(322 25% 50%) 55%,
-    hsl(30 25% 85%) 78%,
+    hsl(var(--brand-teal-deep)) 0%,
+    hsl(var(--brand-teal)) 35%,
+    hsl(184 55% 70%) 65%,
+    hsl(var(--brand-teal-soft)) 85%,
     hsl(var(--background)) 100%);
-  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-surface)) 0%, hsl(0 0% 100%) 100%);
+  --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-teal-soft)) 0%, hsl(0 0% 100%) 100%);
 
-  --shadow-brand: 0 10px 30px -10px hsl(var(--brand-plum) / 0.35);
+  --shadow-brand: 0 10px 30px -10px hsl(var(--brand-teal) / 0.35);
   --shadow-card-soft: 0 1px 4px hsl(0 0% 0% / 0.04), 0 2px 8px hsl(0 0% 0% / 0.03);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
@@ -183,40 +185,40 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 322 20% 7%;
-  --foreground: 36 25% 94%;
-  --primary: 19 60% 60%;            /* terracotta lifts in dark mode */
-  --primary-foreground: 322 20% 7%;
-  --secondary: 322 18% 14%;
-  --secondary-foreground: 36 25% 94%;
-  --muted: 322 14% 14%;
-  --muted-foreground: 36 15% 70%;
-  --accent: 19 60% 60%;
-  --accent-foreground: 322 20% 7%;
-  --destructive: 6 64% 52%;
-  --destructive-foreground: 36 25% 94%;
-  --card: 322 18% 11%;
-  --card-foreground: 36 25% 94%;
-  --card-border: 322 14% 20%;
-  --border: 322 14% 20%;
-  --input: 322 14% 22%;
-  --ring: 19 60% 60%;
-  --popover: 322 18% 11%;
-  --popover-foreground: 36 25% 94%;
-  --popover-border: 322 14% 20%;
-  --sidebar: 322 25% 9%;
-  --sidebar-foreground: 36 25% 94%;
-  --sidebar-border: 322 18% 18%;
-  --sidebar-primary: 19 60% 60%;
-  --sidebar-primary-foreground: 322 20% 7%;
-  --sidebar-accent: 322 18% 18%;
-  --sidebar-accent-foreground: 36 25% 94%;
-  --sidebar-ring: 19 60% 60%;
-  --chart-1: 19 60% 60%;
-  --chart-2: 322 37% 50%;
-  --chart-3: 30 25% 70%;
-  --chart-4: 322 22% 55%;
-  --chart-5: 36 20% 65%;
+  --background: 200 30% 7%;
+  --foreground: 210 20% 95%;
+  --primary: 184 65% 55%;
+  --primary-foreground: 200 30% 7%;
+  --secondary: 200 20% 14%;
+  --secondary-foreground: 210 20% 95%;
+  --muted: 200 18% 14%;
+  --muted-foreground: 210 15% 70%;
+  --accent: 184 65% 55%;
+  --accent-foreground: 200 30% 7%;
+  --destructive: 6 70% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --card: 200 22% 11%;
+  --card-foreground: 210 20% 95%;
+  --card-border: 200 15% 20%;
+  --border: 200 15% 20%;
+  --input: 200 15% 22%;
+  --ring: 184 65% 55%;
+  --popover: 200 22% 11%;
+  --popover-foreground: 210 20% 95%;
+  --popover-border: 200 15% 20%;
+  --sidebar: 184 72% 30%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 184 60% 24%;
+  --sidebar-primary: 0 0% 100%;
+  --sidebar-primary-foreground: 184 72% 30%;
+  --sidebar-accent: 184 60% 22%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 184 65% 55%;
+  --chart-1: 184 65% 55%;
+  --chart-2: 184 50% 70%;
+  --chart-3: 210 15% 60%;
+  --chart-4: 200 25% 40%;
+  --chart-5: 184 30% 50%;
 
   --shadow-2xs: rgba(0,0,0,0.04) 0px 1px 4px;
   --shadow-xs:  rgba(16,24,40,0.05) 0px 1px 4px;
