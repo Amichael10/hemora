@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
-import { MailLinear as Mail } from "solar-icon-set";
+import { LetterBold as Mail } from "solar-icon-set";
 
 export default function Login() {
   const [, setLocation] = useLocation();
