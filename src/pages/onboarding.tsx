@@ -541,6 +541,7 @@ export default function Onboarding() {
                     return (
                       <button
                         key={g}
+                        type="button"
                         onClick={() => { update("gender", g); setTimeout(next, 220); }}
                         className="rounded-2xl p-4 text-sm font-semibold transition-all border text-center"
                         style={{
@@ -555,15 +556,6 @@ export default function Onboarding() {
                     );
                   })}
                 </div>
-
-                <Button
-                  variant="ghost"
-                  onClick={next}
-                  className="w-full h-12 rounded-2xl text-sm font-medium text-muted-foreground mt-6"
-                  data-testid="btn-skip-gender"
-                >
-                  Skip for now
-                </Button>
               </motion.div>
             )}
 
@@ -594,6 +586,7 @@ export default function Onboarding() {
                     return (
                       <button
                         key={g}
+                        type="button"
                         onClick={() => update("scdStatus", g)}
                         className="px-4 py-2.5 rounded-full text-sm font-semibold transition-all border"
                         style={{
@@ -733,24 +726,15 @@ export default function Onboarding() {
                   transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
                   className="flex flex-col items-center"
                 >
-                  <div className="relative mb-8">
-                    <motion.img
-                      src={botanical}
-                      alt=""
-                      className="w-40 h-40 opacity-90"
-                      animate={{ rotate: [0, 2, -2, 0] }}
-                      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.6, duration: 0.5, type: "spring" }}
-                      className="absolute -top-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-                      style={{ background: "linear-gradient(140deg, #39839F 0%, #256680 100%)" }}
-                    >
-                      <Sparkles size={18} className="text-white" />
-                    </motion.div>
-                  </div>
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+                    className="mb-8 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ background: "linear-gradient(140deg, #39839F 0%, #256680 100%)" }}
+                  >
+                    <Sparkles size={22} className="text-white" />
+                  </motion.div>
 
                   <p className="text-xs uppercase tracking-[3px] text-primary/50 font-semibold mb-3">All set</p>
                   <h2 className="font-serif text-[2rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px] max-w-[320px]">
@@ -761,14 +745,7 @@ export default function Onboarding() {
                   </p>
                 </motion.div>
 
-                <motion.img
-                  src={family}
-                  alt=""
-                  className="w-[240px] max-w-full mt-8 mb-auto"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                />
+                <div className="mb-auto" />
 
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
