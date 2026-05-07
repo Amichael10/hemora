@@ -426,12 +426,54 @@ export default function Crisis() {
                   ))}
                 </div>
               ) : logs?.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <div className="text-primary/20 flex justify-center mb-4">
-                    <HealthIcon outline={HeartbeatOutline} filled={HeartbeatFilled} width="48" height="48" />
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="mt-2"
+                >
+                  <div className="surface-soft p-6 text-center">
+                    <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                         style={{ background: "var(--gradient-warm)" }}>
+                      <HealthIcon
+                        outline={HeartbeatOutline}
+                        filled={HeartbeatFilled}
+                        width="32"
+                        height="32"
+                        active
+                      />
+                    </div>
+                    <h3 className="font-serif text-lg font-semibold text-foreground mb-1.5 tracking-tight">
+                      No crises logged — that's a good thing.
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-5 max-w-[280px] mx-auto">
+                      When pain shows up, log it here. Over time you'll see patterns — triggers, what helped, when to call your team.
+                    </p>
+
+                    <div className="grid grid-cols-3 gap-2 mb-5 text-left">
+                      {[
+                        { n: "1", t: "Tap Start log" },
+                        { n: "2", t: "Rate the pain" },
+                        { n: "3", t: "Note what helped" },
+                      ].map((s) => (
+                        <div key={s.n} className="rounded-xl bg-card/70 border border-border/40 p-2.5">
+                          <div className="text-[10px] font-bold text-accent mb-0.5">STEP {s.n}</div>
+                          <div className="text-[11px] font-medium text-foreground leading-tight">{s.t}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button size="lg" className="w-full" onClick={() => setStep("entry")} data-testid="btn-empty-start-log">
+                      <Plus size={16} /> Log your first crisis
+                    </Button>
+                    <button
+                      onClick={() => setLocation("/emergency")}
+                      className="mt-3 text-xs font-semibold text-accent hover:underline"
+                    >
+                      In a crisis right now? Get urgent care →
+                    </button>
                   </div>
-                  <p className="text-sm">No crisis logs recorded yet.</p>
-                </div>
+                </motion.div>
               ) : (
                 <div className="space-y-3">
                   {logs?.map((log, idx) => (
