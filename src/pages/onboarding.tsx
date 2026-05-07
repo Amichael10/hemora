@@ -41,6 +41,7 @@ interface FormData {
   fullName: string;
   dateOfBirth: string;
   gender: string;
+  scdStatus: string;
   country: string;
   state: string;
 }
@@ -52,8 +53,10 @@ const SETUP_OPTIONS: { id: SetupFor; label: string; sub: string; Icon: typeof Us
   { id: CreateProfileBodySetupFor.partner_and_i, label: "My partner and I", sub: "We're navigating this together", Icon: UsersRound },
 ];
 
-const TOTAL_STEPS = 6;
-const PROGRESS_STEPS = [1, 2, 3, 4, 5];
+const GENOTYPES = ["HbSS", "HbSC", "HbS\u03B2", "AS (Trait)", "Not sure", "Prefer not to say"];
+
+const TOTAL_STEPS = 7;
+const PROGRESS_STEPS = [1, 2, 3, 4, 5, 6];
 
 export default function Onboarding() {
   const [, setLocation] = useLocation();
@@ -88,6 +91,7 @@ export default function Onboarding() {
     fullName: "",
     dateOfBirth: "",
     gender: "",
+    scdStatus: "",
     country: "",
     state: "",
   });
@@ -103,7 +107,7 @@ export default function Onboarding() {
           ...data,
           dateOfBirth: data.dateOfBirth || null,
           gender: data.gender || null,
-          scdStatus: null,
+          scdStatus: data.scdStatus || null,
           country: data.country || null,
           state: data.state || null,
           supabaseUserId: user?.id ?? null,
@@ -175,7 +179,8 @@ export default function Onboarding() {
     if (step === 2) return data.fullName.trim().length >= 2;
     if (step === 3) return true; // dob optional
     if (step === 4) return true; // gender optional
-    if (step === 5) return true; // country/state optional
+    if (step === 5) return true; // scd optional
+    if (step === 6) return true; // country/state optional
     return true;
   })();
 
@@ -562,8 +567,62 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── STEP 5: Where are you based? ───────────────── */}
+            {/* ── STEP 5: SCD genotype ───────────────────────── */}
             {step === 5 && (
+              <motion.div
+                key="scd"
+                custom={direction}
+                variants={slide}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="flex-1 flex flex-col px-6 pt-2 pb-6"
+              >
+                <div className="mb-8">
+                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Five</p>
+                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
+                    Sickle cell genotype
+                  </h2>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    If you know it, share it — it helps us personalize care guidance. If not, that's okay.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {GENOTYPES.map((g) => {
+                    const selected = data.scdStatus === g;
+                    return (
+                      <button
+                        key={g}
+                        onClick={() => update("scdStatus", g)}
+                        className="px-4 py-2.5 rounded-full text-sm font-semibold transition-all border"
+                        style={{
+                          background: selected ? "var(--primary)" : "var(--background)",
+                          borderColor: selected ? "var(--primary)" : "var(--border)",
+                          color: selected ? "var(--primary-foreground)" : "var(--foreground)",
+                        }}
+                        data-testid={`option-scd-${g.toLowerCase().replace(/\s+/g, "-").replace(/[()]/g, "")}`}
+                      >
+                        {g}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="flex-1" />
+
+                <Button
+                  onClick={next}
+                  className="w-full h-14 rounded-2xl text-base font-semibold shadow-sm gap-2"
+                  data-testid="btn-step-scd-continue"
+                >
+                  Continue <ArrowRight size={16} />
+                </Button>
+              </motion.div>
+            )}
+
+            {/* ── STEP 6: Where are you based? ───────────────── */}
+            {step === 6 && (
               <motion.div
                 key="location"
                 custom={direction}
@@ -574,7 +633,7 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Five</p>
+                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Six</p>
                   <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
                     Where are you based?
                   </h2>
@@ -659,8 +718,8 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── STEP 6: Welcome reveal ─────────────────────── */}
-            {step === 6 && (
+            {/* ── STEP 7: Welcome reveal ─────────────────────── */}
+            {step === 7 && (
               <motion.div
                 key="welcome"
                 initial={{ opacity: 0 }}

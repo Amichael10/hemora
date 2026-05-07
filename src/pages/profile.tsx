@@ -92,10 +92,15 @@ export default function Profile() {
             <Row label="State" value={profile?.state} />
           </div>
 
-          <p className="text-[11px] text-muted-foreground/70 leading-relaxed px-2">
-            Kindred keeps your profile minimal on purpose. Medical details stay
-            in your records and crisis logs — never collected by default.
-          </p>
+          <div className="bg-card rounded-2xl shadow-sm border border-border/60 overflow-hidden">
+            <p className="eyebrow px-4 pt-4 pb-2">Medical</p>
+            <Row label="Blood type" value={profile?.bloodType} />
+            <Row label="Genotype" value={profile?.genotype} />
+            <Row label="Height" value={profile?.heightCm ? `${profile.heightCm} cm` : null} />
+            <Row label="Weight" value={profile?.weightKg ? `${profile.weightKg} kg` : null} />
+            <Row label="Allergies" value={profile?.allergies} />
+            <Row label="Conditions" value={profile?.conditions} />
+          </div>
 
           <Button
             variant="crisis"
