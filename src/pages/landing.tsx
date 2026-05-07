@@ -496,19 +496,18 @@ function Stories() {
   return (
     <Section id="stories">
       <div className="px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div {...fadeUp} className="max-w-2xl">
+        <div data-reveal className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Stories</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
             Built with families,<br />
             <span className="italic text-muted-foreground">for families.</span>
           </h2>
-        </motion.div>
-        <div className="mt-12 grid md:grid-cols-3 border-y md:border border-border bg-card">
+        </div>
+        <div data-stagger className="mt-12 grid md:grid-cols-3 border-y md:border border-border bg-card">
           {quotes.map((t, i) => (
-            <motion.figure
+            <figure
               key={i}
-              {...fadeUp}
-              transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+              data-stagger-item
               className="p-7 flex flex-col border-b md:border-b-0 md:border-r last:border-r-0 border-border"
             >
               <div className="flex gap-0.5 text-accent">
@@ -521,7 +520,7 @@ function Stories() {
                 <div className="font-semibold text-secondary">{t.name}</div>
                 <div className="text-xs text-muted-foreground">{t.role}</div>
               </figcaption>
-            </motion.figure>
+            </figure>
           ))}
         </div>
       </div>
@@ -534,8 +533,8 @@ function Download() {
   return (
     <Section id="download" dotted={false}>
       <div className="px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div
-          {...fadeUp}
+        <div
+          data-reveal
           className="relative overflow-hidden p-10 sm:p-16 text-center border border-border"
           style={{ background: "var(--gradient-brand)" }}
         >
@@ -566,7 +565,7 @@ function Download() {
               </Button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </Section>
   );
