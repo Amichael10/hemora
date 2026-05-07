@@ -6,6 +6,7 @@ import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
 
 import Splash from "@/pages/splash";
+import Landing from "@/pages/landing";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import Crisis from "@/pages/crisis";
@@ -30,7 +31,8 @@ import { About, Help, Privacy, Terms } from "@/pages/info";
 function Routes() {
   return (
     <Switch>
-      <Route path="/" component={Splash} />
+      <Route path="/" component={Landing} />
+      <Route path="/welcome" component={Splash} />
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
