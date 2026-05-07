@@ -17,9 +17,8 @@ import { CrisisLogPainLevel } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { ClockCircleLinear as Clock, CheckCircleBold as Check, AddCircleLinear as Plus } from "solar-icon-set";
+import { ClockCircleLinear as Clock, CheckCircleBold as Check, AddCircleLinear as Plus, AltArrowLeftLinear as ChevronLeft } from "solar-icon-set";
 import Lottie from "lottie-react";
-import botanicalImage from "@/assets/images/botanical-illustration.png";
 import emojiMild from "@/assets/images/emoji-mild.png";
 import emojiModerate from "@/assets/images/emoji-moderate.png";
 import emojiSevere from "@/assets/images/emoji-severe.png";
@@ -28,6 +27,7 @@ import lottieMild from "@/assets/lottie/1f60a.json";
 import lottieModerate from "@/assets/lottie/1f614.json";
 import lottieSevere from "@/assets/lottie/1f613.json";
 import lottieWorst from "@/assets/lottie/1f621.json";
+import { useToast } from "@/hooks/use-toast";
 import {
   HeartPulseBold as HeartCardiogramFilled,
   DangerTriangleBold as AccidentFilled,
@@ -75,8 +75,9 @@ function StepDots({
 export default function Crisis() {
   const { profileId } = useProfile();
   const [, setLocation] = useLocation();
-  const [step, setStep] = useState<Step>("entry");
+  const [step, setStep] = useState<Step>("history");
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: logs, isLoading: isLoadingLogs } = useListCrisisLogs(
     { profileId },
@@ -110,7 +111,16 @@ export default function Crisis() {
       : locations;
     createLog.mutate(
       { data: { profileId, occurredAt: new Date().toISOString(), painLevel, painLocations: finalLocations, triggers, whatHelped, hospitalVisit: hospitalVisit || false } },
-      { onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) }); setStep("success"); } }
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) });
+          toast({ title: "Log saved", description: "Thanks for tracking — it helps you see patterns." });
+          // reset + go back to history
+          setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText("");
+          setStep("history");
+        },
+        onError: (e: any) => toast({ title: "Couldn't save log", description: e?.message ?? "Please try again", variant: "destructive" }),
+      }
     );
   };
 
@@ -150,7 +160,14 @@ export default function Crisis() {
         <AnimatePresence mode="wait">
 
           {step === "entry" && (
-            <motion.div key="entry" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col flex-1 p-6 items-center justify-center text-center min-h-[70vh]">
+            <motion.div key="entry" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col flex-1 p-6 items-center justify-center text-center min-h-[70vh] relative">
+              <button
+                onClick={() => setStep("history")}
+                aria-label="Back"
+                className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-foreground bg-secondary hover:bg-secondary/80 transition-colors"
+              >
+                <ChevronLeft size={18} />
+              </button>
               <div className="w-20 h-20 bg-accent/10 text-accent rounded-2xl flex items-center justify-center mb-8 shadow-sm">
                 <HealthIcon outline={HeartCardiogramOutline} filled={HeartCardiogramFilled} width="40" height="40" />
               </div>
@@ -161,7 +178,6 @@ export default function Crisis() {
               <div className="w-full space-y-3">
                 <Button size="xl" className="w-full" onClick={() => setStep("pain")} data-testid="btn-start-log">Start log</Button>
                 <Button size="xl" variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/5" onClick={() => setLocation("/emergency")} data-testid="btn-urgent-care">Need urgent care?</Button>
-                <Button variant="ghost" className="mt-2 text-muted-foreground" onClick={() => setStep("history")}>View History</Button>
               </div>
             </motion.div>
           )}
@@ -189,6 +205,14 @@ export default function Crisis() {
                 className="flex-1 flex flex-col px-6 pt-10 pb-8 z-10"
                 style={{ backgroundColor: bgColor }}
               >
+                <button
+                  type="button"
+                  onClick={() => setStep("history")}
+                  aria-label="Back"
+                  className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
+                >
+                  <ChevronLeft size={18} />
+                </button>
                 <motion.div
                   aria-hidden
                   initial={{ opacity: 0 }}
@@ -243,14 +267,14 @@ export default function Crisis() {
                           <p className="text-sm text-white/80 mt-1.5 italic">"{selected.caption}"</p>
                         </>
                       ) : (
-                        <p className="text-base text-white/70 italic">Tap a dot below</p>
+                        <p className="text-base text-white/70 italic mb-2">Tap a face below to start</p>
                       )}
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
                 {/* Emoji + label picker row */}
-                <div className="grid grid-cols-4 gap-2 mb-6">
+                <div className="grid grid-cols-4 gap-2 mb-10">
                   {PAIN_FACES.map((face) => {
                     const isActive = painLevel === face.level;
                     return (
@@ -373,23 +397,20 @@ export default function Crisis() {
             </motion.div>
           )}
 
-          {step === "success" && (
-            <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col flex-1 p-6 items-center justify-center text-center bg-primary/[0.03] min-h-[70vh]">
-              <img src={botanicalImage} alt="Botanical" className="w-48 h-48 mb-8 object-contain opacity-70" />
-              <h2 className="h-display text-primary mb-3">Log saved.</h2>
-              <p className="body-md mb-10 px-4">
-                Thank you for recording this. Keeping track helps you understand patterns and get better care.
-              </p>
-              <Button size="xl" className="w-full" onClick={() => setStep("history")}>View History</Button>
-            </motion.div>
-          )}
+          {/* success step removed — toast shown instead */}
 
           {step === "history" && (
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-5">
                 <h1 className="h-page">Crisis History</h1>
-                <Button size="icon" variant="soft" onClick={() => setStep("entry")}>
-                  <Plus size={16} />
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
+                  <Plus size={16} /> Start log
+                </Button>
+                <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
+                  onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
+                  Urgent care
                 </Button>
               </div>
 

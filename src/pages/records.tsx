@@ -96,11 +96,11 @@ export default function Records() {
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid grid-cols-4 w-full bg-muted/40 rounded-xl p-1 h-11 shadow-sm">
-            <TabsTrigger value="all" className="rounded-lg text-xs font-medium">All</TabsTrigger>
-            <TabsTrigger value="visit" className="rounded-lg text-xs font-medium">Visits</TabsTrigger>
-            <TabsTrigger value="lab" className="rounded-lg text-xs font-medium">Labs</TabsTrigger>
-            <TabsTrigger value="doc" className="rounded-lg text-xs font-medium">Docs</TabsTrigger>
+          <TabsList className="grid grid-cols-4 w-full bg-muted/50 rounded-2xl p-1.5 h-13 shadow-sm gap-1" style={{ height: 52 }}>
+            <TabsTrigger value="all" className="rounded-xl text-sm font-semibold h-full data-[state=active]:bg-background data-[state=active]:shadow-md">All</TabsTrigger>
+            <TabsTrigger value="visit" className="rounded-xl text-sm font-semibold h-full data-[state=active]:bg-background data-[state=active]:shadow-md">Visits</TabsTrigger>
+            <TabsTrigger value="lab" className="rounded-xl text-sm font-semibold h-full data-[state=active]:bg-background data-[state=active]:shadow-md">Labs</TabsTrigger>
+            <TabsTrigger value="imaging" className="rounded-xl text-sm font-semibold h-full data-[state=active]:bg-background data-[state=active]:shadow-md">Imaging</TabsTrigger>
           </TabsList>
         </Tabs>
 

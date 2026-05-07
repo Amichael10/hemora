@@ -16,7 +16,7 @@ import {
   useGetProfile,
   useUpdateProfile,
   useUpdateProvider,
-  useCreateProvider,
+  useCreateProviderSuggestion,
   getListProvidersQueryKey,
   getGetProfileQueryKey,
   type ListProvidersParams,
@@ -686,7 +686,7 @@ function SuggestProviderDialog({
 }: SuggestProviderDialogProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const createProvider = useCreateProvider();
+  const createProvider = useCreateProviderSuggestion();
 
   const [name, setName] = useState("");
   const [type, setType] = useState<CreateProviderBody["type"]>("hospital");
