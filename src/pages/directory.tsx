@@ -511,9 +511,16 @@ export default function Directory() {
                   data-testid={`provider-card-${provider.id}`}
                 >
                   <CardContent className="p-5">
-                    <button
-                      type="button"
+                    <div
+                      role="link"
+                      tabIndex={0}
                       onClick={() => setLocation(`/directory/${provider.id}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setLocation(`/directory/${provider.id}`);
+                        }
+                      }}
                       className="flex items-start gap-4 mb-4 w-full text-left cursor-pointer"
                       data-testid={`provider-link-${provider.id}`}
                     >
@@ -603,7 +610,7 @@ export default function Directory() {
                           </div>
                         )}
                       </div>
-                    </button>
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
