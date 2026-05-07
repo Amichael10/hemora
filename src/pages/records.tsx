@@ -90,39 +90,9 @@ export default function Records() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="h-page">Care Records</h1>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="soft" data-testid="btn-add-record">
-                <Plus size={16} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
-              <SheetHeader>
-                <SheetTitle className="h-section text-primary">Add Record</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={handleAddRecord} className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input value={title} onChange={e => setTitle(e.target.value)} required placeholder="e.g. Blood Work" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Hospital / Clinic</Label>
-                  <Input value={hospital} onChange={e => setHospital(e.target.value)} placeholder="e.g. General Hospital" />
-                </div>
-                <div className="space-y-2 flex flex-col">
-                  <Label>Type</Label>
-                  <div className="flex gap-2">
-                    {["visit", "lab", "doc"].map(t => (
-                      <Button key={t} type="button" variant={type === t ? "default" : "outline"} onClick={() => setType(t as CreateCareRecordBodyType)} className="flex-1 capitalize">{t}</Button>
-                    ))}
-                  </div>
-                </div>
-                <Button type="submit" size="xl" className="w-full mt-4" disabled={createRecord.isPending}>
-                  {createRecord.isPending ? "Adding..." : "Save Record"}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+          <Button size="icon" variant="soft" data-testid="btn-add-record" onClick={() => setLocation("/records/new")}>
+            <Plus size={16} />
+          </Button>
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
