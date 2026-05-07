@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -87,6 +88,7 @@ const ALL_STATES = "__all_states__";
 export default function Directory() {
   const { profileId } = useProfile();
   const { data: profile } = useGetProfile(profileId);
+  const [, setLocation] = useLocation();
 
   const profileCountry = profile?.country ?? null;
   const defaultCountry = profileCountry ?? DEFAULT_COUNTRY;
@@ -509,7 +511,19 @@ export default function Directory() {
                   data-testid={`provider-card-${provider.id}`}
                 >
                   <CardContent className="p-5">
-                    <div className="flex items-start gap-4 mb-4">
+                    <div
+                      role="link"
+                      tabIndex={0}
+                      onClick={() => setLocation(`/directory/${provider.id}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setLocation(`/directory/${provider.id}`);
+                        }
+                      }}
+                      className="flex items-start gap-4 mb-4 w-full text-left cursor-pointer"
+                      data-testid={`provider-link-${provider.id}`}
+                    >
                       <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <span
                           className="relative inline-flex shrink-0"
@@ -542,7 +556,10 @@ export default function Directory() {
                             )}
                             <button
                               type="button"
-                              onClick={() => handleToggleSaved(provider.id, provider.name, provider.saved)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleSaved(provider.id, provider.name, provider.saved);
+                              }}
                               disabled={updateProvider.isPending}
                               aria-label={provider.saved ? `Remove ${provider.name} from saved` : `Save ${provider.name}`}
                               aria-pressed={provider.saved}
