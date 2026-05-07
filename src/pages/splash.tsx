@@ -9,7 +9,10 @@ export default function Splash() {
 
   return (
     <div className="min-h-[100dvh] w-full bg-secondary flex justify-center">
-      <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col relative shadow-xl items-center text-center px-6 pt-24 pb-12">
+      <div
+        className="w-full max-w-[430px] min-h-[100dvh] flex flex-col relative shadow-xl items-center text-center px-6 pt-24 pb-12"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
