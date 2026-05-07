@@ -34,11 +34,11 @@ function AdherenceHeart({ percent }: { percent: number }) {
         <svg viewBox="0 0 48 48" width="192" height="176" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="heartGradKindred" x1="0%" y1="0%" x2="80%" y2="100%">
-              <stop offset="0%" stopColor="#39839F" />
-              <stop offset="100%" stopColor="#256680" />
+              <stop offset="0%" stopColor="hsl(var(--brand-teal))" />
+              <stop offset="100%" stopColor="hsl(var(--brand-teal-deep))" />
             </linearGradient>
             <filter id="heartShadow">
-              <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="rgba(57,131,159,0.28)" />
+              <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="hsl(var(--brand-teal) / 0.3)" />
             </filter>
           </defs>
           <path
@@ -48,7 +48,7 @@ function AdherenceHeart({ percent }: { percent: number }) {
           />
         </svg>
         <div className="absolute flex flex-col items-center justify-center" style={{ marginTop: 10 }}>
-          <span className="font-bold leading-none tracking-[-2px]" style={{ color: "#fff", fontSize: 36, textShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
+          <span className="font-bold leading-none tracking-[-2px] text-white" style={{ fontSize: 36, textShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
             {percent}%
           </span>
         </div>
@@ -93,16 +93,16 @@ export default function Meds() {
     <MobileAppShell>
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="font-serif text-[1.5rem] text-primary font-semibold tracking-[-0.5px]">Medications</h1>
+          <h1 className="h-page">Medications</h1>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="h-9 w-9 shadow-sm" data-testid="btn-add-med">
+              <Button size="icon" variant="soft" data-testid="btn-add-med">
                 <Plus size={16} />
               </Button>
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
               <SheetHeader>
-                <SheetTitle className="font-serif text-primary tracking-[-0.25px]">Add Medication</SheetTitle>
+                <SheetTitle className="h-section text-primary">Add Medication</SheetTitle>
               </SheetHeader>
               <form onSubmit={handleAddMed} className="space-y-4 mt-6">
                 <div className="space-y-2">
@@ -121,7 +121,7 @@ export default function Meds() {
                   <Label>Reminder Time</Label>
                   <Input type="time" value={reminderTime} onChange={e => setReminderTime(e.target.value)} />
                 </div>
-                <Button type="submit" className="w-full h-12 font-semibold mt-4 shadow-sm" disabled={createMed.isPending}>
+                <Button type="submit" size="xl" className="w-full mt-4" disabled={createMed.isPending}>
                   {createMed.isPending ? "Adding..." : "Save Medication"}
                 </Button>
               </form>
@@ -129,13 +129,13 @@ export default function Meds() {
           </Sheet>
         </div>
 
-        <Card className="border-none shadow-md bg-card mb-6 overflow-hidden">
+        <Card className="border-none shadow-sm bg-card mb-6 overflow-hidden">
           <CardContent className="p-0">
             <AdherenceHeart percent={85} />
           </CardContent>
         </Card>
 
-        <h2 className="font-semibold text-xs text-primary mb-4 uppercase tracking-widest opacity-60">Current Routine</h2>
+        <h2 className="eyebrow mb-4">Current Routine</h2>
 
         {isLoadingMeds ? (
           <div className="space-y-3">
@@ -157,7 +157,7 @@ export default function Meds() {
               <HealthIcon outline={MedicinesOutline} filled={MedicinesFilled} width="48" height="48" />
             </div>
             <p className="text-sm mb-4">No medications added yet.</p>
-            <Button variant="outline" className="shadow-sm" onClick={() => setOpen(true)}>Add Medication</Button>
+            <Button variant="soft" onClick={() => setOpen(true)}>Add Medication</Button>
           </div>
         ) : (
           <div className="space-y-3">
