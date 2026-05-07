@@ -389,15 +389,15 @@ function Features() {
   return (
     <Section id="features" dotted={false}>
       <div className="px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div {...fadeUp} className="max-w-2xl">
+        <div data-reveal className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">What's inside</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
             Everything you need.<br />
             <span className="italic text-muted-foreground">Nothing you don't.</span>
           </h2>
-        </motion.div>
+        </div>
 
-        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 border-y border-l border-border bg-card">
+        <div data-stagger className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 border-y border-l border-border bg-card">
           {features.map((f, i) => {
             const Icon = f.icon;
             const tone =
@@ -407,10 +407,9 @@ function Features() {
                 ? "bg-accent/20 text-accent-foreground"
                 : "bg-secondary/10 text-secondary";
             return (
-              <motion.div
+              <div
                 key={f.title}
-                {...fadeUp}
-                transition={{ ...fadeUp.transition, delay: i * 0.05 }}
+                data-stagger-item
                 className="group p-7 border-r border-b border-border hover:bg-muted/40 transition-colors"
               >
                 <div className={`w-11 h-11 rounded-xl grid place-items-center ${tone}`}>
@@ -418,7 +417,7 @@ function Features() {
                 </div>
                 <h3 className="mt-4 font-serif text-xl text-secondary">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-              </motion.div>
+              </div>
             );
           })}
         </div>
