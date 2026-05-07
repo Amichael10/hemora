@@ -255,38 +255,72 @@ function Hero() {
             "radial-gradient(60% 50% at 80% 0%, hsl(var(--brand-gold) / 0.18), transparent 60%), radial-gradient(50% 60% at 0% 30%, hsl(var(--brand-teal) / 0.10), transparent 70%)",
         }}
       />
-      <div className="px-6 sm:px-10 pt-20 pb-16 lg:pt-28 lg:pb-20 text-center">
-        <div className="max-w-4xl mx-auto">
-          <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            For families touched by sickle cell
-          </div>
-          <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
-            <span className="inline-block">Care that stays with you,</span>{" "}
-            <span className="inline-block italic text-primary">between appointments.</span>
-          </h1>
-          <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Hemora helps you log crises, stay on top of meds, keep records in one place,
-            and find sickle-cell-aware care — on your phone, anywhere.
-          </p>
+      <div className="px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
+          <div className="text-center lg:text-left">
+            <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              For families touched by sickle cell
+            </div>
+            <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
+              <span className="inline-block">Care that stays with you,</span>{" "}
+              <span className="inline-block italic text-primary">between appointments.</span>
+            </h1>
+            <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Hemora helps you log crises, stay on top of meds, keep records in one place,
+              and find sickle-cell-aware care — on your phone, anywhere.
+            </p>
 
-          <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center gap-3">
-            <Button size="lg" onClick={() => setLocation("/signup")}>
-              Open the app <ArrowRight size={16} />
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a href="#download">Download for mobile</a>
-            </Button>
+            <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
+              <Button size="lg" onClick={() => setLocation("/signup")}>
+                Open the app <ArrowRight size={16} />
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <a href="#download">Download for mobile</a>
+              </Button>
+            </div>
+
+            <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
+              <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
+              <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
+            </div>
           </div>
 
-          <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
-            <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
-            <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
+          <div data-anim="hero-image" className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-6 rounded-[2.5rem] blur-3xl opacity-60"
+              style={{ background: "var(--gradient-warm)" }}
+            />
+            <img
+              src={heroFamily}
+              alt="An African family embracing, with a luminous globe behind them"
+              width={1600}
+              height={900}
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              className="relative w-full h-auto rounded-2xl border border-border shadow-2xl object-cover"
+            />
           </div>
         </div>
+      </div>
+    </Section>
+  );
+}
 
-        <div data-anim="hero-mockup" className="mt-14 lg:mt-20 px-6 sm:px-10">
+function ProductPreview() {
+  return (
+    <Section dotted={false}>
+      <div className="px-6 sm:px-10 py-20 lg:py-28">
+        <div data-reveal className="max-w-2xl mx-auto text-center mb-12">
+          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">A look inside</div>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
+            Your day, gently organized.
+          </h2>
+        </div>
+        <div data-anim="hero-mockup">
           <DesktopMockup />
         </div>
       </div>
