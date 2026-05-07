@@ -235,6 +235,7 @@ function DesktopMockup() {
                 {[3, 5, 2, 6, 4, 2, 1].map((v, i) => (
                   <div
                     key={i}
+                    data-anim="bar"
                     className="flex-1 rounded-md"
                     style={{ height: `${v * 14}%`, background: "hsl(var(--accent))" }}
                   />
@@ -582,12 +583,12 @@ function FAQ() {
   return (
     <Section id="faq" className="bg-muted/40">
       <div className="px-6 sm:px-10 py-20 lg:py-28 max-w-3xl mx-auto">
-        <motion.div {...fadeUp} className="text-center">
+        <div data-reveal className="text-center">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">FAQ</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary">
             Still wondering?
           </h2>
-        </motion.div>
+        </div>
         <div className="mt-10 divide-y divide-border bg-card border border-border">
           {items.map((it) => (
             <details key={it.q} className="group p-5 sm:p-6">
