@@ -638,8 +638,89 @@ function Footer() {
 }
 
 export default function Landing() {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const root = rootRef.current;
+    const ctx = gsap.context(() => {
+      // Hero entrance
+      const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      heroTl
+        .from("[data-anim='hero-badge']", { y: 14, opacity: 0, duration: 0.6 })
+        .from("[data-anim='hero-title'] > *", { y: 28, opacity: 0, duration: 0.9, stagger: 0.08 }, "-=0.3")
+        .from("[data-anim='hero-sub']", { y: 18, opacity: 0, duration: 0.7 }, "-=0.5")
+        .from("[data-anim='hero-cta'] > *", { y: 14, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.4")
+        .from("[data-anim='hero-trust'] > *", { y: 10, opacity: 0, duration: 0.5, stagger: 0.06 }, "-=0.35")
+        .from("[data-anim='hero-mockup']", { y: 60, opacity: 0, scale: 0.96, duration: 1.1, ease: "power4.out" }, "-=0.4");
+
+      // Subtle floating glow on hero mockup
+      gsap.to("[data-anim='hero-mockup']", {
+        y: -10,
+        duration: 4,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      // Generic scroll-triggered reveals
+      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
+        gsap.from(el, {
+          y: 40,
+          opacity: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 85%" },
+        });
+      });
+
+      // Stagger groups
+      gsap.utils.toArray<HTMLElement>("[data-stagger]").forEach((group) => {
+        const items = group.querySelectorAll<HTMLElement>("[data-stagger-item]");
+        gsap.from(items, {
+          y: 40,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: 0.08,
+          scrollTrigger: { trigger: group, start: "top 80%" },
+        });
+      });
+
+      // Animated stat counters
+      gsap.utils.toArray<HTMLElement>("[data-counter]").forEach((el) => {
+        const target = parseFloat(el.dataset.counter || "0");
+        const suffix = el.dataset.counterSuffix || "";
+        const prefix = el.dataset.counterPrefix || "";
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: target,
+          duration: 1.6,
+          ease: "power2.out",
+          scrollTrigger: { trigger: el, start: "top 85%" },
+          onUpdate: () => {
+            const n = target >= 100 ? Math.round(obj.v) : obj.v.toFixed(0);
+            el.textContent = `${prefix}${n}${suffix}`;
+          },
+        });
+      });
+
+      // Pain chart bars grow
+      gsap.from("[data-anim='bar']", {
+        scaleY: 0,
+        transformOrigin: "bottom",
+        duration: 0.9,
+        ease: "power3.out",
+        stagger: 0.07,
+        scrollTrigger: { trigger: "[data-anim='bar']", start: "top 90%" },
+      });
+    }, root);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="min-h-[100dvh] w-full bg-background text-foreground antialiased">
+    <div ref={rootRef} className="min-h-[100dvh] w-full bg-background text-foreground antialiased">
       <Nav />
       <main>
         <Hero />
