@@ -248,7 +248,7 @@ function Hero() {
   return (
     <Section className="overflow-hidden" topRule={false}>
       {/* Full-bleed hero image */}
-      <div aria-hidden className="absolute inset-0 -z-10">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
         <img
           src={heroFamily}
           alt=""
@@ -272,7 +272,7 @@ function Hero() {
           style={{ background: "hsl(var(--background) / 0.7)" }}
         />
       </div>
-      <div className="px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
+      <div className="relative z-10 px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
           <div className="text-center lg:text-left">
             <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
