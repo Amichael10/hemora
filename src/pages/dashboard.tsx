@@ -129,14 +129,16 @@ export default function Dashboard() {
             >
               <Bell size={16} />
             </button>
-            <Avatar
-              className="w-10 h-10 border-2 border-white/40"
-              data-testid="avatar-dashboard"
-            >
-              <AvatarFallback className="font-serif font-bold text-sm text-white bg-white/25">
-                {getInitials(profile?.fullName)}
-              </AvatarFallback>
-            </Avatar>
+            <Link href="/profile">
+              <Avatar
+                className="w-10 h-10 border-2 border-white/40 cursor-pointer"
+                data-testid="avatar-dashboard"
+              >
+                <AvatarFallback className="font-serif font-bold text-sm text-white bg-white/25">
+                  {getInitials(profile?.fullName)}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
           </div>
         </div>
 
