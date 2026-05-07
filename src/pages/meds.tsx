@@ -129,7 +129,7 @@ export default function Meds() {
               <HealthIcon outline={MedicinesOutline} filled={MedicinesFilled} width="48" height="48" />
             </div>
             <p className="text-sm mb-4">No medications added yet.</p>
-            <Button variant="soft" onClick={() => setOpen(true)}>Add Medication</Button>
+            <Button variant="soft" onClick={() => setLocation("/meds/new")}>Add Medication</Button>
           </div>
         ) : (
           <div className="space-y-3">
