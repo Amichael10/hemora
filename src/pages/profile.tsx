@@ -1,13 +1,13 @@
-import { useLocation, Link } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
+import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
 import { useGetProfile } from "@workspace/api-client-react";
-import { ArrowLeftLinear as ArrowLeft, Logout3Linear as LogOut } from "solar-icon-set";
+import { PenNewSquareLinear as EditIcon } from "solar-icon-set";
+import { Link } from "wouter";
 
 function getInitials(name?: string) {
   if (!name) return "K";
@@ -26,63 +26,44 @@ function Row({ label, value }: { label: string; value?: string | number | null }
 }
 
 export default function Profile() {
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { profileId } = useProfile();
 
   const { data: profile, isLoading } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
   });
 
-  const handleLogout = async () => {
-    await signOut();
-    toast({ title: "Signed out" });
-    setLocation("/");
-  };
-
   return (
     <MobileAppShell>
+      <SubPageHeader title="Profile" back="/settings" />
       <div className="flex flex-col min-h-full">
-        {/* Header */}
-        <div
-          className="px-5 pt-11 pb-8 relative"
-          style={{ background: "var(--gradient-brand)" }}
-        >
-          <div className="flex items-center justify-between mb-6">
-            <Link href="/dashboard">
-              <button
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white bg-white/20 hover:bg-white/25 transition-colors"
-                aria-label="Back"
-              >
-                <ArrowLeft size={18} />
-              </button>
-            </Link>
-            <p className="eyebrow-on-dark">Profile</p>
-            <div className="w-9 h-9" />
-          </div>
-
-          <div className="flex flex-col items-center gap-3">
-            <Avatar className="w-20 h-20 border-2 border-white/40">
-              <AvatarFallback className="font-serif font-bold text-xl text-white bg-white/25">
-                {getInitials(profile?.fullName)}
-              </AvatarFallback>
-            </Avatar>
-            {isLoading ? (
-              <Skeleton className="h-6 w-32" />
-            ) : (
-              <h1 className="font-serif font-bold text-[22px] text-white drop-shadow">
-                {profile?.fullName || "Friend"}
-              </h1>
-            )}
-            {user?.email && (
-              <p className="text-xs text-white/85 font-medium">{user.email}</p>
-            )}
-          </div>
+        {/* Profile header */}
+        <div className="flex flex-col items-center text-center pt-2 pb-6 px-5">
+          <Avatar className="w-20 h-20 mb-3 border border-border/60">
+            <AvatarFallback className="font-serif font-semibold text-xl bg-muted text-foreground">
+              {getInitials(profile?.fullName)}
+            </AvatarFallback>
+          </Avatar>
+          {isLoading ? (
+            <Skeleton className="h-6 w-32" />
+          ) : (
+            <h1 className="font-serif font-semibold text-[20px] text-foreground tracking-[-0.3px]">
+              {profile?.fullName || "Friend"}
+            </h1>
+          )}
+          {user?.email && (
+            <p className="text-xs text-muted-foreground mt-1">{user.email}</p>
+          )}
+          <Link href="/onboarding">
+            <Button size="sm" className="mt-4 rounded-full px-5">
+              <EditIcon size={14} />
+              Edit profile
+            </Button>
+          </Link>
         </div>
 
         {/* Details */}
-        <div className="px-4 -mt-4 pb-6 space-y-4">
+        <div className="px-4 pb-6 space-y-4">
           <div className="bg-card rounded-2xl shadow-sm border border-border/60 overflow-hidden">
             <p className="eyebrow px-4 pt-4 pb-2">Personal</p>
             <Row label="Full name" value={profile?.fullName} />
@@ -101,17 +82,6 @@ export default function Profile() {
             <Row label="Allergies" value={profile?.allergies} />
             <Row label="Conditions" value={profile?.conditions} />
           </div>
-
-          <Button
-            variant="crisis"
-            size="xl"
-            className="w-full"
-            onClick={handleLogout}
-            data-testid="btn-logout"
-          >
-            <LogOut size={18} />
-            Log out
-          </Button>
         </div>
       </div>
     </MobileAppShell>
