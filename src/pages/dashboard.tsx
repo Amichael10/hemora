@@ -303,6 +303,34 @@ export default function Dashboard() {
             </motion.button>
           )}
 
+          {/* Personalised tools by setupFor */}
+          <motion.section variants={itemVariants} className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setLocation("/genotype-checker")}
+              className="text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors"
+            >
+              <p className="text-[13px] font-semibold">Genotype checker</p>
+              <p className="text-[11px] text-muted-foreground mt-1">See pregnancy outcomes for any pairing.</p>
+            </button>
+            {profile?.setupFor === "my_child" ? (
+              <button
+                onClick={() => setLocation("/school-letter")}
+                className="text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors"
+              >
+                <p className="text-[13px] font-semibold">School letter</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Request accommodations for your child.</p>
+              </button>
+            ) : (
+              <button
+                onClick={() => setLocation("/family")}
+                className="text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors"
+              >
+                <p className="text-[13px] font-semibold">Family tree</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Add relatives and check shared risk.</p>
+              </button>
+            )}
+          </motion.section>
+
           {/* Next dose */}
           <motion.section variants={itemVariants}>
             <div className="flex items-end justify-between mb-3">

@@ -233,6 +233,66 @@ export type Database = {
         }
         Relationships: []
       }
+      family_members: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          full_name: string
+          genotype: string | null
+          id: string
+          is_self: boolean
+          notes: string | null
+          parent1_id: string | null
+          parent2_id: string | null
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          full_name: string
+          genotype?: string | null
+          id?: string
+          is_self?: boolean
+          notes?: string | null
+          parent1_id?: string | null
+          parent2_id?: string | null
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string
+          genotype?: string | null
+          id?: string
+          is_self?: boolean
+          notes?: string | null
+          parent1_id?: string | null
+          parent2_id?: string | null
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_parent1_id_fkey"
+            columns: ["parent1_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_parent2_id_fkey"
+            columns: ["parent2_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medication_logs: {
         Row: {
           created_at: string
