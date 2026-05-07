@@ -285,7 +285,7 @@ export default function Dashboard() {
           {missingProfileFields.length > 0 && (
             <motion.button
               variants={itemVariants}
-              onClick={() => setLocation("/onboarding")}
+              onClick={() => setLocation("/profile/edit")}
               className="w-full text-left rounded-2xl border border-primary/20 bg-primary/5 p-4 flex items-center gap-3 hover:bg-primary/10 transition-colors"
               data-testid="banner-complete-profile"
             >
