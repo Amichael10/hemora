@@ -286,9 +286,9 @@
   /* Bottom sheet that lifts off the gradient (reference look) */
   .sheet-surface {
     @apply bg-background;
-    border-top-left-radius: 28px;
-    border-top-right-radius: 28px;
-    box-shadow: 0 -8px 24px -12px rgba(0,0,0,0.12);
+    border-top-left-radius: 36px;
+    border-top-right-radius: 36px;
+    box-shadow: 0 -12px 40px -16px rgba(0,0,0,0.18);
   }
 }
 
