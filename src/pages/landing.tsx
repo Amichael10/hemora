@@ -1,5 +1,8 @@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
 import kindredLogo from "@/assets/brand/Logo.png";
 import dashboardEmoji from "@/assets/images/emoji-mild.png";
@@ -16,6 +19,8 @@ import {
   StarBold as Star,
 } from "solar-icon-set";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
