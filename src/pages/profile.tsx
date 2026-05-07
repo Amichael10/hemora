@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
 import { useGetProfile } from "@workspace/api-client-react";
-import { ArrowLeftLinear as ArrowLeft, LogoutLinear as LogOut } from "solar-icon-set";
+import { ArrowLeftLinear as ArrowLeft, Logout3Linear as LogOut } from "solar-icon-set";
 
 function getInitials(name?: string) {
   if (!name) return "K";
