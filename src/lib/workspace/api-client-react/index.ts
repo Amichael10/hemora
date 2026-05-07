@@ -114,7 +114,7 @@ function useList<T>(table: string, mapRow: (r: any) => T, args: any, opts: any, 
     queryKey,
     enabled,
     queryFn: async () => {
-      let q: any = supabase.from(table).select("*").order("created_at", { ascending: false });
+      let q: any = (supabase.from(table as any) as any).select("*").order("created_at", { ascending: false });
       if (extraFilter) q = extraFilter(q);
       const { data, error } = await q;
       if (error) throw new ApiError(error.message);
@@ -170,7 +170,7 @@ export const useGetProfile = (id?: any, opts?: any) => {
 export const useGetDashboardSummary = (arg?: any, opts?: any) => {
   const enabled = (opts?.query?.enabled ?? true) && !!arg;
   return useQuery({
-    queryKey: opts?.query?.queryKey ?? ["dashboard-summary", id],
+    queryKey: opts?.query?.queryKey ?? ["dashboard-summary", arg],
     enabled,
     queryFn: async () => {
       const [{ data: meds }, { data: crisis }, { data: logs }] = await Promise.all([
