@@ -14,7 +14,6 @@ import {
   ArrowRightLinear as ArrowRight,
   CheckCircleBold as Check,
   StarBold as Star,
-  PhoneBold as Phone,
 } from "solar-icon-set";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 
@@ -25,11 +24,95 @@ const fadeUp = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
 
+/**
+ * Section wrapper that draws continuous vertical guide rails (Dub-style),
+ * a faint dotted background, and "+" markers at the four corners where the
+ * section's top/bottom horizontal rules meet the vertical rails.
+ */
+function Section({
+  id,
+  className = "",
+  innerClassName = "",
+  dotted = true,
+  topRule = true,
+  bottomRule = true,
+  children,
+}: {
+  id?: string;
+  className?: string;
+  innerClassName?: string;
+  dotted?: boolean;
+  topRule?: boolean;
+  bottomRule?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className={`relative ${className}`}>
+      {/* Dotted grid background */}
+      {dotted && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "radial-gradient(hsl(var(--foreground) / 0.18) 1px, transparent 1px)",
+            backgroundSize: "22px 22px",
+            maskImage:
+              "radial-gradient(ellipse at center, black 40%, transparent 85%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at center, black 40%, transparent 85%)",
+          }}
+        />
+      )}
+      {/* Continuous frame: vertical rails + top/bottom rules + corner "+" */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="mx-auto h-full max-w-7xl relative">
+          {/* vertical rails */}
+          <div className="absolute inset-y-0 left-0 w-px bg-border" />
+          <div className="absolute inset-y-0 right-0 w-px bg-border" />
+          {/* horizontal rules */}
+          {topRule && (
+            <div className="absolute top-0 inset-x-0 h-px bg-border" />
+          )}
+          {bottomRule && (
+            <div className="absolute bottom-0 inset-x-0 h-px bg-border" />
+          )}
+          {/* corner plus markers */}
+          {topRule && <Plus className="absolute -top-2 -left-2" />}
+          {topRule && <Plus className="absolute -top-2 -right-2" />}
+          {bottomRule && <Plus className="absolute -bottom-2 -left-2" />}
+          {bottomRule && <Plus className="absolute -bottom-2 -right-2" />}
+        </div>
+      </div>
+      <div className={`relative mx-auto max-w-7xl ${innerClassName}`}>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Plus({ className = "" }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`block w-4 h-4 text-border ${className}`}
+      style={{
+        backgroundImage:
+          "linear-gradient(currentColor,currentColor),linear-gradient(currentColor,currentColor)",
+        backgroundSize: "100% 1px, 1px 100%",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        color: "hsl(var(--border))",
+      }}
+    />
+  );
+}
+
 function Nav() {
   const [, setLocation] = useLocation();
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background/75 border-b border-border/50">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background/80 border-b border-border">
+      <div className="mx-auto max-w-7xl px-6 sm:px-10 h-16 flex items-center justify-between border-x border-border">
         <button onClick={() => setLocation("/")} className="flex items-center gap-2">
           <img src={kindredLogo} alt="Kindred" className="w-8 h-8" />
           <span className="font-serif text-xl tracking-tight text-secondary">Kindred</span>
@@ -49,79 +132,105 @@ function Nav() {
   );
 }
 
-/** A small, decorative phone mockup that mirrors the in-app dashboard hero. */
-function PhoneMockup() {
+/** A desktop browser-style mockup of the in-app dashboard (Dub-style hero visual). */
+function DesktopMockup() {
   return (
-    <div className="relative mx-auto" style={{ width: 280 }}>
-      {/* Glow */}
+    <div className="relative mx-auto w-full max-w-3xl">
       <div
         aria-hidden
-        className="absolute -inset-10 rounded-[3rem] blur-3xl opacity-60"
+        className="absolute -inset-12 rounded-[3rem] blur-3xl opacity-50"
         style={{ background: "var(--gradient-warm)" }}
       />
-      <div className="relative rounded-[2.4rem] p-2 bg-secondary shadow-2xl border border-secondary/40">
-        <div className="rounded-[2rem] overflow-hidden bg-background aspect-[9/19] flex flex-col">
-          {/* Status bar */}
-          <div className="flex justify-between items-center px-6 pt-3 pb-2 text-[10px] font-medium text-secondary">
-            <span>9:41</span>
-            <span className="w-16 h-4 rounded-full bg-secondary/90" />
-            <span>100%</span>
+      <div className="relative rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
+        {/* Browser chrome */}
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/40">
+          <span className="w-2.5 h-2.5 rounded-full bg-primary/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-accent" />
+          <span className="w-2.5 h-2.5 rounded-full bg-secondary/40" />
+          <div className="flex-1 mx-4 h-6 rounded-md bg-background border border-border flex items-center justify-center text-[10px] text-muted-foreground">
+            kindred.app/dashboard
           </div>
-          {/* Screen */}
-          <div className="flex-1 px-4 py-3 space-y-3 overflow-hidden">
+        </div>
+        {/* App body */}
+        <div className="grid grid-cols-[180px_1fr] min-h-[420px]">
+          {/* Sidebar */}
+          <aside className="border-r border-border bg-secondary/[0.04] p-4 space-y-1">
+            <div className="flex items-center gap-2 mb-4">
+              <img src={kindredLogo} alt="" className="w-6 h-6" />
+              <span className="font-serif text-sm text-secondary">Kindred</span>
+            </div>
+            {[
+              { Icon: HeartPulse, label: "Dashboard", active: true },
+              { Icon: Pills, label: "Medications" },
+              { Icon: Notebook, label: "Records" },
+              { Icon: Users, label: "Directory" },
+              { Icon: Bell, label: "Reminders" },
+              { Icon: Chart, label: "Insights" },
+            ].map(({ Icon, label, active }) => (
+              <div
+                key={label}
+                className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] ${
+                  active
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <Icon size={13} />
+                {label}
+              </div>
+            ))}
+          </aside>
+          {/* Main */}
+          <div className="p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-[10px] text-muted-foreground">Good morning</div>
-                <div className="font-serif text-base text-secondary leading-tight">Amara</div>
+                <div className="font-serif text-lg text-secondary leading-tight">Amara</div>
               </div>
               <div className="w-8 h-8 rounded-full bg-accent/30" />
             </div>
-
-            {/* Hero card */}
             <div
-              className="rounded-2xl p-3 text-white relative overflow-hidden"
+              className="rounded-xl p-4 text-white relative overflow-hidden"
               style={{ background: "var(--gradient-brand)" }}
             >
               <div className="text-[10px] opacity-80">Today's plan</div>
-              <div className="font-serif text-lg leading-tight mt-0.5">Feeling steady</div>
-              <div className="mt-2 flex gap-1.5">
+              <div className="font-serif text-xl leading-tight mt-0.5">Feeling steady</div>
+              <div className="mt-3 flex gap-1.5">
                 <div className="flex-1 h-1.5 rounded-full bg-accent" />
                 <div className="flex-1 h-1.5 rounded-full bg-white/30" />
                 <div className="flex-1 h-1.5 rounded-full bg-white/30" />
               </div>
-              <img src={dashboardEmoji} alt="" className="absolute -right-2 -bottom-2 w-16 h-16 opacity-90" />
+              <img src={dashboardEmoji} alt="" className="absolute -right-2 -bottom-2 w-20 h-20 opacity-90" />
             </div>
-
-            {/* Med tile */}
-            <div className="rounded-xl bg-card p-2.5 flex items-center gap-2.5 border border-border/60">
-              <div className="w-8 h-8 rounded-lg bg-accent/20 grid place-items-center">
-                <Pills size={16} color="hsl(var(--accent))" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-background p-3 flex items-center gap-2.5 border border-border">
+                <div className="w-8 h-8 rounded-lg bg-accent/20 grid place-items-center">
+                  <Pills size={16} color="hsl(var(--accent))" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-[11px] font-semibold text-secondary">Hydroxyurea</div>
+                  <div className="text-[9px] text-muted-foreground">8:00 AM · Taken</div>
+                </div>
+                <Check size={16} color="hsl(var(--accent))" />
               </div>
-              <div className="flex-1">
-                <div className="text-[11px] font-semibold text-secondary">Hydroxyurea</div>
-                <div className="text-[9px] text-muted-foreground">8:00 AM · Taken</div>
+              <div className="rounded-xl bg-background p-3 flex items-center gap-2.5 border border-border">
+                <div className="w-8 h-8 rounded-lg bg-primary/15 grid place-items-center">
+                  <HeartPulse size={16} color="hsl(var(--primary))" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-[11px] font-semibold text-secondary">Log a crisis</div>
+                  <div className="text-[9px] text-muted-foreground">Track what helped</div>
+                </div>
+                <ArrowRight size={14} color="hsl(var(--muted-foreground))" />
               </div>
-              <Check size={16} color="hsl(var(--accent))" />
             </div>
-            <div className="rounded-xl bg-card p-2.5 flex items-center gap-2.5 border border-border/60">
-              <div className="w-8 h-8 rounded-lg bg-primary/15 grid place-items-center">
-                <HeartPulse size={16} color="hsl(var(--primary))" />
-              </div>
-              <div className="flex-1">
-                <div className="text-[11px] font-semibold text-secondary">Log a crisis</div>
-                <div className="text-[9px] text-muted-foreground">Track what helped</div>
-              </div>
-              <ArrowRight size={14} color="hsl(var(--muted-foreground))" />
-            </div>
-
-            {/* Mini chart */}
-            <div className="rounded-xl bg-card p-3 border border-border/60">
-              <div className="text-[10px] text-muted-foreground mb-1.5">Pain · last 7 days</div>
-              <div className="flex items-end gap-1 h-10">
+            <div className="rounded-xl bg-background p-4 border border-border">
+              <div className="text-[10px] text-muted-foreground mb-2">Pain · last 7 days</div>
+              <div className="flex items-end gap-1.5 h-16">
                 {[3, 5, 2, 6, 4, 2, 1].map((v, i) => (
                   <div
                     key={i}
-                    className="flex-1 rounded-sm"
+                    className="flex-1 rounded-md"
                     style={{ height: `${v * 14}%`, background: "hsl(var(--accent))" }}
                   />
                 ))}
@@ -137,8 +246,7 @@ function PhoneMockup() {
 function Hero() {
   const [, setLocation] = useLocation();
   return (
-    <section className="relative overflow-hidden">
-      {/* Dub-style guide lines + soft halo */}
+    <Section className="overflow-hidden" topRule={false}>
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
@@ -147,22 +255,9 @@ function Hero() {
             "radial-gradient(60% 50% at 80% 0%, hsl(var(--brand-gold) / 0.18), transparent 60%), radial-gradient(50% 60% at 0% 30%, hsl(var(--brand-teal) / 0.10), transparent 70%)",
         }}
       />
-      {/* Vertical guide lines */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="mx-auto max-w-6xl h-full px-5 sm:px-8 relative">
-          <div className="absolute inset-y-0 left-5 sm:left-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
-          <div className="absolute inset-y-0 right-5 sm:right-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
-          <div className="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent" />
-        </div>
-      </div>
-      {/* Horizontal guide lines */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-full">
-        <div className="absolute top-[88px] inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      </div>
-      <div className="mx-auto max-w-4xl px-5 sm:px-8 pt-16 pb-12 lg:pt-24 lg:pb-16 text-center">
-        <motion.div {...fadeUp}>
-          <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border/60 px-3 py-1 text-xs text-muted-foreground">
+      <div className="px-6 sm:px-10 pt-20 pb-16 lg:pt-28 lg:pb-20 text-center">
+        <motion.div {...fadeUp} className="max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             For families touched by sickle cell
           </div>
@@ -180,7 +275,7 @@ function Hero() {
               Open the app <ArrowRight size={16} />
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <a href="#download"><Phone size={16} /> Download for mobile</a>
+              <a href="#download">Download for mobile</a>
             </Button>
           </div>
 
@@ -191,11 +286,11 @@ function Hero() {
           </div>
         </motion.div>
 
-        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="mt-14 lg:mt-16">
-          <PhoneMockup />
+        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="mt-14 lg:mt-20 px-6 sm:px-10">
+          <DesktopMockup />
         </motion.div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -206,17 +301,8 @@ function Context() {
     { n: "1 in 4", label: "Nigerians carries the sickle cell trait — the highest burden worldwide.", source: "WHO Africa" },
   ];
   return (
-    <section className="relative py-20 lg:py-24 border-y border-border/50 bg-muted/30 overflow-hidden">
-      {/* Vertical guide lines */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="mx-auto max-w-5xl h-full px-5 sm:px-8 relative">
-          <div className="absolute inset-y-0 left-5 sm:left-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
-          <div className="absolute inset-y-0 right-5 sm:right-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
-          <div className="hidden sm:block absolute inset-y-0 left-1/3 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent" />
-          <div className="hidden sm:block absolute inset-y-0 left-2/3 w-px bg-gradient-to-b from-transparent via-border/60 to-transparent" />
-        </div>
-      </div>
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+    <Section className="bg-muted/40 overflow-hidden">
+      <div className="px-6 sm:px-10 py-20 lg:py-24">
         <motion.div {...fadeUp} className="text-center max-w-2xl mx-auto">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
@@ -226,13 +312,13 @@ function Context() {
             Kindred is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
           </p>
         </motion.div>
-        <div className="mt-12 grid sm:grid-cols-3 gap-6">
+        <div className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
           {stats.map((s, i) => (
             <motion.div
               key={s.n}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-              className="rounded-2xl bg-card border border-border/60 p-6 text-center"
+              className="p-8 text-center"
             >
               <div className="font-serif text-4xl sm:text-5xl text-primary tracking-tight">{s.n}</div>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.label}</p>
@@ -241,7 +327,7 @@ function Context() {
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -286,8 +372,8 @@ const features = [
 
 function Features() {
   return (
-    <section id="features" className="py-20 lg:py-28">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <Section id="features" dotted={false}>
+      <div className="px-6 sm:px-10 py-20 lg:py-28">
         <motion.div {...fadeUp} className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">What's inside</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
@@ -296,7 +382,7 @@ function Features() {
           </h2>
         </motion.div>
 
-        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 border-y border-l border-border bg-card">
           {features.map((f, i) => {
             const Icon = f.icon;
             const tone =
@@ -310,7 +396,7 @@ function Features() {
                 key={f.title}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.05 }}
-                className="group rounded-2xl bg-card border border-border/60 p-6 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                className="group p-7 border-r border-b border-border hover:bg-muted/40 transition-colors"
               >
                 <div className={`w-11 h-11 rounded-xl grid place-items-center ${tone}`}>
                   <Icon size={20} />
@@ -322,7 +408,7 @@ function Features() {
           })}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -333,7 +419,7 @@ function HowItWorks() {
     { n: "03", title: "Share when it matters", body: "Export a clean summary for appointments — or carry it on your phone for the ER." },
   ];
   return (
-    <section id="how" className="py-20 lg:py-28 bg-secondary text-secondary-foreground relative overflow-hidden">
+    <section id="how" className="relative bg-secondary text-secondary-foreground overflow-hidden border-y border-secondary/40">
       <div
         aria-hidden
         className="absolute inset-0 opacity-30"
@@ -342,7 +428,14 @@ function HowItWorks() {
             "radial-gradient(40% 60% at 100% 0%, hsl(var(--brand-gold) / 0.4), transparent 60%), radial-gradient(40% 50% at 0% 100%, hsl(var(--brand-red) / 0.2), transparent 60%)",
         }}
       />
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
+      {/* Frame on dark */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="mx-auto h-full max-w-7xl relative">
+          <div className="absolute inset-y-0 left-0 w-px bg-white/10" />
+          <div className="absolute inset-y-0 right-0 w-px bg-white/10" />
+        </div>
+      </div>
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-10 py-20 lg:py-28">
         <motion.div {...fadeUp} className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">How it works</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight">
@@ -350,13 +443,13 @@ function HowItWorks() {
             <span className="italic">a complicated condition.</span>
           </h2>
         </motion.div>
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
+        <div className="mt-12 grid md:grid-cols-3 border-y md:border border-white/10">
           {steps.map((s, i) => (
             <motion.div
               key={s.n}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.08 }}
-              className="rounded-2xl border border-white/10 p-6 bg-white/[0.04] backdrop-blur-sm"
+              className="p-8 border-b md:border-b-0 md:border-r last:border-r-0 border-white/10 bg-white/[0.03]"
             >
               <div className="font-serif text-3xl text-accent">{s.n}</div>
               <h3 className="mt-3 font-serif text-xl">{s.title}</h3>
@@ -388,8 +481,8 @@ function Stories() {
     },
   ];
   return (
-    <section id="stories" className="py-20 lg:py-28">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <Section id="stories">
+      <div className="px-6 sm:px-10 py-20 lg:py-28">
         <motion.div {...fadeUp} className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Stories</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
@@ -397,13 +490,13 @@ function Stories() {
             <span className="italic text-muted-foreground">for families.</span>
           </h2>
         </motion.div>
-        <div className="mt-12 grid md:grid-cols-3 gap-4">
+        <div className="mt-12 grid md:grid-cols-3 border-y md:border border-border bg-card">
           {quotes.map((t, i) => (
             <motion.figure
               key={i}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-              className="rounded-2xl bg-card border border-border/60 p-6 flex flex-col"
+              className="p-7 flex flex-col border-b md:border-b-0 md:border-r last:border-r-0 border-border"
             >
               <div className="flex gap-0.5 text-accent">
                 {Array.from({ length: 5 }).map((_, k) => <Star key={k} size={14} />)}
@@ -419,18 +512,18 @@ function Stories() {
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
 function Download() {
   const [, setLocation] = useLocation();
   return (
-    <section id="download" className="py-20 lg:py-28">
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+    <Section id="download" dotted={false}>
+      <div className="px-6 sm:px-10 py-20 lg:py-28">
         <motion.div
           {...fadeUp}
-          className="relative overflow-hidden rounded-3xl p-10 sm:p-14 text-center"
+          className="relative overflow-hidden p-10 sm:p-16 text-center border border-border"
           style={{ background: "var(--gradient-brand)" }}
         >
           <div
@@ -462,7 +555,7 @@ function Download() {
           </div>
         </motion.div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -475,15 +568,15 @@ function FAQ() {
     { q: "Can caregivers use it for someone else?", a: "Absolutely. During setup you can choose to track for yourself, a child, or another loved one." },
   ];
   return (
-    <section id="faq" className="py-20 lg:py-28 bg-muted/40">
-      <div className="mx-auto max-w-3xl px-5 sm:px-8">
+    <Section id="faq" className="bg-muted/40">
+      <div className="px-6 sm:px-10 py-20 lg:py-28 max-w-3xl mx-auto">
         <motion.div {...fadeUp} className="text-center">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">FAQ</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary">
             Still wondering?
           </h2>
         </motion.div>
-        <div className="mt-10 divide-y divide-border/60 rounded-2xl bg-card border border-border/60">
+        <div className="mt-10 divide-y divide-border bg-card border border-border">
           {items.map((it) => (
             <details key={it.q} className="group p-5 sm:p-6">
               <summary className="flex justify-between items-center cursor-pointer list-none">
@@ -495,14 +588,14 @@ function FAQ() {
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
 function Footer() {
   return (
     <footer className="bg-secondary text-secondary-foreground">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8 py-14 grid md:grid-cols-4 gap-8 text-sm">
+      <div className="mx-auto max-w-7xl px-6 sm:px-10 py-14 grid md:grid-cols-4 gap-8 text-sm border-x border-white/10">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2">
             <img src={kindredLogo} alt="Kindred" className="w-9 h-9" />
@@ -530,7 +623,7 @@ function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
           <span>© {new Date().getFullYear()} Kindred. All rights reserved.</span>
           <span>Made with care.</span>
         </div>
