@@ -368,6 +368,98 @@ export const useUpdateProvider = () => {
   }) as UseMutationResult<any, Error, any>;
 };
 
+// ---- Generic update/delete factories for owned tables ----
+function useUpdateRow(table: string, mapRow: (r: any) => any, invalidateKey: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: any) => {
+      const patch: any = {};
+      for (const [k, v] of Object.entries(data)) {
+        const key = k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
+        patch[key] = v;
+      }
+      const { data: row, error } = await (supabase.from(table as any) as any)
+        .update(patch).eq("id", id).select().single();
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: [invalidateKey] });
+      return mapRow(row);
+    },
+  }) as UseMutationResult<any, Error, any>;
+}
+
+function useDeleteRow(table: string, invalidateKey: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id }: any) => {
+      const { error } = await (supabase.from(table as any) as any).delete().eq("id", id);
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: [invalidateKey] });
+      return { id };
+    },
+  }) as UseMutationResult<any, Error, any>;
+}
+
+export const useUpdateMedication = () => useUpdateRow("medications", mapMed, "medications");
+export const useDeleteMedication = () => useDeleteRow("medications", "medications");
+export const useUpdateCareRecord = () => useUpdateRow("care_records", mapRecord, "care-records");
+export const useDeleteCareRecord = () => useDeleteRow("care_records", "care-records");
+export const useDeleteCrisisLog = () => useDeleteRow("crisis_logs", "crisis-logs");
+
+export const useCreateEmergencyContact = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ data }: any) => {
+      const user_id = await getUserId();
+      const { data: row, error } = await supabase.from("emergency_contacts").insert({
+        user_id, name: data.fullName ?? data.name, full_name: data.fullName ?? data.name,
+        phone: data.phone, relationship: data.relationship, is_primary: data.isPrimary ?? false,
+      }).select().single();
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: ["emergency-contacts"] });
+      return mapEC(row);
+    },
+  }) as UseMutationResult<any, Error, any>;
+};
+export const useDeleteEmergencyContact = () => useDeleteRow("emergency_contacts", "emergency-contacts");
+
+// Get single med / record helpers
+export const useGetMedication = (id?: any, opts?: any) => {
+  const enabled = (opts?.query?.enabled ?? true) && !!id;
+  return useQuery({
+    queryKey: ["medication", id],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("medications") as any).select("*").eq("id", id).maybeSingle();
+      if (error) throw new ApiError(error.message);
+      return data ? mapMed(data) : null;
+    },
+  }) as UseQueryResult<any, Error>;
+};
+export const useGetCareRecord = (id?: any, opts?: any) => {
+  const enabled = (opts?.query?.enabled ?? true) && !!id;
+  return useQuery({
+    queryKey: ["care-record", id],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("care_records") as any).select("*").eq("id", id).maybeSingle();
+      if (error) throw new ApiError(error.message);
+      return data ? mapRecord(data) : null;
+    },
+  }) as UseQueryResult<any, Error>;
+};
+export const useGetCrisisLog = (id?: any, opts?: any) => {
+  const enabled = (opts?.query?.enabled ?? true) && !!id;
+  return useQuery({
+    queryKey: ["crisis-log", id],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("crisis_logs") as any).select("*").eq("id", id).maybeSingle();
+      if (error) throw new ApiError(error.message);
+      return data ? mapCrisis(data) : null;
+    },
+  }) as UseQueryResult<any, Error>;
+};
+
 // Auth-token / base-url plumbing — no-ops (we use the Supabase client directly)
 export type AuthTokenGetter = () => string | Promise<string | null> | null;
 export function setBaseUrl(_url: string) {}
