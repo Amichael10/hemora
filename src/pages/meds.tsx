@@ -99,34 +99,6 @@ export default function Meds() {
           <Button size="icon" variant="soft" data-testid="btn-add-med" onClick={() => setLocation("/meds/new")}>
             <Plus size={16} />
           </Button>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
-              <SheetHeader>
-                <SheetTitle className="h-section text-primary">Add Medication</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={handleAddMed} className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Name</Label>
-                  <Input value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Hydroxyurea" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Dose</Label>
-                  <Input value={dose} onChange={e => setDose(e.target.value)} placeholder="e.g. 500mg" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Frequency</Label>
-                  <Input value={frequency} onChange={e => setFrequency(e.target.value)} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Reminder Time</Label>
-                  <Input type="time" value={reminderTime} onChange={e => setReminderTime(e.target.value)} />
-                </div>
-                <Button type="submit" size="xl" className="w-full mt-4" disabled={createMed.isPending}>
-                  {createMed.isPending ? "Adding..." : "Save Medication"}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
         </div>
 
         <Card className="border-none shadow-sm bg-card mb-6 overflow-hidden">
