@@ -17,21 +17,42 @@ import Emergency from "@/pages/emergency";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
+import MedForm from "@/pages/med-form";
+import RecordForm from "@/pages/record-form";
+import CrisisDetail from "@/pages/crisis-detail";
+import Settings from "@/pages/settings";
+import Contacts from "@/pages/contacts";
+import Notifications from "@/pages/notifications";
+import { About, Help, Privacy, Terms } from "@/pages/info";
 
 function Routes() {
   return (
     <Switch>
       <Route path="/" component={Splash} />
       <Route path="/onboarding" component={Onboarding} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
       <Route path="/auth/callback" component={AuthCallback} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/crisis" component={Crisis} />
+      <Route path="/crisis/:id" component={CrisisDetail} />
       <Route path="/meds" component={Meds} />
+      <Route path="/meds/:id" component={MedForm} />
       <Route path="/records" component={Records} />
+      <Route path="/records/:id" component={RecordForm} />
       <Route path="/directory" component={Directory} />
       <Route path="/directory/:id" component={DirectoryDetail} />
       <Route path="/emergency" component={Emergency} />
       <Route path="/profile" component={Profile} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/settings/contacts" component={Contacts} />
+      <Route path="/settings/notifications" component={Notifications} />
+      <Route path="/help" component={Help} />
+      <Route path="/about" component={About} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
       <Route component={NotFound} />
     </Switch>
   );
