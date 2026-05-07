@@ -247,14 +247,31 @@ function Hero() {
   const [, setLocation] = useLocation();
   return (
     <Section className="overflow-hidden" topRule={false}>
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 80% 0%, hsl(var(--brand-gold) / 0.18), transparent 60%), radial-gradient(50% 60% at 0% 30%, hsl(var(--brand-teal) / 0.10), transparent 70%)",
-        }}
-      />
+      {/* Full-bleed hero image */}
+      <div aria-hidden className="absolute inset-0 -z-10">
+        <img
+          src={heroFamily}
+          alt=""
+          width={1600}
+          height={900}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          className="w-full h-full object-cover object-right"
+        />
+        {/* Left-side fade so text stays legible */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.92) 35%, hsl(var(--background) / 0.55) 55%, transparent 75%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 lg:hidden"
+          style={{ background: "hsl(var(--background) / 0.7)" }}
+        />
+      </div>
       <div className="px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
           <div className="text-center lg:text-left">
@@ -287,23 +304,8 @@ function Hero() {
             </div>
           </div>
 
-          <div data-anim="hero-image" className="relative">
-            <div
-              aria-hidden
-              className="absolute -inset-6 rounded-[2.5rem] blur-3xl opacity-60"
-              style={{ background: "var(--gradient-warm)" }}
-            />
-            <img
-              src={heroFamily}
-              alt="An African family embracing, with a luminous globe behind them"
-              width={1600}
-              height={900}
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              className="relative w-full h-auto rounded-2xl border border-border shadow-2xl object-cover"
-            />
-          </div>
+          {/* Right column intentionally empty — image is full-bleed background */}
+          <div aria-hidden />
         </div>
       </div>
     </Section>
