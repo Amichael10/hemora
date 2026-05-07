@@ -3,7 +3,9 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
-import kindredLogo from "@/assets/brand/Logo.png";
+import hemoraLogo from "@/assets/brand/Logo.png";
+import hemoraWordmark from "@/assets/brand/Wordmark.png";
+import heroFamily from "@/assets/hero/family-hero.webp";
 import dashboardEmoji from "@/assets/images/emoji-mild.png";
 import {
   HeartPulse2Bold as HeartPulse,
@@ -111,8 +113,8 @@ function Nav() {
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background/80 border-b border-border">
       <div className="mx-auto max-w-7xl px-6 sm:px-10 h-16 flex items-center justify-between border-x border-border">
         <button onClick={() => setLocation("/")} className="flex items-center gap-2">
-          <img src={kindredLogo} alt="Kindred" className="w-8 h-8" />
-          <span className="font-serif text-xl tracking-tight text-secondary">Kindred</span>
+          <img src={hemoraLogo} alt="Hemora" className="w-8 h-8" />
+          <img src={hemoraWordmark} alt="Hemora" className="h-6 w-auto" />
         </button>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
@@ -153,7 +155,7 @@ function DesktopMockup() {
           {/* Sidebar */}
           <aside className="border-r border-border bg-secondary/[0.04] p-4 space-y-1">
             <div className="flex items-center gap-2 mb-4">
-              <img src={kindredLogo} alt="" className="w-6 h-6" />
+              <img src={hemoraLogo} alt="" className="w-6 h-6" />
               <span className="font-serif text-sm text-secondary">Hemora</span>
             </div>
             {[
@@ -603,8 +605,8 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-6 sm:px-10 py-14 grid md:grid-cols-4 gap-8 text-sm border-x border-white/10">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2">
-            <img src={kindredLogo} alt="Kindred" className="w-9 h-9" />
-            <span className="font-serif text-2xl">Kindred</span>
+            <img src={hemoraLogo} alt="Hemora" className="w-9 h-9" />
+            <span className="font-serif text-2xl">Hemora</span>
           </div>
           <p className="mt-3 text-secondary-foreground/70 max-w-sm leading-relaxed">
             Care that stays with you. For every family touched by sickle cell.
