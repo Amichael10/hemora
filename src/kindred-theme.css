@@ -132,11 +132,12 @@
   --brand-cream: 132 11% 96%;         /* #F2F5F2 */
 
   --gradient-brand: linear-gradient(180deg,
-    hsl(var(--brand-teal)) 0%,
-    hsl(195 40% 58%) 28%,
-    hsl(195 30% 78%) 52%,
-    hsl(var(--brand-cream)) 78%,
-    hsl(0 0% 100%) 100%);
+    hsl(var(--brand-teal-deep)) 0%,
+    hsl(var(--brand-teal)) 22%,
+    hsl(195 38% 62%) 44%,
+    hsl(195 25% 82%) 64%,
+    hsl(var(--background)) 88%,
+    hsl(var(--background)) 100%);
   --gradient-brand-soft: linear-gradient(140deg, hsl(var(--brand-surface)) 0%, hsl(0 0% 100%) 100%);
 
   --shadow-brand: 0 10px 30px -10px hsl(var(--brand-teal) / 0.35);
