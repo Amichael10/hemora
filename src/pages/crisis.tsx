@@ -420,6 +420,7 @@ export default function Crisis() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.04, duration: 0.25 }}
                     >
+                      <div onClick={() => setLocation(`/crisis/${log.id}`)} className="cursor-pointer">
                       <Card
                         className={`bg-card border border-border border-l-4 ${getPainAccent(log.painLevel)} rounded-none shadow-none hover:bg-muted/30 transition-colors`}
                         data-testid={`crisis-card-${log.id}`}
