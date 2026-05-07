@@ -302,12 +302,12 @@ function Context() {
     <Section className="bg-muted/40 overflow-hidden">
       <div className="px-6 sm:px-10 py-20 lg:py-24">
         <div data-reveal className="text-center max-w-2xl mx-auto">
-          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Hemora exists</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
             Africa carries the heaviest weight — <span className="italic text-muted-foreground">and the strongest community.</span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-            Kindred is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
+            Hemora is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
           </p>
         </div>
         <div data-stagger className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
@@ -541,7 +541,7 @@ function Download() {
           />
           <div className="relative">
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-white leading-tight">
-              Take Kindred with you.
+              Take Hemora with you.
             </h2>
             <p className="mt-4 text-white/80 max-w-xl mx-auto">
               Install it as a PWA on any phone, or grab the native app. Same care, anywhere.
@@ -566,10 +566,10 @@ function Download() {
 
 function FAQ() {
   const items = [
-    { q: "Is Kindred free to use?", a: "Yes — the core experience (crisis logging, meds, records, directory) is free. Premium care features are coming later." },
+    { q: "Is Hemora free to use?", a: "Yes — the core experience (crisis logging, meds, records, directory) is free. Premium care features are coming later." },
     { q: "Is my health data private?", a: "Your data is yours. It's stored securely and never sold. You decide what to share, with whom, and when." },
-    { q: "Does it work offline?", a: "Yes. Kindred is a Progressive Web App, so you can log entries without signal and they'll sync when you reconnect." },
-    { q: "Do you have iOS and Android apps?", a: "Native apps are rolling out. In the meantime, you can install Kindred to your home screen on any modern phone." },
+    { q: "Does it work offline?", a: "Yes. Hemora is a Progressive Web App, so you can log entries without signal and they'll sync when you reconnect." },
+    { q: "Do you have iOS and Android apps?", a: "Native apps are rolling out. In the meantime, you can install Hemora to your home screen on any modern phone." },
     { q: "Can caregivers use it for someone else?", a: "Absolutely. During setup you can choose to track for yourself, a child, or another loved one." },
   ];
   return (
