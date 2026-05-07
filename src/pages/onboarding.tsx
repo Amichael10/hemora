@@ -562,62 +562,8 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── STEP 5: SCD genotype ───────────────────────── */}
+            {/* ── STEP 5: Where are you based? ───────────────── */}
             {step === 5 && (
-              <motion.div
-                key="scd"
-                custom={direction}
-                variants={slide}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="flex-1 flex flex-col px-6 pt-2 pb-6"
-              >
-                <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Five</p>
-                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
-                    Sickle cell genotype
-                  </h2>
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                    If you know it, share it — it helps us personalize care guidance. If not, that's okay.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {GENOTYPES.map((g) => {
-                    const selected = data.scdStatus === g;
-                    return (
-                      <button
-                        key={g}
-                        onClick={() => update("scdStatus", g)}
-                        className="px-4 py-2.5 rounded-full text-sm font-semibold transition-all border"
-                        style={{
-                          background: selected ? "var(--primary)" : "var(--background)",
-                          borderColor: selected ? "var(--primary)" : "var(--border)",
-                          color: selected ? "var(--primary-foreground)" : "var(--foreground)",
-                        }}
-                        data-testid={`option-scd-${g.toLowerCase().replace(/\s+/g, "-").replace(/[()]/g, "")}`}
-                      >
-                        {g}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="flex-1" />
-
-                <Button
-                  onClick={next}
-                  className="w-full h-14 rounded-2xl text-base font-semibold shadow-sm gap-2"
-                  data-testid="btn-step-scd-continue"
-                >
-                  Continue <ArrowRight size={16} />
-                </Button>
-              </motion.div>
-            )}
-
-            {/* ── STEP 6: Where are you based? ───────────────── */}
-            {step === 6 && (
               <motion.div
                 key="location"
                 custom={direction}
@@ -628,7 +574,7 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Six</p>
+                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Five</p>
                   <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
                     Where are you based?
                   </h2>
@@ -713,8 +659,8 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── STEP 7: Welcome reveal ─────────────────────── */}
-            {step === 7 && (
+            {/* ── STEP 6: Welcome reveal ─────────────────────── */}
+            {step === 6 && (
               <motion.div
                 key="welcome"
                 initial={{ opacity: 0 }}
