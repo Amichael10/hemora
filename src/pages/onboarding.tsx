@@ -41,7 +41,6 @@ interface FormData {
   fullName: string;
   dateOfBirth: string;
   gender: string;
-  scdStatus: string;
   country: string;
   state: string;
 }
@@ -53,10 +52,8 @@ const SETUP_OPTIONS: { id: SetupFor; label: string; sub: string; Icon: typeof Us
   { id: CreateProfileBodySetupFor.partner_and_i, label: "My partner and I", sub: "We're navigating this together", Icon: UsersRound },
 ];
 
-const GENOTYPES = ["HbSS", "HbSC", "HbS\u03B2", "AS (Trait)", "Not sure", "Prefer not to say"];
-
-const TOTAL_STEPS = 7;
-const PROGRESS_STEPS = [1, 2, 3, 4, 5, 6];
+const TOTAL_STEPS = 6;
+const PROGRESS_STEPS = [1, 2, 3, 4, 5];
 
 export default function Onboarding() {
   const [, setLocation] = useLocation();
@@ -91,7 +88,6 @@ export default function Onboarding() {
     fullName: "",
     dateOfBirth: "",
     gender: "",
-    scdStatus: "",
     country: "",
     state: "",
   });
@@ -107,7 +103,7 @@ export default function Onboarding() {
           ...data,
           dateOfBirth: data.dateOfBirth || null,
           gender: data.gender || null,
-          scdStatus: data.scdStatus || null,
+          scdStatus: null,
           country: data.country || null,
           state: data.state || null,
           supabaseUserId: user?.id ?? null,
@@ -179,8 +175,7 @@ export default function Onboarding() {
     if (step === 2) return data.fullName.trim().length >= 2;
     if (step === 3) return true; // dob optional
     if (step === 4) return true; // gender optional
-    if (step === 5) return true; // scd optional
-    if (step === 6) return true; // country/state optional
+    if (step === 5) return true; // country/state optional
     return true;
   })();
 
