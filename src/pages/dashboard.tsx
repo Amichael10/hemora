@@ -142,7 +142,7 @@ export default function Dashboard() {
       <div className="flex flex-col min-h-full -mb-20 pb-24 bg-background">
         {/* ── BLUE HERO SECTION ───────────────────────────── */}
         <section
-          className="relative px-5 pt-12 pb-10 text-white"
+          className="relative px-5 pt-12 pb-16 text-white rounded-b-[28px]"
           style={{ background: "var(--gradient-brand)" }}
         >
           {/* Header */}
@@ -266,7 +266,7 @@ export default function Dashboard() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="sheet-surface flex-1 -mt-6 px-5 pt-6 pb-8 flex flex-col gap-7"
+          className="sheet-surface flex-1 -mt-7 relative z-10 px-5 pt-7 pb-8 flex flex-col gap-7"
         >
           {/* drag handle */}
           <div className="mx-auto w-10 h-1 rounded-full bg-border -mt-3" />
