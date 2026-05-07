@@ -35,6 +35,7 @@ import {
 
 export default function Records() {
   const { profileId } = useProfile();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("all");
   const queryClient = useQueryClient();
   const { toast } = useToast();
