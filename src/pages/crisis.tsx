@@ -27,6 +27,13 @@ import lottieMild from "@/assets/lottie/1f60a.json";
 import lottieModerate from "@/assets/lottie/1f614.json";
 import lottieSevere from "@/assets/lottie/1f613.json";
 import lottieWorst from "@/assets/lottie/1f621.json";
+import lottieCold from "@/assets/lottie/1f976.json";
+import lottieStress from "@/assets/lottie/1f629.json";
+import lottieInfection from "@/assets/lottie/1f92e.json";
+import lottieDehydration from "@/assets/lottie/1f4a7.json";
+import lottieExertion from "@/assets/lottie/1f624.json";
+import lottieMissed from "@/assets/lottie/23f0.json";
+import lottieOther from "@/assets/lottie/1fa7a.json";
 import { useToast } from "@/hooks/use-toast";
 import {
   HeartPulseBold as HeartCardiogramFilled,
@@ -92,6 +99,7 @@ export default function Crisis() {
   const [whatHelped, setWhatHelped] = useState<string[]>([]);
   const [hospitalVisit, setHospitalVisit] = useState<boolean | null>(null);
   const [otherLocationText, setOtherLocationText] = useState("");
+  const [otherTriggerText, setOtherTriggerText] = useState("");
 
   const FLOW_STEPS: Step[] = ["pain", "location", "triggers", "relief", "hospital"];
   const goToStep = (idx: number) => {
@@ -109,14 +117,17 @@ export default function Crisis() {
     const finalLocations = locations.includes("Other") && otherLocationText.trim()
       ? [...locations.filter(l => l !== "Other"), `Other: ${otherLocationText.trim()}`]
       : locations;
+    const finalTriggers = triggers.includes("Other") && otherTriggerText.trim()
+      ? [...triggers.filter(t => t !== "Other"), `Other: ${otherTriggerText.trim()}`]
+      : triggers;
     createLog.mutate(
-      { data: { profileId, occurredAt: new Date().toISOString(), painLevel, painLocations: finalLocations, triggers, whatHelped, hospitalVisit: hospitalVisit || false } },
+      { data: { profileId, occurredAt: new Date().toISOString(), painLevel, painLocations: finalLocations, triggers: finalTriggers, whatHelped, hospitalVisit: hospitalVisit || false } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) });
           toast({ title: "Log saved", description: "Thanks for tracking — it helps you see patterns." });
           // reset + go back to history
-          setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText("");
+          setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText(""); setOtherTriggerText("");
           setStep("history");
         },
         onError: (e: any) => toast({ title: "Couldn't save log", description: e?.message ?? "Please try again", variant: "destructive" }),
