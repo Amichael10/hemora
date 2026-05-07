@@ -556,7 +556,10 @@ export default function Directory() {
                             )}
                             <button
                               type="button"
-                              onClick={() => handleToggleSaved(provider.id, provider.name, provider.saved)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleSaved(provider.id, provider.name, provider.saved);
+                              }}
                               disabled={updateProvider.isPending}
                               aria-label={provider.saved ? `Remove ${provider.name} from saved` : `Save ${provider.name}`}
                               aria-pressed={provider.saved}
