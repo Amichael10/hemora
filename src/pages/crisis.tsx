@@ -458,7 +458,7 @@ export default function Crisis() {
 
                               {log.painLocations && log.painLocations.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mb-1.5">
-                                  {log.painLocations.slice(0, 4).map((loc) => (
+                                  {log.painLocations.slice(0, 4).map((loc: string) => (
                                     <span
                                       key={loc}
                                       className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 text-foreground/80 border border-border/40"
