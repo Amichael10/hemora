@@ -8,16 +8,12 @@ import { HealthIcon } from "@/components/ui/health-icon";
 import { useProfile } from "@/context/ProfileContext";
 import {
   useListMedications,
-  useCreateMedication,
   getListMedicationsQueryKey,
   useListMedicationLogs,
   getListMedicationLogsQueryKey,
 } from "@workspace/api-client-react";
-import { CreateMedicationBodyStatus } from "@workspace/api-client-react";
 import { AltArrowRightLinear as ChevronRight, AddCircleLinear as Plus } from "solar-icon-set";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
 import {
   Pills2Bold as MedicinesFilled,
   PillBold as BlisterFilled,
