@@ -425,7 +425,7 @@ export default function Crisis() {
                     </Card>
                   ))}
                 </div>
-              ) : logs?.length === 0 ? (
+              ) : !logs || logs.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
