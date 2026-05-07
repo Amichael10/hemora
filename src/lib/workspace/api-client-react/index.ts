@@ -80,6 +80,8 @@ const mapProvider = (r: any) => ({
   id: r.id, name: r.name, type: r.type, specialty: r.specialty,
   hospital: r.hospital, phone: r.phone, email: r.email, address: r.address,
   city: r.city, state: r.state, country: r.country,
+  website: r.website ?? null,
+  latitude: r.latitude ?? null, longitude: r.longitude ?? null,
   services: r.services ?? [], saved: r.saved ?? false, verified: r.verified ?? false,
 });
 const mapEC = (r: any) => ({
