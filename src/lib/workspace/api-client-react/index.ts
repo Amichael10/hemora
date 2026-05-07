@@ -154,21 +154,21 @@ export const useListProviders = (args: any, opts?: any) => {
 };
 
 // ---- Single profile / dashboard ----
-export const useGetProfile = (id?: string, opts?: any) => {
+export const useGetProfile = (id?: any, opts?: any) => {
   const enabled = (opts?.query?.enabled ?? true) && !!id;
   return useQuery({
     queryKey: opts?.query?.queryKey ?? ["profile", id],
     enabled,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", id!).maybeSingle();
+      const { data, error } = await (supabase.from("profiles") as any).select("*").eq("id", id).maybeSingle();
       if (error) throw new ApiError(error.message);
       return mapProfile(data);
     },
   }) as UseQueryResult<any, Error>;
 };
 
-export const useGetDashboardSummary = (id?: string, opts?: any) => {
-  const enabled = (opts?.query?.enabled ?? true) && !!id;
+export const useGetDashboardSummary = (arg?: any, opts?: any) => {
+  const enabled = (opts?.query?.enabled ?? true) && !!arg;
   return useQuery({
     queryKey: opts?.query?.queryKey ?? ["dashboard-summary", id],
     enabled,
