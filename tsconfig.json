@@ -21,7 +21,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@assets/*": ["./src/lib/workspace/assets/*"],
+      "@workspace/regions": ["./src/lib/workspace/regions/index.ts"],
+      "@workspace/api-client-react": ["./src/lib/workspace/api-client-react/index.ts"]
     }
   }
 }
