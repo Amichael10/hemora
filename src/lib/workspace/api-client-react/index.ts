@@ -169,6 +169,21 @@ export const useGetProfile = (id?: any, opts?: any) => {
   }) as UseQueryResult<any, Error>;
 };
 
+export const useGetProvider = (id?: any, opts?: any) => {
+  const enabled = (opts?.query?.enabled ?? true) && !!id;
+  return useQuery({
+    queryKey: opts?.query?.queryKey ?? ["provider", id],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("providers") as any)
+        .select("*").eq("id", id).maybeSingle();
+      if (error) throw new ApiError(error.message);
+      return data ? mapProvider(data) : null;
+    },
+  }) as UseQueryResult<any, Error>;
+};
+export const getGetProviderQueryKey = (id: any) => ["provider", id];
+
 export const useGetDashboardSummary = (arg?: any, opts?: any) => {
   const enabled = (opts?.query?.enabled ?? true) && !!arg;
   return useQuery({
