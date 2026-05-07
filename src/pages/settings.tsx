@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
@@ -16,6 +17,7 @@ import {
   QuestionCircleLinear as HelpIcon,
   Logout3Linear as LogOut,
   AltArrowRightLinear as ArrowRight,
+  PenNewSquareLinear as EditIcon,
 } from "solar-icon-set";
 
 function getInitials(name?: string | null) {
@@ -71,6 +73,12 @@ export default function Settings() {
           {user?.email && (
             <p className="text-xs text-muted-foreground mt-1">{user.email}</p>
           )}
+          <Link href="/onboarding">
+            <Button size="sm" className="mt-4 rounded-full px-5">
+              <EditIcon size={14} />
+              Edit profile
+            </Button>
+          </Link>
         </div>
 
         <Group>
