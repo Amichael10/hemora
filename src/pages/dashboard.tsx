@@ -105,17 +105,17 @@ export default function Dashboard() {
 
   return (
     <MobileAppShell>
-      <div className="flex flex-col min-h-full" style={{ background: "var(--gradient-brand)" }}>
+      <div className="flex flex-col min-h-[calc(100dvh-5rem)]" style={{ background: "var(--gradient-brand)" }}>
 
         {/* ── Slim header (on gradient) ────────────────────────── */}
         <div className="flex justify-between items-center px-5 pt-11 pb-4 relative">
           <div>
-            <p className="text-xs font-medium text-white/75">{getGreeting()}</p>
+            <p className="text-xs font-semibold text-white/85 drop-shadow-sm">{getGreeting()}</p>
             {loadingProfile ? (
               <Skeleton className="h-7 w-28 mt-1" />
             ) : (
               <h1
-                className="font-serif font-bold text-[22px] leading-tight tracking-[-0.5px] mt-0.5 text-white"
+                className="font-serif font-bold text-[22px] leading-tight tracking-[-0.5px] mt-0.5 text-white drop-shadow"
                 data-testid="dashboard-greeting"
               >
                 {firstName}
