@@ -11,7 +11,7 @@ import {
   MapPointLinear as MapPin,
   ArrowRightUpLinear as ArrowUpRight,
   CheckCircleBold as CheckCircle,
-  Letter2Linear as MailIcon,
+  LetterLinear as MailIcon,
 } from "solar-icon-set";
 
 export default function DirectoryDetail() {
