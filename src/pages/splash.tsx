@@ -20,10 +20,10 @@ export default function Splash() {
           className="flex flex-col items-center"
         >
           <img src={kindredLogo} alt="Kindred Logo" className="w-24 h-24 mb-6" data-testid="img-splash-logo" />
-          <h1 className="h-display text-primary max-w-[280px]">
+          <h1 className="font-serif font-semibold text-[1.875rem] leading-[1.15] tracking-[-0.5px] text-white drop-shadow max-w-[280px]">
             For every family touched by sickle cell.
           </h1>
-          <p className="mt-4 body-md tracking-wide">
+          <p className="mt-4 text-sm leading-relaxed text-white/90 tracking-wide">
             Built for families. Guided by care.
           </p>
         </motion.div>
@@ -43,7 +43,7 @@ export default function Splash() {
           transition={{ duration: 0.5, delay: 1 }}
           className="w-full mt-8"
         >
-          <Button size="xl" className="w-full" onClick={() => setLocation("/onboarding")} data-testid="button-get-started">
+          <Button size="xl" className="w-full bg-white text-primary hover:bg-white/95 shadow-lg" onClick={() => setLocation("/onboarding")} data-testid="button-get-started">
             Get Started
           </Button>
         </motion.div>
