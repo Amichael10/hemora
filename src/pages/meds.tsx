@@ -61,6 +61,7 @@ function AdherenceHeart({ percent }: { percent: number }) {
 
 export default function Meds() {
   const { profileId } = useProfile();
+  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
