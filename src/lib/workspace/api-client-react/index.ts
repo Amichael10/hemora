@@ -320,7 +320,7 @@ export const useCreateProvider = () => {
   return useMutation({
     mutationFn: async ({ data }: any) => {
       const user_id = await getUserId();
-      const { data: row, error } = await supabase.from("providers").insert({
+      const { data: row, error } = await (supabase.from("providers") as any).insert({
         user_id, name: data.name, type: data.type ?? "hospital",
         specialty: data.specialty, hospital: data.hospital,
         phone: data.phone, email: data.email, address: data.address,
