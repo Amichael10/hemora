@@ -9,9 +9,10 @@ import {
   Preview,
   Section,
   Text,
+  Img,
 } from '@react-email/components'
 
-// Kindred brand tokens (mirrors src/kindred-theme.css)
+// Hemora brand tokens (mirrors src/kindred-theme.css)
 export const brand = {
   cream: '#f4ead8',
   creamSoft: '#faf3e3',
@@ -23,6 +24,11 @@ export const brand = {
   ink: '#2a2a2a',
   muted: '#6b6256',
 }
+
+// Absolute URL for the Hemora wordmark used inside emails.
+// Email clients require absolute URLs for images.
+export const HEMORA_WORDMARK_URL =
+  'https://project--c7428bd7-6c08-4d7b-a83f-109ec3907cba.lovable.app/email/hemora-wordmark.png'
 
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
@@ -41,11 +47,9 @@ const container: React.CSSProperties = {
 }
 
 const wordmark: React.CSSProperties = {
-  fontFamily: "'Fraunces', Georgia, serif",
-  fontSize: '20px',
-  fontWeight: 600,
-  color: brand.teal,
-  letterSpacing: '-0.01em',
+  height: '34px',
+  width: 'auto',
+  display: 'block',
   margin: 0,
 }
 
@@ -136,9 +140,12 @@ export const BrandLayout = ({ preview, siteName, children }: BrandLayoutProps) =
     <Body style={main}>
       <Container style={container}>
         <Section>
-          <Heading as="h2" style={wordmark}>
-            {siteName}
-          </Heading>
+          <Img
+            src={HEMORA_WORDMARK_URL}
+            alt={siteName}
+            height={34}
+            style={wordmark}
+          />
           <Hr style={goldRule} />
         </Section>
         {children}
