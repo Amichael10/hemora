@@ -12,6 +12,7 @@ import Crisis from "@/pages/crisis";
 import Meds from "@/pages/meds";
 import Records from "@/pages/records";
 import Directory from "@/pages/directory";
+import DirectoryDetail from "@/pages/directory-detail";
 import Emergency from "@/pages/emergency";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
@@ -28,6 +29,7 @@ function Routes() {
       <Route path="/meds" component={Meds} />
       <Route path="/records" component={Records} />
       <Route path="/directory" component={Directory} />
+      <Route path="/directory/:id" component={DirectoryDetail} />
       <Route path="/emergency" component={Emergency} />
       <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
