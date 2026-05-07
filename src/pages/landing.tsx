@@ -1,5 +1,7 @@
 import { useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
 import kindredLogo from "@/assets/brand/Logo.png";
 import dashboardEmoji from "@/assets/images/emoji-mild.png";
@@ -17,12 +19,7 @@ import {
 } from "solar-icon-set";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 
-const fadeUp = {
-  initial: { opacity: 0, y: 16 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" },
-  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
-};
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Section wrapper that draws continuous vertical guide rails (Dub-style),
@@ -230,6 +227,7 @@ function DesktopMockup() {
                 {[3, 5, 2, 6, 4, 2, 1].map((v, i) => (
                   <div
                     key={i}
+                    data-anim="bar"
                     className="flex-1 rounded-md"
                     style={{ height: `${v * 14}%`, background: "hsl(var(--accent))" }}
                   />
@@ -256,21 +254,21 @@ function Hero() {
         }}
       />
       <div className="px-6 sm:px-10 pt-20 pb-16 lg:pt-28 lg:pb-20 text-center">
-        <motion.div {...fadeUp} className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
+        <div className="max-w-4xl mx-auto">
+          <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             For families touched by sickle cell
           </div>
-          <h1 className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
-            Care that stays with you,{" "}
-            <span className="italic text-primary">between appointments.</span>
+          <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
+            <span className="inline-block">Care that stays with you,</span>{" "}
+            <span className="inline-block italic text-primary">between appointments.</span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Kindred helps you log crises, stay on top of meds, keep records in one place,
             and find sickle-cell-aware care — on your phone, anywhere.
           </p>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center gap-3">
             <Button size="lg" onClick={() => setLocation("/signup")}>
               Open the app <ArrowRight size={16} />
             </Button>
@@ -279,16 +277,16 @@ function Hero() {
             </Button>
           </div>
 
-          <div className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
+          <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
             <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
             <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="mt-14 lg:mt-20 px-6 sm:px-10">
+        <div data-anim="hero-mockup" className="mt-14 lg:mt-20 px-6 sm:px-10">
           <DesktopMockup />
-        </motion.div>
+        </div>
       </div>
     </Section>
   );
@@ -296,14 +294,14 @@ function Hero() {
 
 function Context() {
   const stats = [
-    { n: "75%", label: "of all sickle cell births globally happen in sub-Saharan Africa.", source: "WHO" },
-    { n: "300K+", label: "babies are born with sickle cell disease in Africa each year.", source: "WHO" },
-    { n: "1 in 4", label: "Nigerians carries the sickle cell trait — the highest burden worldwide.", source: "WHO Africa" },
+    { value: 75, prefix: "", suffix: "%", n: "75%", label: "of all sickle cell births globally happen in sub-Saharan Africa.", source: "WHO" },
+    { value: 300, prefix: "", suffix: "K+", n: "300K+", label: "babies are born with sickle cell disease in Africa each year.", source: "WHO" },
+    { value: 0, prefix: "", suffix: "", n: "1 in 4", label: "Nigerians carries the sickle cell trait — the highest burden worldwide.", source: "WHO Africa" },
   ];
   return (
     <Section className="bg-muted/40 overflow-hidden">
       <div className="px-6 sm:px-10 py-20 lg:py-24">
-        <motion.div {...fadeUp} className="text-center max-w-2xl mx-auto">
+        <div data-reveal className="text-center max-w-2xl mx-auto">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
             Africa carries the heaviest weight — <span className="italic text-muted-foreground">and the strongest community.</span>
@@ -311,19 +309,29 @@ function Context() {
           <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
             Kindred is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
           </p>
-        </motion.div>
-        <div className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
+        </div>
+        <div data-stagger className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
           {stats.map((s, i) => (
-            <motion.div
+            <div
               key={s.n}
-              {...fadeUp}
-              transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+              data-stagger-item
               className="p-8 text-center"
             >
-              <div className="font-serif text-4xl sm:text-5xl text-primary tracking-tight">{s.n}</div>
+              {s.value > 0 ? (
+                <div
+                  className="font-serif text-4xl sm:text-5xl text-primary tracking-tight"
+                  data-counter={s.value}
+                  data-counter-suffix={s.suffix}
+                  data-counter-prefix={s.prefix}
+                >
+                  0{s.suffix}
+                </div>
+              ) : (
+                <div className="font-serif text-4xl sm:text-5xl text-primary tracking-tight">{s.n}</div>
+              )}
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.label}</p>
               <div className="mt-3 text-[10px] uppercase tracking-wider text-muted-foreground/70">Source: {s.source}</div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -374,15 +382,15 @@ function Features() {
   return (
     <Section id="features" dotted={false}>
       <div className="px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div {...fadeUp} className="max-w-2xl">
+        <div data-reveal className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">What's inside</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
             Everything you need.<br />
             <span className="italic text-muted-foreground">Nothing you don't.</span>
           </h2>
-        </motion.div>
+        </div>
 
-        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 border-y border-l border-border bg-card">
+        <div data-stagger className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 border-y border-l border-border bg-card">
           {features.map((f, i) => {
             const Icon = f.icon;
             const tone =
@@ -392,10 +400,9 @@ function Features() {
                 ? "bg-accent/20 text-accent-foreground"
                 : "bg-secondary/10 text-secondary";
             return (
-              <motion.div
+              <div
                 key={f.title}
-                {...fadeUp}
-                transition={{ ...fadeUp.transition, delay: i * 0.05 }}
+                data-stagger-item
                 className="group p-7 border-r border-b border-border hover:bg-muted/40 transition-colors"
               >
                 <div className={`w-11 h-11 rounded-xl grid place-items-center ${tone}`}>
@@ -403,7 +410,7 @@ function Features() {
                 </div>
                 <h3 className="mt-4 font-serif text-xl text-secondary">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -436,25 +443,24 @@ function HowItWorks() {
         </div>
       </div>
       <div className="relative mx-auto max-w-7xl px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div {...fadeUp} className="max-w-2xl">
+        <div data-reveal className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">How it works</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight">
             A calmer way to manage{" "}
             <span className="italic">a complicated condition.</span>
           </h2>
-        </motion.div>
-        <div className="mt-12 grid md:grid-cols-3 border-y md:border border-white/10">
+        </div>
+        <div data-stagger className="mt-12 grid md:grid-cols-3 border-y md:border border-white/10">
           {steps.map((s, i) => (
-            <motion.div
+            <div
               key={s.n}
-              {...fadeUp}
-              transition={{ ...fadeUp.transition, delay: i * 0.08 }}
+              data-stagger-item
               className="p-8 border-b md:border-b-0 md:border-r last:border-r-0 border-white/10 bg-white/[0.03]"
             >
               <div className="font-serif text-3xl text-accent">{s.n}</div>
               <h3 className="mt-3 font-serif text-xl">{s.title}</h3>
               <p className="mt-2 text-sm text-secondary-foreground/70 leading-relaxed">{s.body}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -483,19 +489,18 @@ function Stories() {
   return (
     <Section id="stories">
       <div className="px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div {...fadeUp} className="max-w-2xl">
+        <div data-reveal className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Stories</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
             Built with families,<br />
             <span className="italic text-muted-foreground">for families.</span>
           </h2>
-        </motion.div>
-        <div className="mt-12 grid md:grid-cols-3 border-y md:border border-border bg-card">
+        </div>
+        <div data-stagger className="mt-12 grid md:grid-cols-3 border-y md:border border-border bg-card">
           {quotes.map((t, i) => (
-            <motion.figure
+            <figure
               key={i}
-              {...fadeUp}
-              transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+              data-stagger-item
               className="p-7 flex flex-col border-b md:border-b-0 md:border-r last:border-r-0 border-border"
             >
               <div className="flex gap-0.5 text-accent">
@@ -508,7 +513,7 @@ function Stories() {
                 <div className="font-semibold text-secondary">{t.name}</div>
                 <div className="text-xs text-muted-foreground">{t.role}</div>
               </figcaption>
-            </motion.figure>
+            </figure>
           ))}
         </div>
       </div>
@@ -521,8 +526,8 @@ function Download() {
   return (
     <Section id="download" dotted={false}>
       <div className="px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div
-          {...fadeUp}
+        <div
+          data-reveal
           className="relative overflow-hidden p-10 sm:p-16 text-center border border-border"
           style={{ background: "var(--gradient-brand)" }}
         >
@@ -553,7 +558,7 @@ function Download() {
               </Button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </Section>
   );
@@ -570,12 +575,12 @@ function FAQ() {
   return (
     <Section id="faq" className="bg-muted/40">
       <div className="px-6 sm:px-10 py-20 lg:py-28 max-w-3xl mx-auto">
-        <motion.div {...fadeUp} className="text-center">
+        <div data-reveal className="text-center">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">FAQ</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary">
             Still wondering?
           </h2>
-        </motion.div>
+        </div>
         <div className="mt-10 divide-y divide-border bg-card border border-border">
           {items.map((it) => (
             <details key={it.q} className="group p-5 sm:p-6">
@@ -633,8 +638,89 @@ function Footer() {
 }
 
 export default function Landing() {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const root = rootRef.current;
+    const ctx = gsap.context(() => {
+      // Hero entrance
+      const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      heroTl
+        .from("[data-anim='hero-badge']", { y: 14, opacity: 0, duration: 0.6 })
+        .from("[data-anim='hero-title'] > *", { y: 28, opacity: 0, duration: 0.9, stagger: 0.08 }, "-=0.3")
+        .from("[data-anim='hero-sub']", { y: 18, opacity: 0, duration: 0.7 }, "-=0.5")
+        .from("[data-anim='hero-cta'] > *", { y: 14, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.4")
+        .from("[data-anim='hero-trust'] > *", { y: 10, opacity: 0, duration: 0.5, stagger: 0.06 }, "-=0.35")
+        .from("[data-anim='hero-mockup']", { y: 60, opacity: 0, scale: 0.96, duration: 1.1, ease: "power4.out" }, "-=0.4");
+
+      // Subtle floating glow on hero mockup
+      gsap.to("[data-anim='hero-mockup']", {
+        y: -10,
+        duration: 4,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      // Generic scroll-triggered reveals
+      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
+        gsap.from(el, {
+          y: 40,
+          opacity: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 85%" },
+        });
+      });
+
+      // Stagger groups
+      gsap.utils.toArray<HTMLElement>("[data-stagger]").forEach((group) => {
+        const items = group.querySelectorAll<HTMLElement>("[data-stagger-item]");
+        gsap.from(items, {
+          y: 40,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: 0.08,
+          scrollTrigger: { trigger: group, start: "top 80%" },
+        });
+      });
+
+      // Animated stat counters
+      gsap.utils.toArray<HTMLElement>("[data-counter]").forEach((el) => {
+        const target = parseFloat(el.dataset.counter || "0");
+        const suffix = el.dataset.counterSuffix || "";
+        const prefix = el.dataset.counterPrefix || "";
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: target,
+          duration: 1.6,
+          ease: "power2.out",
+          scrollTrigger: { trigger: el, start: "top 85%" },
+          onUpdate: () => {
+            const n = target >= 100 ? Math.round(obj.v) : obj.v.toFixed(0);
+            el.textContent = `${prefix}${n}${suffix}`;
+          },
+        });
+      });
+
+      // Pain chart bars grow
+      gsap.from("[data-anim='bar']", {
+        scaleY: 0,
+        transformOrigin: "bottom",
+        duration: 0.9,
+        ease: "power3.out",
+        stagger: 0.07,
+        scrollTrigger: { trigger: "[data-anim='bar']", start: "top 90%" },
+      });
+    }, root);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="min-h-[100dvh] w-full bg-background text-foreground antialiased">
+    <div ref={rootRef} className="min-h-[100dvh] w-full bg-background text-foreground antialiased">
       <Nav />
       <main>
         <Hero />
