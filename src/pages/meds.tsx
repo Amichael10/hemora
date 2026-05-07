@@ -134,7 +134,8 @@ export default function Meds() {
         ) : (
           <div className="space-y-3">
             {meds?.map((med) => (
-              <Card key={med.id} className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`med-card-${med.id}`}>
+              <Link key={med.id} href={`/meds/${med.id}`}>
+              <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`med-card-${med.id}`}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
@@ -165,6 +166,7 @@ export default function Meds() {
                   <ChevronRight size={16} color="rgba(115,115,115,0.5)" />
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}
