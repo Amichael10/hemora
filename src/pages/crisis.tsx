@@ -404,15 +404,17 @@ export default function Crisis() {
               <div className="flex items-center justify-between mb-5">
                 <h1 className="h-page">Crisis History</h1>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
-                  <Plus size={16} /> Start log
-                </Button>
-                <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
-                  onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
-                  Urgent care
-                </Button>
-              </div>
+              {logs && logs.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
+                    <Plus size={16} /> Start log
+                  </Button>
+                  <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
+                    onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
+                    Urgent care
+                  </Button>
+                </div>
+              )}
 
               {isLoadingLogs ? (
                 <div className="space-y-4">
