@@ -18,45 +18,48 @@ export class ApiError extends Error {
 
 // ---- Enums (string-literal style; pages use `Foo.BAR`) ----
 export const CrisisLogPainLevel = {
-  MILD: "mild",
-  MODERATE: "moderate",
-  SEVERE: "severe",
-  WORST: "worst",
+  mild: "mild",
+  moderate: "moderate",
+  severe: "severe",
+  worst: "worst",
 } as const;
 export type CrisisLogPainLevel = (typeof CrisisLogPainLevel)[keyof typeof CrisisLogPainLevel];
 
 export const CreateCareRecordBodyType = {
-  LAB: "lab",
-  IMAGING: "imaging",
-  VISIT: "visit",
-  OTHER: "other",
+  lab: "lab",
+  imaging: "imaging",
+  visit: "visit",
+  other: "other",
 } as const;
 export type CreateCareRecordBodyType = (typeof CreateCareRecordBodyType)[keyof typeof CreateCareRecordBodyType];
 
 export const CreateCareRecordBodyStatus = {
-  PENDING: "pending",
-  COMPLETED: "completed",
+  pending: "pending",
+  completed: "completed",
+  saved: "saved",
 } as const;
 export type CreateCareRecordBodyStatus = (typeof CreateCareRecordBodyStatus)[keyof typeof CreateCareRecordBodyStatus];
 
 export const CreateMedicationBodyStatus = {
-  ACTIVE: "active",
-  PAUSED: "paused",
-  ARCHIVED: "archived",
+  ongoing: "ongoing",
+  active: "active",
+  paused: "paused",
+  archived: "archived",
 } as const;
 export type CreateMedicationBodyStatus = (typeof CreateMedicationBodyStatus)[keyof typeof CreateMedicationBodyStatus];
 
 export const CreateMedicationLogBodyStatus = {
-  TAKEN: "taken",
-  SKIPPED: "skipped",
-  MISSED: "missed",
+  taken: "taken",
+  skipped: "skipped",
+  missed: "missed",
 } as const;
 export type CreateMedicationLogBodyStatus = (typeof CreateMedicationLogBodyStatus)[keyof typeof CreateMedicationLogBodyStatus];
 
 export const CreateProfileBodySetupFor = {
-  SELF: "self",
-  CHILD: "child",
-  OTHER: "other",
+  myself: "myself",
+  my_child: "my_child",
+  someone_i_care_for: "someone_i_care_for",
+  partner_and_i: "partner_and_i",
 } as const;
 export type CreateProfileBodySetupFor = (typeof CreateProfileBodySetupFor)[keyof typeof CreateProfileBodySetupFor];
 
