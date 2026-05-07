@@ -401,10 +401,16 @@ export default function Crisis() {
 
           {step === "history" && (
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-5">
                 <h1 className="h-page">Crisis History</h1>
-                <Button size="icon" variant="soft" onClick={() => setStep("entry")}>
-                  <Plus size={16} />
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
+                  <Plus size={16} /> Start log
+                </Button>
+                <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
+                  onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
+                  Urgent care
                 </Button>
               </div>
 
