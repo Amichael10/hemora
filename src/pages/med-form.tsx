@@ -42,8 +42,8 @@ function from24h(t: string): { h: string; m: string; p: "AM" | "PM" } {
 
 export default function MedForm() {
   const [, setLocation] = useLocation();
-  const [, params] = useRoute("/meds/:id");
-  const id = params?.id && params.id !== "new" ? params.id : undefined;
+  const [matchEdit, editParams] = useRoute("/meds/:id/edit");
+  const id = matchEdit ? editParams?.id : undefined;
   const isEdit = !!id;
   const { profileId } = useProfile();
   const { toast } = useToast();

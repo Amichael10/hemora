@@ -22,6 +22,7 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import MedForm from "@/pages/med-form";
+import MedDetail from "@/pages/med-detail";
 import RecordForm from "@/pages/record-form";
 import CrisisDetail from "@/pages/crisis-detail";
 import Settings from "@/pages/settings";
@@ -45,7 +46,9 @@ function Routes() {
       <Route path="/crisis" component={Crisis} />
       <Route path="/crisis/:id" component={CrisisDetail} />
       <Route path="/meds" component={Meds} />
-      <Route path="/meds/:id" component={MedForm} />
+      <Route path="/meds/new" component={MedForm} />
+      <Route path="/meds/:id/edit" component={MedForm} />
+      <Route path="/meds/:id" component={MedDetail} />
       <Route path="/records" component={Records} />
       <Route path="/records/:id" component={RecordForm} />
       <Route path="/directory" component={Directory} />
