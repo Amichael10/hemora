@@ -87,16 +87,16 @@ export default function Records() {
     <MobileAppShell>
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="font-serif text-[1.5rem] text-primary font-semibold tracking-[-0.5px]">Care Records</h1>
+          <h1 className="h-page">Care Records</h1>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="h-9 w-9 shadow-sm" data-testid="btn-add-record">
+              <Button size="icon" variant="soft" data-testid="btn-add-record">
                 <Plus size={16} />
               </Button>
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl sm:max-w-[430px] mx-auto">
               <SheetHeader>
-                <SheetTitle className="font-serif text-primary tracking-[-0.25px]">Add Record</SheetTitle>
+                <SheetTitle className="h-section text-primary">Add Record</SheetTitle>
               </SheetHeader>
               <form onSubmit={handleAddRecord} className="space-y-4 mt-6">
                 <div className="space-y-2">
@@ -111,11 +111,11 @@ export default function Records() {
                   <Label>Type</Label>
                   <div className="flex gap-2">
                     {["visit", "lab", "doc"].map(t => (
-                      <Button key={t} type="button" variant={type === t ? "default" : "outline"} onClick={() => setType(t as CreateCareRecordBodyType)} className="flex-1 capitalize shadow-sm">{t}</Button>
+                      <Button key={t} type="button" variant={type === t ? "default" : "outline"} onClick={() => setType(t as CreateCareRecordBodyType)} className="flex-1 capitalize">{t}</Button>
                     ))}
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-12 font-semibold mt-4 shadow-sm" disabled={createRecord.isPending}>
+                <Button type="submit" size="xl" className="w-full mt-4" disabled={createRecord.isPending}>
                   {createRecord.isPending ? "Adding..." : "Save Record"}
                 </Button>
               </form>
@@ -133,10 +133,10 @@ export default function Records() {
         </Tabs>
 
         <div className="flex gap-2 mb-6 flex-wrap">
-          <Button variant="outline" className="h-9 whitespace-nowrap text-xs bg-card shadow-sm border-none">
+          <Button variant="soft" size="sm" className="whitespace-nowrap">
             <FileUp size={14} /> Export Summary
           </Button>
-          <Button variant="outline" className="h-9 whitespace-nowrap text-xs bg-card shadow-sm border-none">
+          <Button variant="soft" size="sm" className="whitespace-nowrap">
             Filter by Date
           </Button>
         </div>
@@ -161,7 +161,7 @@ export default function Records() {
               <HealthIcon outline={MedicalRecordsOutline} filled={MedicalRecordsFilled} width="48" height="48" />
             </div>
             <p className="text-sm mb-4">No records found.</p>
-            <Button variant="outline" className="shadow-sm" onClick={() => setOpen(true)}>Add Record</Button>
+            <Button variant="soft" onClick={() => setOpen(true)}>Add Record</Button>
           </div>
         ) : (
           <div className="space-y-3">
