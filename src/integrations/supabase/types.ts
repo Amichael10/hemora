@@ -14,7 +14,293 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      care_records: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          id: string
+          notes: string | null
+          provider_name: string | null
+          record_date: string | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          notes?: string | null
+          provider_name?: string | null
+          record_date?: string | null
+          status?: string
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          notes?: string | null
+          provider_name?: string | null
+          record_date?: string | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crisis_logs: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          occurred_at: string
+          pain_level: string
+          pain_locations: Json | null
+          triggers: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          pain_level: string
+          pain_locations?: Json | null
+          triggers?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          pain_level?: string
+          pain_locations?: Json | null
+          triggers?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      emergency_contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_primary: boolean | null
+          name: string
+          phone: string
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name: string
+          phone: string
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name?: string
+          phone?: string
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medication_logs: {
+        Row: {
+          created_at: string
+          id: string
+          medication_id: string
+          notes: string | null
+          status: string
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          medication_id: string
+          notes?: string | null
+          status?: string
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          medication_id?: string
+          notes?: string | null
+          status?: string
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_logs_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medications: {
+        Row: {
+          created_at: string
+          dosage: string | null
+          frequency: string | null
+          id: string
+          name: string
+          notes: string | null
+          schedule_time: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dosage?: string | null
+          frequency?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          schedule_time?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dosage?: string | null
+          frequency?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          schedule_time?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          allergies: string | null
+          blood_type: string | null
+          conditions: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          full_name: string | null
+          genotype: string | null
+          height_cm: number | null
+          id: string
+          setup_for: string | null
+          sex: string | null
+          state: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          allergies?: string | null
+          blood_type?: string | null
+          conditions?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string | null
+          genotype?: string | null
+          height_cm?: number | null
+          id?: string
+          setup_for?: string | null
+          sex?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          allergies?: string | null
+          blood_type?: string | null
+          conditions?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string | null
+          genotype?: string | null
+          height_cm?: number | null
+          id?: string
+          setup_for?: string | null
+          sex?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      providers: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          hospital: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          specialty: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          hospital?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          specialty?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          hospital?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          specialty?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
