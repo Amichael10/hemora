@@ -19,15 +19,17 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  BellLinear as Bell,
-  CheckCircleBold as Check,
-  PillBold as Pill,
-  ClockCircleLinear as Clock,
+  SettingsLinear as Settings,
+  EyeClosedLinear as EyeOff,
   AltArrowRightLinear as ArrowRight,
+  PillBold as Pill,
   HeartPulseLinear as HeartPulse,
   DocumentTextLinear as DocText,
+  AddCircleBold as Plus,
+  ClockCircleBold as Clock,
+  CheckCircleBold as Check,
+  ChartLinear as Chart,
 } from "solar-icon-set";
-import { bottleForMedication } from "@/lib/medBottle";
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -43,13 +45,10 @@ function getInitials(name?: string) {
 
 function formatTime(t?: string | null) {
   if (!t) return "—";
-  // Accept "HH:MM" or ISO; render as "8:00 AM"
   const m = /^(\d{1,2}):(\d{2})/.exec(t);
   if (!m) {
     const d = new Date(t);
-    if (!isNaN(d.getTime())) {
-      return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-    }
+    if (!isNaN(d.getTime())) return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
     return t;
   }
   const h = parseInt(m[1], 10);
@@ -65,6 +64,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [markingTaken, setMarkingTaken] = useState<number | null>(null);
+  const [hideStats, setHideStats] = useState(false);
 
   const { data: profile, isLoading: loadingProfile } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
@@ -122,18 +122,14 @@ export default function Dashboard() {
   const recentCrisis = summary?.recentCrisisLog;
   const firstName = profile?.fullName.split(" ")[0] || "Friend";
 
-  // Sort today's schedule by reminderTime
   const sortedMeds = useMemo(() => {
     if (!meds) return [];
-    return [...meds].sort((a, b) => {
-      const ta = a.reminderTime || "99:99";
-      const tb = b.reminderTime || "99:99";
-      return ta.localeCompare(tb);
-    });
+    return [...meds].sort((a, b) => (a.reminderTime || "99:99").localeCompare(b.reminderTime || "99:99"));
   }, [meds]);
 
   const totalToday = sortedMeds.length;
   const doneToday = sortedMeds.filter((m) => takenTodayIds.has(m.id)).length;
+  const activeMeds = meds?.length ?? 0;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -144,145 +140,141 @@ export default function Dashboard() {
   return (
     <MobileAppShell>
       <div className="flex flex-col min-h-full -mb-20 pb-24 bg-background">
-        {/* ── Header ─────────────────────────────────────────── */}
-        <header className="flex justify-between items-center px-5 pt-12 pb-6">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-              {getGreeting()}
-            </p>
-            {loadingProfile ? (
-              <Skeleton className="h-8 w-32 mt-1.5" />
-            ) : (
-              <h1
-                className="font-serif font-semibold text-[26px] leading-tight tracking-[-0.5px] mt-1 text-foreground"
-                data-testid="dashboard-greeting"
-              >
-                {firstName}
-              </h1>
-            )}
-          </div>
-          <div className="flex items-center gap-2.5">
-            <button
-              className="w-10 h-10 rounded-full flex items-center justify-center text-foreground/70 bg-secondary hover:bg-secondary/70 transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell size={18} />
-            </button>
-            <Link href="/profile">
-              <Avatar
-                className="w-10 h-10 cursor-pointer ring-2 ring-secondary"
-                data-testid="avatar-dashboard"
-              >
-                <AvatarFallback className="font-serif font-semibold text-sm text-primary bg-primary/10">
+        {/* ── BLUE HERO SECTION ───────────────────────────── */}
+        <section
+          className="relative px-5 pt-12 pb-10 text-white"
+          style={{ background: "var(--gradient-brand)" }}
+        >
+          {/* Header */}
+          <header className="flex items-center justify-between">
+            <Link href="/profile" className="flex items-center gap-3 group">
+              <Avatar className="w-11 h-11 ring-2 ring-white/30" data-testid="avatar-dashboard">
+                <AvatarFallback className="font-serif font-semibold text-sm text-primary bg-white">
                   {getInitials(profile?.fullName)}
                 </AvatarFallback>
               </Avatar>
+              <div>
+                <p className="text-[12px] text-white/75 leading-tight">{getGreeting()},</p>
+                {loadingProfile ? (
+                  <Skeleton className="h-5 w-24 mt-0.5 bg-white/20" />
+                ) : (
+                  <p className="font-serif font-semibold text-[18px] leading-tight tracking-[-0.3px]">
+                    {firstName}
+                  </p>
+                )}
+              </div>
             </Link>
-          </div>
-        </header>
+            <button
+              onClick={() => setLocation("/profile")}
+              aria-label="Settings"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/10 hover:bg-white/15 transition-colors"
+            >
+              <Settings size={18} />
+            </button>
+          </header>
 
+          {/* Adherence summary */}
+          <div className="mt-7">
+            <Link
+              href="/meds"
+              className="inline-flex items-center gap-1 text-[13px] text-white/85 hover:text-white"
+            >
+              Today's care
+              <ArrowRight size={12} />
+            </Link>
+            <div className="flex items-end justify-between mt-1">
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-serif font-semibold text-[34px] leading-none tracking-[-1px]">
+                  {hideStats ? "•••" : `${doneToday}/${totalToday || 0}`}
+                </span>
+                <span className="text-[14px] text-white/80 font-medium">doses</span>
+              </div>
+              <button
+                onClick={() => setHideStats((v) => !v)}
+                aria-label="Toggle privacy"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white/85 hover:bg-white/10"
+              >
+                <EyeOff size={18} />
+              </button>
+            </div>
+
+            {/* progress bar */}
+            <div className="mt-3 h-1.5 rounded-full bg-white/15 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-white/90 transition-all duration-700"
+                style={{ width: `${totalToday ? (doneToday / totalToday) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Stat cards row (like the reference's two cards) */}
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl p-4 backdrop-blur-md bg-white/12 border border-white/20">
+              <div className="flex items-center justify-between">
+                <Pill size={18} color="white" />
+                <span className="text-[10px] text-white/70 font-semibold tracking-wider uppercase">
+                  Active
+                </span>
+              </div>
+              <p className="text-[11px] text-white/75 mt-3">Medications</p>
+              <p className="font-serif font-semibold text-[22px] tracking-[-0.5px] leading-tight">
+                {hideStats ? "•••" : activeMeds}
+              </p>
+            </div>
+            <div className="rounded-2xl p-4 backdrop-blur-md bg-white/12 border border-white/20">
+              <div className="flex items-center justify-between">
+                <Chart size={18} color="white" />
+                <span className="text-[10px] text-white/70 font-semibold tracking-wider uppercase">
+                  Month
+                </span>
+              </div>
+              <p className="text-[11px] text-white/75 mt-3">Adherence</p>
+              <p className="font-serif font-semibold text-[22px] tracking-[-0.5px] leading-tight">
+                {hideStats ? "•••" : `${adherencePct}%`}
+              </p>
+            </div>
+          </div>
+
+          {/* Quick actions row */}
+          <div className="mt-5 grid grid-cols-3 gap-3">
+            <button
+              onClick={() => setLocation("/meds")}
+              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
+            >
+              <Plus size={20} />
+              <span className="text-[12px] font-semibold">Log dose</span>
+            </button>
+            <button
+              onClick={() => setLocation("/crisis")}
+              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
+            >
+              <HeartPulse size={20} />
+              <span className="text-[12px] font-semibold">Crisis</span>
+            </button>
+            <button
+              onClick={() => setLocation("/records")}
+              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
+            >
+              <DocText size={20} />
+              <span className="text-[12px] font-semibold">Records</span>
+            </button>
+          </div>
+        </section>
+
+        {/* ── WHITE SHEET ────────────────────────────────── */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="flex flex-col gap-7 px-5"
+          className="sheet-surface flex-1 -mt-6 px-5 pt-6 pb-8 flex flex-col gap-7"
         >
-          {/* ── HERO: Next medication ───────────────────────── */}
+          {/* drag handle */}
+          <div className="mx-auto w-10 h-1 rounded-full bg-border -mt-3" />
+
+          {/* Next dose */}
           <motion.section variants={itemVariants}>
             <div className="flex items-end justify-between mb-3">
               <p className="eyebrow">Next dose</p>
-              {totalToday > 0 && (
-                <p className="text-[11px] font-semibold text-muted-foreground">
-                  {doneToday} of {totalToday} taken today
-                </p>
-              )}
-            </div>
-
-            {loadingSummary ? (
-              <Skeleton className="h-44 w-full rounded-3xl" />
-            ) : nextMed ? (
-              <div className="relative overflow-hidden rounded-3xl bg-card border border-border/60 shadow-[0_8px_32px_-12px_rgba(15,40,55,0.08)]">
-                {/* Subtle teal corner accent */}
-                <div
-                  className="absolute -right-16 -top-16 w-56 h-56 rounded-full opacity-60 pointer-events-none"
-                  style={{
-                    background:
-                      "radial-gradient(circle, hsl(var(--brand-teal-soft)) 0%, transparent 70%)",
-                  }}
-                />
-                <img
-                  src={bottleForMedication(nextMed.name)}
-                  alt=""
-                  aria-hidden="true"
-                  className="absolute pointer-events-none select-none"
-                  style={{
-                    right: -8,
-                    top: 8,
-                    height: 150,
-                    width: "auto",
-                    objectFit: "contain",
-                    filter: "drop-shadow(0 12px 20px rgba(15,40,55,0.18))",
-                    transform: "rotate(-18deg)",
-                    zIndex: 0,
-                  }}
-                  data-testid="img-med-bottle"
-                />
-
-                <div className="relative p-6 pr-32">
-                  <div className="flex items-center gap-1.5 text-primary">
-                    <Clock size={14} />
-                    <span className="text-[12px] font-semibold tracking-wide">
-                      {formatTime(nextMed.reminderTime) || "Scheduled"}
-                    </span>
-                  </div>
-                  <p className="font-serif font-semibold text-[28px] leading-tight tracking-[-0.5px] mt-2 text-foreground">
-                    {nextMed.name}
-                  </p>
-                  <p className="text-[14px] text-muted-foreground mt-0.5">{nextMed.dose}</p>
-
-                  <div className="flex items-center gap-2 mt-5">
-                    <button
-                      className="h-11 px-5 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
-                      onClick={() => handleMarkTaken(nextMed.id, nextMed.name)}
-                      disabled={markingTaken === nextMed.id || takenTodayIds.has(nextMed.id)}
-                      data-testid="btn-mark-taken"
-                    >
-                      {takenTodayIds.has(nextMed.id)
-                        ? "Taken ✓"
-                        : markingTaken === nextMed.id
-                          ? "Saving…"
-                          : "Mark taken"}
-                    </button>
-                    <button
-                      className="h-11 px-4 rounded-full text-sm font-semibold text-foreground/70 hover:bg-secondary transition-colors"
-                      onClick={() => setLocation("/meds")}
-                      data-testid="btn-snooze"
-                    >
-                      Snooze
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-3xl bg-card border border-border/60 p-8 flex flex-col items-center gap-3 text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Pill size={22} />
-                </div>
-                <p className="text-sm font-medium text-foreground">No medications scheduled</p>
-                <Link
-                  href="/meds"
-                  className="h-10 px-5 rounded-full bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center"
-                >
-                  Add medication
-                </Link>
-              </div>
-            )}
-          </motion.section>
-
-          {/* ── Today's Schedule (timeline) ─────────────────── */}
-          <motion.section variants={itemVariants}>
-            <div className="flex items-center justify-between mb-3">
-              <p className="eyebrow">Today's schedule</p>
               <Link
                 href="/meds"
                 className="text-[12px] font-semibold text-primary inline-flex items-center gap-0.5 hover:underline"
@@ -291,6 +283,53 @@ export default function Dashboard() {
               </Link>
             </div>
 
+            {loadingSummary ? (
+              <Skeleton className="h-24 w-full rounded-2xl" />
+            ) : nextMed ? (
+              <div className="rounded-2xl bg-card border border-border/60 p-4 flex items-center gap-4 shadow-[0_8px_24px_-16px_rgba(15,40,55,0.12)]">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Pill size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 text-primary">
+                    <Clock size={12} />
+                    <span className="text-[11px] font-semibold tracking-wide">
+                      {formatTime(nextMed.reminderTime) || "Scheduled"}
+                    </span>
+                  </div>
+                  <p className="font-serif font-semibold text-[17px] leading-tight tracking-[-0.3px] mt-0.5 text-foreground truncate">
+                    {nextMed.name}
+                  </p>
+                  <p className="text-[12px] text-muted-foreground truncate">{nextMed.dose}</p>
+                </div>
+                <button
+                  onClick={() => handleMarkTaken(nextMed.id, nextMed.name)}
+                  disabled={markingTaken === nextMed.id || takenTodayIds.has(nextMed.id)}
+                  className="shrink-0 h-10 px-4 rounded-full bg-primary text-primary-foreground text-[12px] font-semibold shadow-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  data-testid="btn-mark-taken"
+                >
+                  {takenTodayIds.has(nextMed.id) ? "Taken ✓" : markingTaken === nextMed.id ? "…" : "Take"}
+                </button>
+              </div>
+            ) : (
+              <div className="rounded-2xl bg-card border border-border/60 p-6 flex flex-col items-center gap-3 text-center">
+                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Pill size={20} />
+                </div>
+                <p className="text-sm font-medium text-foreground">No medications scheduled</p>
+                <Link
+                  href="/meds"
+                  className="h-9 px-4 rounded-full bg-primary text-primary-foreground text-[13px] font-semibold inline-flex items-center"
+                >
+                  Add medication
+                </Link>
+              </div>
+            )}
+          </motion.section>
+
+          {/* Today's schedule */}
+          <motion.section variants={itemVariants}>
+            <p className="eyebrow mb-3">Today's schedule</p>
             {loadingMeds ? (
               <div className="space-y-3">
                 <Skeleton className="h-16 w-full rounded-2xl" />
@@ -301,62 +340,41 @@ export default function Dashboard() {
                 <p className="text-sm text-muted-foreground">Nothing scheduled today.</p>
               </div>
             ) : (
-              <ol className="relative">
-                {/* vertical timeline rail */}
-                <div className="absolute left-[15px] top-3 bottom-3 w-px bg-border/70" />
+              <ol className="space-y-2.5">
                 {sortedMeds.slice(0, 5).map((med) => {
                   const done = takenTodayIds.has(med.id);
                   return (
-                    <li key={med.id} className="relative pl-10 py-2.5">
-                      {/* dot */}
+                    <li
+                      key={med.id}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-2xl bg-card border transition-colors ${
+                        done ? "border-border/40" : "border-border/60 hover:border-primary/40"
+                      }`}
+                    >
                       <span
-                        className={`absolute left-[8px] top-[18px] w-[15px] h-[15px] rounded-full border-2 ${
-                          done
-                            ? "bg-primary border-primary"
-                            : "bg-background border-border"
-                        } flex items-center justify-center`}
-                      >
-                        {done && <Check size={9} color="white" />}
-                      </span>
-
-                      <div
-                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl bg-card border transition-colors ${
-                          done ? "border-border/40" : "border-border/60 hover:border-primary/40"
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          done ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
                         }`}
                       >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p
-                              className={`text-[10px] font-bold tracking-wider uppercase ${
-                                done ? "text-muted-foreground" : "text-primary"
-                              }`}
-                            >
-                              {formatTime(med.reminderTime) || med.frequency}
-                            </p>
-                          </div>
-                          <p
-                            className={`text-[15px] font-semibold mt-0.5 truncate ${
-                              done
-                                ? "text-muted-foreground line-through decoration-muted-foreground/40"
-                                : "text-foreground"
-                            }`}
-                          >
-                            {med.name}
-                          </p>
-                          <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
-                            {med.dose}
-                          </p>
-                        </div>
-                        {!done && (
-                          <button
-                            onClick={() => handleMarkTaken(med.id, med.name)}
-                            disabled={markingTaken === med.id}
-                            className="shrink-0 h-9 px-3.5 rounded-full text-[12px] font-semibold text-primary bg-primary/10 hover:bg-primary/15 transition-colors disabled:opacity-50"
-                          >
-                            {markingTaken === med.id ? "…" : "Take"}
-                          </button>
-                        )}
+                        {done ? <Check size={16} /> : <Pill size={16} />}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[10px] font-bold tracking-wider uppercase ${done ? "text-muted-foreground" : "text-primary"}`}>
+                          {formatTime(med.reminderTime) || med.frequency}
+                        </p>
+                        <p className={`text-[14px] font-semibold mt-0.5 truncate ${done ? "text-muted-foreground line-through decoration-muted-foreground/40" : "text-foreground"}`}>
+                          {med.name}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground truncate">{med.dose}</p>
                       </div>
+                      {!done && (
+                        <button
+                          onClick={() => handleMarkTaken(med.id, med.name)}
+                          disabled={markingTaken === med.id}
+                          className="shrink-0 h-8 px-3 rounded-full text-[11px] font-semibold text-primary bg-primary/10 hover:bg-primary/15 transition-colors disabled:opacity-50"
+                        >
+                          {markingTaken === med.id ? "…" : "Take"}
+                        </button>
+                      )}
                     </li>
                   );
                 })}
@@ -364,78 +382,58 @@ export default function Dashboard() {
             )}
           </motion.section>
 
-          {/* ── Quick links ─────────────────────────────────── */}
-          <motion.section variants={itemVariants} className="grid grid-cols-2 gap-3">
-            <Link
-              href="/crisis"
-              className="group p-4 rounded-2xl bg-card border border-border/60 hover:border-destructive/40 transition-colors"
-              data-testid="btn-crisis-strip"
-            >
-              <div className="w-9 h-9 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-3">
-                <HeartPulse size={16} />
-              </div>
-              <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
-                Last crisis
-              </p>
-              {loadingSummary ? (
-                <Skeleton className="h-5 w-20 mt-1.5" />
-              ) : recentCrisis ? (
-                <>
-                  <p className="font-serif font-semibold text-[16px] text-foreground mt-1">
-                    {new Date(recentCrisis.occurredAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 capitalize truncate">
-                    {recentCrisis.painLevel}
-                    {recentCrisis.painLocations?.length
-                      ? ` · ${recentCrisis.painLocations[0]}`
-                      : ""}
-                  </p>
-                </>
-              ) : (
-                <p className="font-serif font-semibold text-[16px] text-foreground mt-1">
-                  None logged
+          {/* Recent activity */}
+          <motion.section variants={itemVariants}>
+            <p className="eyebrow mb-3">Recent</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/crisis"
+                className="p-4 rounded-2xl bg-card border border-border/60 hover:border-destructive/40 transition-colors"
+                data-testid="btn-crisis-strip"
+              >
+                <div className="w-9 h-9 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-3">
+                  <HeartPulse size={16} />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
+                  Last crisis
                 </p>
-              )}
-            </Link>
+                {loadingSummary ? (
+                  <Skeleton className="h-5 w-20 mt-1.5" />
+                ) : recentCrisis ? (
+                  <>
+                    <p className="font-serif font-semibold text-[15px] text-foreground mt-1">
+                      {new Date(recentCrisis.occurredAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 capitalize truncate">
+                      {recentCrisis.painLevel}
+                      {recentCrisis.painLocations?.length ? ` · ${recentCrisis.painLocations[0]}` : ""}
+                    </p>
+                  </>
+                ) : (
+                  <p className="font-serif font-semibold text-[15px] text-foreground mt-1">None logged</p>
+                )}
+              </Link>
 
-            <Link
-              href="/records"
-              className="group p-4 rounded-2xl bg-card border border-border/60 hover:border-primary/40 transition-colors"
-              data-testid="btn-records-strip"
-            >
-              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <DocText size={16} />
-              </div>
-              <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
-                Records
-              </p>
-              {records === undefined ? (
-                <Skeleton className="h-6 w-10 mt-1.5" />
-              ) : (
-                <p className="font-serif font-semibold text-[20px] text-foreground mt-1">
-                  {records.length}
-                  <span className="text-[12px] font-normal text-muted-foreground ml-1.5">
-                    saved
-                  </span>
+              <Link
+                href="/records"
+                className="p-4 rounded-2xl bg-card border border-border/60 hover:border-primary/40 transition-colors"
+                data-testid="btn-records-strip"
+              >
+                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+                  <DocText size={16} />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
+                  Records
                 </p>
-              )}
-            </Link>
-          </motion.section>
-
-          {/* ── Adherence footer ────────────────────────────── */}
-          <motion.section variants={itemVariants} className="pt-1">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[12px] font-semibold text-foreground">Monthly adherence</p>
-              <p className="text-[12px] font-bold text-primary">{adherencePct}%</p>
-            </div>
-            <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-700"
-                style={{ width: `${adherencePct}%` }}
-              />
+                {records === undefined ? (
+                  <Skeleton className="h-6 w-10 mt-1.5" />
+                ) : (
+                  <p className="font-serif font-semibold text-[18px] text-foreground mt-1">
+                    {records.length}
+                    <span className="text-[11px] font-normal text-muted-foreground ml-1.5">saved</span>
+                  </p>
+                )}
+              </Link>
             </div>
           </motion.section>
         </motion.div>
