@@ -301,14 +301,14 @@ function Hero() {
 
 function Context() {
   const stats = [
-    { n: "75%", label: "of all sickle cell births globally happen in sub-Saharan Africa.", source: "WHO" },
-    { n: "300K+", label: "babies are born with sickle cell disease in Africa each year.", source: "WHO" },
-    { n: "1 in 4", label: "Nigerians carries the sickle cell trait — the highest burden worldwide.", source: "WHO Africa" },
+    { value: 75, prefix: "", suffix: "%", n: "75%", label: "of all sickle cell births globally happen in sub-Saharan Africa.", source: "WHO" },
+    { value: 300, prefix: "", suffix: "K+", n: "300K+", label: "babies are born with sickle cell disease in Africa each year.", source: "WHO" },
+    { value: 0, prefix: "", suffix: "", n: "1 in 4", label: "Nigerians carries the sickle cell trait — the highest burden worldwide.", source: "WHO Africa" },
   ];
   return (
     <Section className="bg-muted/40 overflow-hidden">
       <div className="px-6 sm:px-10 py-20 lg:py-24">
-        <motion.div {...fadeUp} className="text-center max-w-2xl mx-auto">
+        <div data-reveal className="text-center max-w-2xl mx-auto">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
             Africa carries the heaviest weight — <span className="italic text-muted-foreground">and the strongest community.</span>
@@ -316,19 +316,29 @@ function Context() {
           <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
             Kindred is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
           </p>
-        </motion.div>
-        <div className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
+        </div>
+        <div data-stagger className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
           {stats.map((s, i) => (
-            <motion.div
+            <div
               key={s.n}
-              {...fadeUp}
-              transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+              data-stagger-item
               className="p-8 text-center"
             >
-              <div className="font-serif text-4xl sm:text-5xl text-primary tracking-tight">{s.n}</div>
+              {s.value > 0 ? (
+                <div
+                  className="font-serif text-4xl sm:text-5xl text-primary tracking-tight"
+                  data-counter={s.value}
+                  data-counter-suffix={s.suffix}
+                  data-counter-prefix={s.prefix}
+                >
+                  0{s.suffix}
+                </div>
+              ) : (
+                <div className="font-serif text-4xl sm:text-5xl text-primary tracking-tight">{s.n}</div>
+              )}
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.label}</p>
               <div className="mt-3 text-[10px] uppercase tracking-wider text-muted-foreground/70">Source: {s.source}</div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
