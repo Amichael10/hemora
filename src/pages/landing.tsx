@@ -114,7 +114,7 @@ function Nav() {
       <div className="mx-auto max-w-7xl px-6 sm:px-10 h-16 flex items-center justify-between border-x border-border">
         <button onClick={() => setLocation("/")} className="flex items-center gap-2">
           <img src={hemoraLogo} alt="Hemora" className="w-8 h-8" />
-          <img src={hemoraWordmark} alt="Hemora" className="h-6 w-auto" />
+          <span className="font-serif text-xl text-secondary">Hemora</span>
         </button>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
