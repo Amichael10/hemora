@@ -3,7 +3,9 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
-import kindredLogo from "@/assets/brand/Logo.png";
+import hemoraLogo from "@/assets/brand/Logo.png";
+import hemoraWordmark from "@/assets/brand/Wordmark.png";
+import heroFamily from "@/assets/hero/family-hero.webp";
 import dashboardEmoji from "@/assets/images/emoji-mild.png";
 import {
   HeartPulse2Bold as HeartPulse,
@@ -111,8 +113,8 @@ function Nav() {
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background/80 border-b border-border">
       <div className="mx-auto max-w-7xl px-6 sm:px-10 h-16 flex items-center justify-between border-x border-border">
         <button onClick={() => setLocation("/")} className="flex items-center gap-2">
-          <img src={kindredLogo} alt="Kindred" className="w-8 h-8" />
-          <span className="font-serif text-xl tracking-tight text-secondary">Kindred</span>
+          <img src={hemoraLogo} alt="Hemora" className="w-8 h-8" />
+          <img src={hemoraWordmark} alt="Hemora" className="h-6 w-auto" />
         </button>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
@@ -145,7 +147,7 @@ function DesktopMockup() {
           <span className="w-2.5 h-2.5 rounded-full bg-accent" />
           <span className="w-2.5 h-2.5 rounded-full bg-secondary/40" />
           <div className="flex-1 mx-4 h-6 rounded-md bg-background border border-border flex items-center justify-center text-[10px] text-muted-foreground">
-            kindred.app/dashboard
+            hemora.xyz/dashboard
           </div>
         </div>
         {/* App body */}
@@ -153,8 +155,8 @@ function DesktopMockup() {
           {/* Sidebar */}
           <aside className="border-r border-border bg-secondary/[0.04] p-4 space-y-1">
             <div className="flex items-center gap-2 mb-4">
-              <img src={kindredLogo} alt="" className="w-6 h-6" />
-              <span className="font-serif text-sm text-secondary">Kindred</span>
+              <img src={hemoraLogo} alt="" className="w-6 h-6" />
+              <span className="font-serif text-sm text-secondary">Hemora</span>
             </div>
             {[
               { Icon: HeartPulse, label: "Dashboard", active: true },
@@ -253,38 +255,72 @@ function Hero() {
             "radial-gradient(60% 50% at 80% 0%, hsl(var(--brand-gold) / 0.18), transparent 60%), radial-gradient(50% 60% at 0% 30%, hsl(var(--brand-teal) / 0.10), transparent 70%)",
         }}
       />
-      <div className="px-6 sm:px-10 pt-20 pb-16 lg:pt-28 lg:pb-20 text-center">
-        <div className="max-w-4xl mx-auto">
-          <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            For families touched by sickle cell
-          </div>
-          <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
-            <span className="inline-block">Care that stays with you,</span>{" "}
-            <span className="inline-block italic text-primary">between appointments.</span>
-          </h1>
-          <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Kindred helps you log crises, stay on top of meds, keep records in one place,
-            and find sickle-cell-aware care — on your phone, anywhere.
-          </p>
+      <div className="px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
+          <div className="text-center lg:text-left">
+            <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              For families touched by sickle cell
+            </div>
+            <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
+              <span className="inline-block">Care that stays with you,</span>{" "}
+              <span className="inline-block italic text-primary">between appointments.</span>
+            </h1>
+            <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Hemora helps you log crises, stay on top of meds, keep records in one place,
+              and find sickle-cell-aware care — on your phone, anywhere.
+            </p>
 
-          <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center gap-3">
-            <Button size="lg" onClick={() => setLocation("/signup")}>
-              Open the app <ArrowRight size={16} />
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a href="#download">Download for mobile</a>
-            </Button>
+            <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
+              <Button size="lg" onClick={() => setLocation("/signup")}>
+                Open the app <ArrowRight size={16} />
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <a href="#download">Download for mobile</a>
+              </Button>
+            </div>
+
+            <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
+              <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
+              <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
+            </div>
           </div>
 
-          <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center items-center gap-5 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
-            <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
-            <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
+          <div data-anim="hero-image" className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-6 rounded-[2.5rem] blur-3xl opacity-60"
+              style={{ background: "var(--gradient-warm)" }}
+            />
+            <img
+              src={heroFamily}
+              alt="An African family embracing, with a luminous globe behind them"
+              width={1600}
+              height={900}
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              className="relative w-full h-auto rounded-2xl border border-border shadow-2xl object-cover"
+            />
           </div>
         </div>
+      </div>
+    </Section>
+  );
+}
 
-        <div data-anim="hero-mockup" className="mt-14 lg:mt-20 px-6 sm:px-10">
+function ProductPreview() {
+  return (
+    <Section dotted={false}>
+      <div className="px-6 sm:px-10 py-20 lg:py-28">
+        <div data-reveal className="max-w-2xl mx-auto text-center mb-12">
+          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">A look inside</div>
+          <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
+            Your day, gently organized.
+          </h2>
+        </div>
+        <div data-anim="hero-mockup">
           <DesktopMockup />
         </div>
       </div>
@@ -302,12 +338,12 @@ function Context() {
     <Section className="bg-muted/40 overflow-hidden">
       <div className="px-6 sm:px-10 py-20 lg:py-24">
         <div data-reveal className="text-center max-w-2xl mx-auto">
-          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Kindred exists</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Why Hemora exists</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl text-secondary leading-tight">
             Africa carries the heaviest weight — <span className="italic text-muted-foreground">and the strongest community.</span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-            Kindred is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
+            Hemora is built for families across Lagos, Accra, Nairobi, Kampala — and everywhere the diaspora calls home.
           </p>
         </div>
         <div data-stagger className="mt-12 grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border-y sm:border border-border bg-card">
@@ -541,7 +577,7 @@ function Download() {
           />
           <div className="relative">
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-white leading-tight">
-              Take Kindred with you.
+              Take Hemora with you.
             </h2>
             <p className="mt-4 text-white/80 max-w-xl mx-auto">
               Install it as a PWA on any phone, or grab the native app. Same care, anywhere.
@@ -566,10 +602,10 @@ function Download() {
 
 function FAQ() {
   const items = [
-    { q: "Is Kindred free to use?", a: "Yes — the core experience (crisis logging, meds, records, directory) is free. Premium care features are coming later." },
+    { q: "Is Hemora free to use?", a: "Yes — the core experience (crisis logging, meds, records, directory) is free. Premium care features are coming later." },
     { q: "Is my health data private?", a: "Your data is yours. It's stored securely and never sold. You decide what to share, with whom, and when." },
-    { q: "Does it work offline?", a: "Yes. Kindred is a Progressive Web App, so you can log entries without signal and they'll sync when you reconnect." },
-    { q: "Do you have iOS and Android apps?", a: "Native apps are rolling out. In the meantime, you can install Kindred to your home screen on any modern phone." },
+    { q: "Does it work offline?", a: "Yes. Hemora is a Progressive Web App, so you can log entries without signal and they'll sync when you reconnect." },
+    { q: "Do you have iOS and Android apps?", a: "Native apps are rolling out. In the meantime, you can install Hemora to your home screen on any modern phone." },
     { q: "Can caregivers use it for someone else?", a: "Absolutely. During setup you can choose to track for yourself, a child, or another loved one." },
   ];
   return (
@@ -603,8 +639,8 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-6 sm:px-10 py-14 grid md:grid-cols-4 gap-8 text-sm border-x border-white/10">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2">
-            <img src={kindredLogo} alt="Kindred" className="w-9 h-9" />
-            <span className="font-serif text-2xl">Kindred</span>
+            <img src={hemoraLogo} alt="Hemora" className="w-9 h-9" />
+            <span className="font-serif text-2xl">Hemora</span>
           </div>
           <p className="mt-3 text-secondary-foreground/70 max-w-sm leading-relaxed">
             Care that stays with you. For every family touched by sickle cell.
@@ -629,7 +665,7 @@ function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
-          <span>© {new Date().getFullYear()} Kindred. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Hemora. All rights reserved.</span>
           <span>Made with care.</span>
         </div>
       </div>
@@ -724,6 +760,7 @@ export default function Landing() {
       <Nav />
       <main>
         <Hero />
+        <ProductPreview />
         <Context />
         <Features />
         <HowItWorks />
