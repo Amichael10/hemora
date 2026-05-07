@@ -760,6 +760,7 @@ export default function Landing() {
       <Nav />
       <main>
         <Hero />
+        <ProductPreview />
         <Context />
         <Features />
         <HowItWorks />
