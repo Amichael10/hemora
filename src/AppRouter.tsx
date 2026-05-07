@@ -27,6 +27,9 @@ import CrisisDetail from "@/pages/crisis-detail";
 import Settings from "@/pages/settings";
 import Contacts from "@/pages/contacts";
 import Notifications from "@/pages/notifications";
+import GenotypeChecker from "@/pages/genotype-checker";
+import Family from "@/pages/family";
+import SchoolLetter from "@/pages/school-letter";
 import { About, Help, Privacy, Terms } from "@/pages/info";
 
 function Routes() {
@@ -53,6 +56,9 @@ function Routes() {
       <Route path="/settings" component={Settings} />
       <Route path="/settings/contacts" component={Contacts} />
       <Route path="/settings/notifications" component={Notifications} />
+      <Route path="/genotype-checker" component={GenotypeChecker} />
+      <Route path="/family" component={Family} />
+      <Route path="/school-letter" component={SchoolLetter} />
       <Route path="/help" component={Help} />
       <Route path="/about" component={About} />
       <Route path="/privacy" component={Privacy} />
