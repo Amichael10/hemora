@@ -57,6 +57,13 @@ const mapProfile = (r: any) => r && ({
   dateOfBirth: r.date_of_birth,
   gender: r.gender,
   scdStatus: r.scd_status,
+  sex: r.sex,
+  bloodType: r.blood_type,
+  genotype: r.genotype,
+  heightCm: r.height_cm,
+  weightKg: r.weight_kg,
+  allergies: r.allergies,
+  conditions: r.conditions,
 });
 const mapMed = (r: any) => ({
   id: r.id, name: r.name, dose: r.dose, frequency: r.frequency,
@@ -328,6 +335,14 @@ export const useUpdateProfile = () => {
       if (data.gender !== undefined) patch.gender = data.gender;
       if (data.scdStatus !== undefined) patch.scd_status = data.scdStatus;
       if (data.dateOfBirth !== undefined) patch.date_of_birth = data.dateOfBirth;
+      if (data.sex !== undefined) patch.sex = data.sex;
+      if (data.bloodType !== undefined) patch.blood_type = data.bloodType;
+      if (data.genotype !== undefined) patch.genotype = data.genotype;
+      if (data.heightCm !== undefined) patch.height_cm = data.heightCm;
+      if (data.weightKg !== undefined) patch.weight_kg = data.weightKg;
+      if (data.allergies !== undefined) patch.allergies = data.allergies;
+      if (data.conditions !== undefined) patch.conditions = data.conditions;
+      if (data.setupFor !== undefined) patch.setup_for = data.setupFor;
       const { data: row, error } = await supabase.from("profiles").update(patch).eq("id", id).select().single();
       if (error) throw new ApiError(error.message);
       qc.invalidateQueries({ queryKey: ["profile"] });

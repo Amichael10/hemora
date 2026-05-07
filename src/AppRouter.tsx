@@ -17,6 +17,7 @@ import DirectoryDetail from "@/pages/directory-detail";
 import Emergency from "@/pages/emergency";
 import AuthCallback from "@/pages/auth-callback";
 import Profile from "@/pages/profile";
+import ProfileEdit from "@/pages/profile-edit";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
@@ -48,6 +49,7 @@ function Routes() {
       <Route path="/directory/:id" component={DirectoryDetail} />
       <Route path="/emergency" component={Emergency} />
       <Route path="/profile" component={Profile} />
+      <Route path="/profile/edit" component={ProfileEdit} />
       <Route path="/settings" component={Settings} />
       <Route path="/settings/contacts" component={Contacts} />
       <Route path="/settings/notifications" component={Notifications} />

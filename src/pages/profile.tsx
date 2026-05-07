@@ -6,8 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
 import { useGetProfile } from "@workspace/api-client-react";
-import { PenNewSquareLinear as EditIcon } from "solar-icon-set";
+import { PenNewSquareLinear as EditIcon, DownloadLinear as DownloadIcon } from "solar-icon-set";
 import { Link } from "wouter";
+import { exportProfileToPdf } from "@/lib/profilePdf";
+import { useToast } from "@/hooks/use-toast";
 
 function getInitials(name?: string) {
   if (!name) return "K";
@@ -28,10 +30,20 @@ function Row({ label, value }: { label: string; value?: string | number | null }
 export default function Profile() {
   const { user } = useAuth();
   const { profileId } = useProfile();
+  const { toast } = useToast();
 
   const { data: profile, isLoading } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
   });
+
+  const handleExport = () => {
+    if (!profile) return;
+    try {
+      exportProfileToPdf(profile, user?.email);
+    } catch (e: any) {
+      toast({ title: "Export failed", description: e?.message ?? "Try again", variant: "destructive" });
+    }
+  };
 
   return (
     <MobileAppShell>
@@ -54,12 +66,18 @@ export default function Profile() {
           {user?.email && (
             <p className="text-xs text-muted-foreground mt-1">{user.email}</p>
           )}
-          <Link href="/onboarding">
-            <Button size="sm" className="mt-4 rounded-full px-5">
-              <EditIcon size={14} />
-              Edit profile
+          <div className="mt-4 flex gap-2">
+            <Link href="/profile/edit">
+              <Button size="sm" className="rounded-full px-5">
+                <EditIcon size={14} />
+                Edit profile
+              </Button>
+            </Link>
+            <Button size="sm" variant="outline" className="rounded-full px-5" onClick={handleExport} disabled={!profile}>
+              <DownloadIcon size={14} />
+              Export PDF
             </Button>
-          </Link>
+          </div>
         </div>
 
         {/* Details */}

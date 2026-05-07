@@ -73,7 +73,7 @@ export default function Settings() {
           {user?.email && (
             <p className="text-xs text-muted-foreground mt-1">{user.email}</p>
           )}
-          <Link href="/onboarding">
+          <Link href="/profile/edit">
             <Button size="sm" className="mt-4 rounded-full px-5">
               <EditIcon size={14} />
               Edit profile
