@@ -105,9 +105,16 @@ export default function Dashboard() {
 
   return (
     <MobileAppShell>
-      <div className="flex flex-col min-h-full -mb-20 pb-20" style={{ background: "var(--gradient-brand)" }}>
-
-        {/* ── Slim header (on gradient) ────────────────────────── */}
+      <div className="flex flex-col min-h-full -mb-20 pb-20 bg-background">
+        {/* ── TOP SECTION: teal brand on gradient ─────────────── */}
+        <div
+          className="relative pb-10"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(var(--brand-teal-deep)) 0%, hsl(var(--brand-teal)) 100%)",
+          }}
+        >
+        {/* Slim header */}
         <div className="flex justify-between items-center px-5 pt-11 pb-4 relative">
           <div>
             <p className="text-xs font-semibold text-white/85 drop-shadow-sm">{getGreeting()}</p>
@@ -142,16 +149,16 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Hero medication — liquid glass card */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="flex flex-col gap-4 pb-6"
+          className="px-4"
         >
-          {/* ── Hero medication (on gradient, no card) ───────── */}
-          <motion.div variants={itemVariants} className="px-6 pt-2 pb-4 relative">
+          <motion.div variants={itemVariants} className="glass-card relative p-5 overflow-hidden">
             {loadingSummary ? (
-              <Skeleton className="h-40 w-full rounded-3xl" />
+              <Skeleton className="h-40 w-full rounded-2xl bg-white/20" />
             ) : nextMed ? (
               <div className="relative">
                 {/* Decorative rings */}
@@ -230,9 +237,18 @@ export default function Dashboard() {
               </div>
             )}
           </motion.div>
+        </motion.div>
+        </div>
 
-          {/* ── Today's schedule ─────────────────────────────── */}
-          <motion.div variants={itemVariants} className="mx-4">
+        {/* ── BOTTOM SECTION: white sheet ─────────────────────── */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="sheet-surface flex flex-col gap-5 px-4 pt-6 pb-6 -mt-6 relative z-10"
+        >
+          {/* Today's schedule */}
+          <motion.div variants={itemVariants}>
             <p className="eyebrow mb-2.5">Today's Schedule</p>
             {loadingMeds ? (
               <div className="space-y-2">
@@ -283,30 +299,30 @@ export default function Dashboard() {
             )}
           </motion.div>
 
-          {/* ── Crisis + records strip ───────────────────────── */}
-          <motion.div variants={itemVariants} className="mx-4 flex gap-2.5">
+          {/* Crisis + records strip */}
+          <motion.div variants={itemVariants} className="flex gap-2.5">
             <Link
               href="/crisis"
-              className="flex-[2] p-3.5 rounded-2xl hover:opacity-90 transition-opacity bg-[hsl(var(--brand-oxblood))]/[0.06] border border-[hsl(var(--brand-oxblood))]/15"
+              className="flex-[2] p-3.5 rounded-2xl hover:opacity-90 transition-opacity bg-destructive/[0.06] border border-destructive/15"
               data-testid="btn-crisis-strip"
             >
-              <p className="text-[10px] font-bold tracking-[1px] uppercase mb-1 text-[hsl(var(--brand-oxblood))]/70">
+              <p className="text-[10px] font-bold tracking-[1px] uppercase mb-1 text-destructive/80">
                 Last Crisis
               </p>
               {loadingSummary ? (
                 <Skeleton className="h-5 w-20 mt-1" />
               ) : recentCrisis ? (
                 <>
-                  <p className="font-serif font-bold text-[15px] text-[hsl(var(--brand-oxblood))]">
+                  <p className="font-serif font-bold text-[15px] text-destructive">
                     {new Date(recentCrisis.occurredAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                   </p>
-                  <p className="text-[11px] mt-0.5 capitalize text-[hsl(var(--brand-oxblood))]/70">
+                  <p className="text-[11px] mt-0.5 capitalize text-destructive/70">
                     {recentCrisis.painLevel}
                     {recentCrisis.painLocations?.length ? ` · ${recentCrisis.painLocations[0]}` : ""}
                   </p>
                 </>
               ) : (
-                <p className="font-serif font-bold text-[15px] text-[hsl(var(--brand-oxblood))]">None logged</p>
+                <p className="font-serif font-bold text-[15px] text-destructive">None logged</p>
               )}
             </Link>
 
