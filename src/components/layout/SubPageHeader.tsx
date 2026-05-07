@@ -15,7 +15,7 @@ export function SubPageHeader({ title, back, right }: Props) {
       <button
         onClick={() => (back ? setLocation(back) : window.history.back())}
         aria-label="Back"
-        className="w-9 h-9 rounded-full flex items-center justify-center text-foreground bg-secondary hover:bg-secondary/80 transition-colors"
+        className="w-9 h-9 rounded-full flex items-center justify-center text-foreground bg-card border border-border/60 hover:bg-muted transition-colors"
       >
         <ChevronLeft size={18} />
       </button>
