@@ -167,7 +167,7 @@ export default function Crisis() {
 
   return (
     <MobileAppShell hideNav={flowStepHideNav}>
-      <div className="min-h-full flex flex-col pb-8">
+      <div className={`min-h-full flex flex-col ${flowStepHideNav ? "" : "pb-8"}`}>
         <AnimatePresence mode="wait">
 
           {step === "entry" && (
