@@ -580,7 +580,7 @@ export default function Directory() {
                         )}
                         {provider.services && provider.services.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {provider.services.slice(0, 2).map((service, idx) => (
+                            {provider.services.slice(0, 2).map((service: string, idx: number) => (
                               <span
                                 key={idx}
                                 className="text-[10px] bg-muted/40 px-2 py-0.5 rounded-md text-muted-foreground"
