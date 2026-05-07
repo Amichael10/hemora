@@ -450,25 +450,24 @@ function HowItWorks() {
         </div>
       </div>
       <div className="relative mx-auto max-w-7xl px-6 sm:px-10 py-20 lg:py-28">
-        <motion.div {...fadeUp} className="max-w-2xl">
+        <div data-reveal className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">How it works</div>
           <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight">
             A calmer way to manage{" "}
             <span className="italic">a complicated condition.</span>
           </h2>
-        </motion.div>
-        <div className="mt-12 grid md:grid-cols-3 border-y md:border border-white/10">
+        </div>
+        <div data-stagger className="mt-12 grid md:grid-cols-3 border-y md:border border-white/10">
           {steps.map((s, i) => (
-            <motion.div
+            <div
               key={s.n}
-              {...fadeUp}
-              transition={{ ...fadeUp.transition, delay: i * 0.08 }}
+              data-stagger-item
               className="p-8 border-b md:border-b-0 md:border-r last:border-r-0 border-white/10 bg-white/[0.03]"
             >
               <div className="font-serif text-3xl text-accent">{s.n}</div>
               <h3 className="mt-3 font-serif text-xl">{s.title}</h3>
               <p className="mt-2 text-sm text-secondary-foreground/70 leading-relaxed">{s.body}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
