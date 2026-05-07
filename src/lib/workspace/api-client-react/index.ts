@@ -75,6 +75,7 @@ const mapCrisis = (r: any) => ({
 const mapRecord = (r: any) => ({
   id: r.id, documentTitle: r.document_title, hospitalClinic: r.hospital_clinic,
   type: r.type, status: r.status, dateOfRecord: r.date_of_record,
+  labName: r.lab_name ?? null, fileUrl: r.file_url ?? null, notes: r.notes ?? null,
 });
 const mapProvider = (r: any) => ({
   id: r.id, name: r.name, type: r.type, specialty: r.specialty,
@@ -221,7 +222,7 @@ export const useCreateMedication = () => {
       const { data: row, error } = await supabase.from("medications").insert({
         user_id, name: data.name, dose: data.dose, frequency: data.frequency,
         reminder_time: data.reminderTime, reminder_enabled: data.reminderEnabled ?? true,
-        status: data.status ?? "ongoing",
+        status: data.status ?? "ongoing", notes: data.notes ?? null,
       }).select().single();
       if (error) throw new ApiError(error.message);
       qc.invalidateQueries({ queryKey: ["medications"] });
@@ -282,6 +283,9 @@ export const useCreateCareRecord = () => {
         type: data.type ?? "other",
         status: data.status ?? "saved",
         date_of_record: data.dateOfRecord ?? new Date().toISOString(),
+        lab_name: data.labName ?? null,
+        file_url: data.fileUrl ?? null,
+        notes: data.notes ?? null,
       }).select().single();
       if (error) throw new ApiError(error.message);
       qc.invalidateQueries({ queryKey: ["care-records"] });
