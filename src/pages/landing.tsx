@@ -145,7 +145,7 @@ function DesktopMockup() {
           <span className="w-2.5 h-2.5 rounded-full bg-accent" />
           <span className="w-2.5 h-2.5 rounded-full bg-secondary/40" />
           <div className="flex-1 mx-4 h-6 rounded-md bg-background border border-border flex items-center justify-center text-[10px] text-muted-foreground">
-            kindred.app/dashboard
+            hemora.xyz/dashboard
           </div>
         </div>
         {/* App body */}
@@ -154,7 +154,7 @@ function DesktopMockup() {
           <aside className="border-r border-border bg-secondary/[0.04] p-4 space-y-1">
             <div className="flex items-center gap-2 mb-4">
               <img src={kindredLogo} alt="" className="w-6 h-6" />
-              <span className="font-serif text-sm text-secondary">Kindred</span>
+              <span className="font-serif text-sm text-secondary">Hemora</span>
             </div>
             {[
               { Icon: HeartPulse, label: "Dashboard", active: true },
@@ -264,7 +264,7 @@ function Hero() {
             <span className="inline-block italic text-primary">between appointments.</span>
           </h1>
           <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Kindred helps you log crises, stay on top of meds, keep records in one place,
+            Hemora helps you log crises, stay on top of meds, keep records in one place,
             and find sickle-cell-aware care — on your phone, anywhere.
           </p>
 
@@ -629,7 +629,7 @@ function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
-          <span>© {new Date().getFullYear()} Kindred. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Hemora. All rights reserved.</span>
           <span>Made with care.</span>
         </div>
       </div>
