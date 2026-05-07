@@ -343,22 +343,105 @@ export default function Crisis() {
             </motion.div>
           )}
 
-          {step === "triggers" && (
-            <motion.div key="triggers" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
-              <StepDots current={3} total={5} onStepClick={goToStep} />
-              <h2 className="h-page text-center mb-2">Any known triggers?</h2>
-              <p className="text-center body-md mb-8">Select all that apply</p>
-              <div className="flex flex-wrap gap-2 justify-center mb-auto">
-                {["Cold Weather", "Stress", "Infection", "Dehydration", "Exertion", "Missed meds", "Other"].map(trig => {
-                  const isSelected = triggers.includes(trig);
-                  return (
-                    <Button key={trig} size="pill" variant={isSelected ? "default" : "outline"} className={isSelected ? "" : "bg-card"} onClick={() => toggleArrayItem(setTriggers, trig)}>{trig}</Button>
-                  );
-                })}
-              </div>
-              <Button size="xl" className="w-full mt-8" onClick={() => setStep("relief")}>Next</Button>
-            </motion.div>
-          )}
+          {step === "triggers" && (() => {
+            const TRIGGERS = [
+              { key: "Cold Weather", emoji: "🥶", bg: "#3B7FB8", caption: "Cold can constrict blood flow" },
+              { key: "Stress",       emoji: "😩", bg: "#7A5CA8", caption: "Stress takes a toll on the body" },
+              { key: "Infection",    emoji: "🤢", bg: "#5C9B5C", caption: "Infections can trigger crises" },
+              { key: "Dehydration",  emoji: "💧", bg: "#3FA6B8", caption: "Hydration helps cells flow" },
+              { key: "Exertion",     emoji: "😤", bg: "#C97A4A", caption: "Push gentle, rest often" },
+              { key: "Missed meds",  emoji: "💊", bg: "#A85C7A", caption: "Routine matters — set a reminder" },
+              { key: "Other",        emoji: "🩺", bg: "#3D6B6B", caption: "Note it for your team" },
+            ] as const;
+            const DEFAULT_BG = "#3D6B6B";
+            const lastKey = triggers[triggers.length - 1];
+            const focused = TRIGGERS.find(t => t.key === lastKey) ?? null;
+            const bgColor = focused?.bg ?? DEFAULT_BG;
+            return (
+              <motion.div
+                key="triggers"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, backgroundColor: bgColor }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                transition={{ backgroundColor: { duration: 0.5, ease: "easeInOut" }, opacity: { duration: 0.3 } }}
+                className="flex-1 flex flex-col px-6 pt-10 pb-8 z-10 relative"
+                style={{ backgroundColor: bgColor }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setStep("location")}
+                  aria-label="Back"
+                  className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <StepDots current={3} total={5} onDark onStepClick={goToStep} />
+                <h2 className="font-serif text-[1.75rem] font-semibold text-center text-white tracking-[-0.5px] leading-[1.15] mb-2">
+                  Any known triggers?
+                </h2>
+                <p className="text-center text-white/75 text-sm">Tap all that apply</p>
+
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <motion.div
+                    key={focused?.key ?? "empty"}
+                    initial={{ scale: 0.7, opacity: 0, rotate: -8 }}
+                    animate={{ scale: 1, opacity: focused ? 1 : 0.5, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 16 }}
+                    className="text-[7rem] leading-none mb-4 select-none"
+                    style={{ filter: focused ? "drop-shadow(0 12px 24px rgba(0,0,0,0.25))" : "none" }}
+                  >
+                    {focused?.emoji ?? "🩺"}
+                  </motion.div>
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={focused?.key ?? "empty-cap"}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.25 }}
+                      className="text-center text-white/85 text-sm italic"
+                    >
+                      {focused ? `"${focused.caption}"` : "Tap a trigger below"}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 mb-6">
+                  {TRIGGERS.map(t => {
+                    const isSelected = triggers.includes(t.key);
+                    return (
+                      <button
+                        key={t.key}
+                        onClick={() => toggleArrayItem(setTriggers, t.key)}
+                        className="flex flex-col items-center gap-1 py-3 px-2 rounded-2xl transition-all"
+                        style={{
+                          background: isSelected ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.08)",
+                          border: `1.5px solid ${isSelected ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.12)"}`,
+                          transform: isSelected ? "translateY(-2px)" : "translateY(0)",
+                        }}
+                      >
+                        <span className="text-2xl leading-none">{t.emoji}</span>
+                        <span
+                          className="text-[11px] font-semibold tracking-wide text-center"
+                          style={{ color: isSelected ? "#FFFFFF" : "rgba(255,255,255,0.75)" }}
+                        >
+                          {t.key}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  size="xl"
+                  className="w-full bg-white text-foreground hover:bg-white/95 shadow-lg"
+                  onClick={() => setStep("relief")}
+                >
+                  <span className="flex items-center gap-2">Next <Check size={16} /></span>
+                </Button>
+              </motion.div>
+            );
+          })()}
 
           {step === "relief" && (
             <motion.div key="relief" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
