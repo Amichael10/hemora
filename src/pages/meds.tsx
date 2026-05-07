@@ -9,17 +9,14 @@ import { useProfile } from "@/context/ProfileContext";
 import {
   useListMedications,
   useCreateMedication,
-  getListMedicationsQueryKey
+  getListMedicationsQueryKey,
+  useListMedicationLogs,
+  getListMedicationLogsQueryKey,
 } from "@workspace/api-client-react";
 import { CreateMedicationBodyStatus } from "@workspace/api-client-react";
 import { AltArrowRightLinear as ChevronRight, AddCircleLinear as Plus } from "solar-icon-set";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import {
   Pills2Bold as MedicinesFilled,
@@ -27,34 +24,81 @@ import {
   Pills2Linear as MedicinesOutline,
   PillLinear as BlisterOutline,
 } from "solar-icon-set";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
 
-function AdherenceHeart({ percent }: { percent: number }) {
+function AdherenceReport({ logs, isLoading }: { logs: any[] | undefined; isLoading: boolean }) {
+  const days = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+  const buckets = days.map((d) => {
+    const next = new Date(d); next.setDate(d.getDate() + 1);
+    const todays = (logs ?? []).filter((l) => {
+      const t = new Date(l.takenAt ?? l.scheduledAt);
+      return t >= d && t < next;
+    });
+    const taken = todays.filter((l) => l.status === "taken").length;
+    const total = todays.length;
+    return {
+      day: d.toLocaleDateString(undefined, { weekday: "short" }).slice(0, 1),
+      pct: total ? Math.round((taken / total) * 100) : 0,
+      taken, total,
+    };
+  });
+  const totalTaken = buckets.reduce((s, b) => s + b.taken, 0);
+  const totalAll = buckets.reduce((s, b) => s + b.total, 0);
+  const overall = totalAll ? Math.round((totalTaken / totalAll) * 100) : 0;
+  const streak = (() => {
+    let s = 0;
+    for (let i = buckets.length - 1; i >= 0; i--) {
+      if (buckets[i].total > 0 && buckets[i].pct === 100) s++;
+      else if (buckets[i].total > 0) break;
+    }
+    return s;
+  })();
+
   return (
-    <div className="flex flex-col items-center py-6">
-      <div className="relative flex items-center justify-center" style={{ width: 192, height: 176 }}>
-        <svg viewBox="0 0 48 48" width="192" height="176" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="heartGradKindred" x1="0%" y1="0%" x2="80%" y2="100%">
-              <stop offset="0%" stopColor="hsl(var(--brand-teal))" />
-              <stop offset="100%" stopColor="hsl(var(--brand-teal-deep))" />
-            </linearGradient>
-            <filter id="heartShadow">
-              <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="hsl(var(--brand-teal) / 0.3)" />
-            </filter>
-          </defs>
-          <path
-            d="M6 18.7241C6 12.6409 10.0359 7 15.5625 7C19.3976 7 22.2434 9.53088 24 13.1211C25.7565 9.53111 28.6022 7 32.4375 7C37.9647 7 42 12.6419 42 18.7241C42 31.7444 24 41 24 41C24 41 6 32.3045 6 18.7241Z"
-            fill="url(#heartGradKindred)"
-            filter="url(#heartShadow)"
-          />
-        </svg>
-        <div className="absolute flex flex-col items-center justify-center" style={{ marginTop: 10 }}>
-          <span className="font-bold leading-none tracking-[-2px] text-white" style={{ fontSize: 36, textShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
-            {percent}%
-          </span>
+    <div className="p-5">
+      <div className="flex items-end justify-between mb-1">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Last 7 days</p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-4xl font-bold tracking-[-1.5px] text-primary">{overall}%</span>
+            <span className="text-xs text-muted-foreground">adherence</span>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-muted-foreground">Streak</p>
+          <p className="text-lg font-semibold text-foreground">{streak} {streak === 1 ? "day" : "days"}</p>
         </div>
       </div>
-      <p className="text-sm text-muted-foreground mt-1 text-center">You're doing well this month</p>
+      <div className="h-32 mt-3">
+        {isLoading ? (
+          <Skeleton className="w-full h-full rounded-lg" />
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={buckets} margin={{ top: 8, right: 4, bottom: 0, left: -28 }}>
+              <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis hide domain={[0, 100]} />
+              <Tooltip
+                cursor={{ fill: "hsl(var(--muted)/0.4)" }}
+                contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 16px rgba(0,0,0,0.08)", fontSize: 12 }}
+                formatter={(v: any, _n, p: any) => [`${v}% (${p.payload.taken}/${p.payload.total})`, "Taken"]}
+              />
+              <Bar dataKey="pct" radius={[8, 8, 4, 4]}>
+                {buckets.map((b, i) => (
+                  <Cell key={i} fill={b.total === 0 ? "hsl(var(--muted))" : b.pct >= 80 ? "hsl(var(--brand-teal))" : b.pct >= 50 ? "hsl(var(--brand-teal)/0.6)" : "hsl(var(--destructive)/0.6)"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground text-center mt-1">
+        {totalAll === 0 ? "Log your meds to see your report here." : `${totalTaken} of ${totalAll} doses taken this week`}
+      </p>
     </div>
   );
 }
@@ -62,34 +106,15 @@ function AdherenceHeart({ percent }: { percent: number }) {
 export default function Meds() {
   const { profileId } = useProfile();
   const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const [open, setOpen] = useState(false);
 
   const { data: meds, isLoading: isLoadingMeds } = useListMedications(
     { profileId },
     { query: { queryKey: getListMedicationsQueryKey({ profileId }), enabled: !!profileId } }
   );
-
-  const createMed = useCreateMedication();
-  const [name, setName] = useState("");
-  const [dose, setDose] = useState("");
-  const [frequency, setFrequency] = useState("Once daily");
-  const [reminderTime, setReminderTime] = useState("");
-
-  const handleAddMed = (e: React.FormEvent) => {
-    e.preventDefault();
-    createMed.mutate({
-      data: { profileId, name, dose, frequency, reminderTime, status: CreateMedicationBodyStatus.ongoing, reminderEnabled: true }
-    }, {
-      onSuccess: () => {
-        toast({ title: "Medication added" });
-        queryClient.invalidateQueries({ queryKey: getListMedicationsQueryKey({ profileId }) });
-        setOpen(false);
-        setName(""); setDose(""); setFrequency("Once daily"); setReminderTime("");
-      }
-    });
-  };
+  const { data: medLogs, isLoading: isLoadingLogs } = useListMedicationLogs(
+    { profileId },
+    { query: { queryKey: getListMedicationLogsQueryKey({ profileId }), enabled: !!profileId } }
+  );
 
   return (
     <MobileAppShell>
@@ -103,7 +128,7 @@ export default function Meds() {
 
         <Card className="border-none shadow-sm bg-card mb-6 overflow-hidden">
           <CardContent className="p-0">
-            <AdherenceHeart percent={85} />
+            <AdherenceReport logs={medLogs} isLoading={isLoadingLogs} />
           </CardContent>
         </Card>
 
