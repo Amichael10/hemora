@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
@@ -37,6 +37,35 @@ import SchoolLetter from "@/pages/school-letter";
 import Resources from "@/pages/resources";
 import ResourceDetail from "@/pages/resource-detail";
 import { About, Help, Privacy, Terms } from "@/pages/info";
+
+/**
+ * Host-based routing:
+ * - app.hemora.xyz → always lands users inside the app (dashboard).
+ *   Marketing routes (/, /about, /help, etc.) are redirected to /dashboard.
+ * - Other hosts (hemora.xyz, www.hemora.xyz, staging.hemora.xyz, previews)
+ *   keep the marketing landing page as the default.
+ */
+const APP_HOST_PREFIX = "app.";
+const MARKETING_PATHS = new Set([
+  "/",
+  "/about",
+  "/help",
+  "/privacy",
+  "/terms",
+]);
+
+function HostRedirect() {
+  const [location, setLocation] = useLocation();
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const host = window.location.hostname;
+    const isAppHost = host.startsWith(APP_HOST_PREFIX);
+    if (isAppHost && MARKETING_PATHS.has(location)) {
+      setLocation("/dashboard");
+    }
+  }, [location, setLocation]);
+  return null;
+}
 
 function Routes() {
   return (
@@ -93,6 +122,7 @@ export default function AppRouter() {
       <ProfileProvider>
         <TooltipProvider>
           <WouterRouter>
+            <HostRedirect />
             <Routes />
           </WouterRouter>
           <Toaster />
