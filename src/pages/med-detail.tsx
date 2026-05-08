@@ -233,7 +233,13 @@ export default function MedDetail() {
               <div className="bg-muted/40 rounded-xl p-3">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Started on</p>
                 <p className="text-sm font-semibold text-foreground mt-1">
-                  {startedOn ? new Date(startedOn).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                  {startedOn ? (() => {
+                    const s = String(startedOn);
+                    const d = /^\d{4}-\d{2}-\d{2}$/.test(s)
+                      ? new Date(`${s}T00:00:00`)
+                      : new Date(s);
+                    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+                  })() : "—"}
                 </p>
               </div>
             </div>
