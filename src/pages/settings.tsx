@@ -19,6 +19,7 @@ import {
   AltArrowRightLinear as ArrowRight,
   PenNewSquareLinear as EditIcon,
   BookLinear as BookIcon,
+  PaletteLinear as PaletteIcon,
 } from "solar-icon-set";
 
 function getInitials(name?: string | null) {
@@ -87,6 +88,7 @@ export default function Settings() {
           <Row icon={<PhoneIcon size={16} />} label="Emergency contacts" href="/settings/contacts" />
           <Row icon={<BellIcon size={16} />} label="Notifications" href="/settings/notifications" />
           <Row icon={<BookIcon size={16} />} label="Resources Library" href="/resources" />
+          <Row icon={<PaletteIcon size={16} />} label="Brand kit" href="/brand" />
           <Row icon={<ShieldIcon size={16} />} label="Privacy" href="/privacy" />
         </Group>
 
