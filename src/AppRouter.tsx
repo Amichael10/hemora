@@ -1,42 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
 
-import Splash from "@/pages/splash";
-import Landing from "@/pages/landing";
-import Onboarding from "@/pages/onboarding";
-import Dashboard from "@/pages/dashboard";
-import Crisis from "@/pages/crisis";
-import Meds from "@/pages/meds";
-import Records from "@/pages/records";
-import Directory from "@/pages/directory";
-import DirectoryDetail from "@/pages/directory-detail";
-import Emergency from "@/pages/emergency";
-import AuthCallback from "@/pages/auth-callback";
-import Profile from "@/pages/profile";
-import ProfileEdit from "@/pages/profile-edit";
-import NotFound from "@/pages/not-found";
-import Login from "@/pages/login";
-import Signup from "@/pages/signup";
-import MedForm from "@/pages/med-form";
-import MedDetail from "@/pages/med-detail";
-import RecordForm from "@/pages/record-form";
-import RecordDetail from "@/pages/record-detail";
-import CrisisDetail from "@/pages/crisis-detail";
-import CrisisInsights from "@/pages/crisis-insights";
-import CrisisShare from "@/pages/crisis-share";
-import Settings from "@/pages/settings";
-import Contacts from "@/pages/contacts";
-import Notifications from "@/pages/notifications";
-import GenotypeChecker from "@/pages/genotype-checker";
-import Family from "@/pages/family";
-import SchoolLetter from "@/pages/school-letter";
-import Resources from "@/pages/resources";
-import ResourceDetail from "@/pages/resource-detail";
-import { About, Help, Privacy, Terms } from "@/pages/info";
+// Lazy load pages
+const Splash = lazy(() => import("@/pages/splash"));
+const Landing = lazy(() => import("@/pages/landing"));
+const Onboarding = lazy(() => import("@/pages/onboarding"));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const Crisis = lazy(() => import("@/pages/crisis"));
+const Meds = lazy(() => import("@/pages/meds"));
+const Records = lazy(() => import("@/pages/records"));
+const Directory = lazy(() => import("@/pages/directory"));
+const DirectoryDetail = lazy(() => import("@/pages/directory-detail"));
+const Emergency = lazy(() => import("@/pages/emergency"));
+const AuthCallback = lazy(() => import("@/pages/auth-callback"));
+const Profile = lazy(() => import("@/pages/profile"));
+const ProfileEdit = lazy(() => import("@/pages/profile-edit"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const Login = lazy(() => import("@/pages/login"));
+const Signup = lazy(() => import("@/pages/signup"));
+const MedForm = lazy(() => import("@/pages/med-form"));
+const MedDetail = lazy(() => import("@/pages/med-detail"));
+const RecordForm = lazy(() => import("@/pages/record-form"));
+const RecordDetail = lazy(() => import("@/pages/record-detail"));
+const CrisisDetail = lazy(() => import("@/pages/crisis-detail"));
+const CrisisInsights = lazy(() => import("@/pages/crisis-insights"));
+const CrisisShare = lazy(() => import("@/pages/crisis-share"));
+const Settings = lazy(() => import("@/pages/settings"));
+const Contacts = lazy(() => import("@/pages/contacts"));
+const Notifications = lazy(() => import("@/pages/notifications"));
+const GenotypeChecker = lazy(() => import("@/pages/genotype-checker"));
+const Family = lazy(() => import("@/pages/family"));
+const SchoolLetter = lazy(() => import("@/pages/school-letter"));
+const Resources = lazy(() => import("@/pages/resources"));
+const ResourceDetail = lazy(() => import("@/pages/resource-detail"));
+
+// Helper for Info pages
+const About = lazy(() => import("@/pages/info").then(m => ({ default: m.About })));
+const Help = lazy(() => import("@/pages/info").then(m => ({ default: m.Help })));
+const Privacy = lazy(() => import("@/pages/info").then(m => ({ default: m.Privacy })));
+const Terms = lazy(() => import("@/pages/info").then(m => ({ default: m.Terms })));
 
 /**
  * Host-based routing:
@@ -69,45 +75,47 @@ function HostRedirect() {
 
 function Routes() {
   return (
-    <Switch>
-      <Route path="/" component={Landing} />
-      <Route path="/welcome" component={Splash} />
-      <Route path="/onboarding" component={Onboarding} />
-      <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
-      <Route path="/auth/callback" component={AuthCallback} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/crisis" component={Crisis} />
-      <Route path="/crisis/insights" component={CrisisInsights} />
-      <Route path="/crisis/share" component={CrisisShare} />
-      <Route path="/crisis/:id" component={CrisisDetail} />
-      <Route path="/meds" component={Meds} />
-      <Route path="/meds/new" component={MedForm} />
-      <Route path="/meds/:id/edit" component={MedForm} />
-      <Route path="/meds/:id" component={MedDetail} />
-      <Route path="/records" component={Records} />
-      <Route path="/records/new" component={RecordForm} />
-      <Route path="/records/:id/edit" component={RecordForm} />
-      <Route path="/records/:id" component={RecordDetail} />
-      <Route path="/directory" component={Directory} />
-      <Route path="/directory/:id" component={DirectoryDetail} />
-      <Route path="/emergency" component={Emergency} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/profile/edit" component={ProfileEdit} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/settings/contacts" component={Contacts} />
-      <Route path="/settings/notifications" component={Notifications} />
-      <Route path="/genotype-checker" component={GenotypeChecker} />
-      <Route path="/family" component={Family} />
-      <Route path="/school-letter" component={SchoolLetter} />
-      <Route path="/resources" component={Resources} />
-      <Route path="/resources/:id" component={ResourceDetail} />
-      <Route path="/help" component={Help} />
-      <Route path="/about" component={About} />
-      <Route path="/privacy" component={Privacy} />
-      <Route path="/terms" component={Terms} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<div className="min-h-[100dvh] w-full bg-secondary flex items-center justify-center">Loading...</div>}>
+      <Switch>
+        <Route path="/" component={Landing} />
+        <Route path="/welcome" component={Splash} />
+        <Route path="/onboarding" component={Onboarding} />
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={Signup} />
+        <Route path="/auth/callback" component={AuthCallback} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/crisis" component={Crisis} />
+        <Route path="/crisis/insights" component={CrisisInsights} />
+        <Route path="/crisis/share" component={CrisisShare} />
+        <Route path="/crisis/:id" component={CrisisDetail} />
+        <Route path="/meds" component={Meds} />
+        <Route path="/meds/new" component={MedForm} />
+        <Route path="/meds/:id/edit" component={MedForm} />
+        <Route path="/meds/:id" component={MedDetail} />
+        <Route path="/records" component={Records} />
+        <Route path="/records/new" component={RecordForm} />
+        <Route path="/records/:id/edit" component={RecordForm} />
+        <Route path="/records/:id" component={RecordDetail} />
+        <Route path="/directory" component={Directory} />
+        <Route path="/directory/:id" component={DirectoryDetail} />
+        <Route path="/emergency" component={Emergency} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/profile/edit" component={ProfileEdit} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/settings/contacts" component={Contacts} />
+        <Route path="/settings/notifications" component={Notifications} />
+        <Route path="/genotype-checker" component={GenotypeChecker} />
+        <Route path="/family" component={Family} />
+        <Route path="/school-letter" component={SchoolLetter} />
+        <Route path="/resources" component={Resources} />
+        <Route path="/resources/:id" component={ResourceDetail} />
+        <Route path="/help" component={Help} />
+        <Route path="/about" component={About} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

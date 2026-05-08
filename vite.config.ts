@@ -20,6 +20,9 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    build: {
+      chunkSizeWarningLimit: 1000,
+    },
     resolve: {
       alias: {
         "@assets": path.resolve(__dirname, "src/lib/workspace/assets"),
