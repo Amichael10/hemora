@@ -58,6 +58,7 @@ const mapProfile = (r: any) => r && ({
   gender: r.gender,
   scdStatus: r.scd_status,
   sex: r.sex,
+  avatarUrl: r.avatar_url ?? null,
   bloodType: r.blood_type,
   genotype: r.genotype,
   heightCm: r.height_cm,
