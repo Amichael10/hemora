@@ -459,7 +459,7 @@ function Features() {
 }
 
 function HowItWorks() {
-  return _HowItWorks();
+  return _HowItWorksImpl();
 }
 
 function ResourcesPreview() {
@@ -511,7 +511,7 @@ function ResourcesPreview() {
   );
 }
 
-function _HowItWorks() {
+function _HowItWorksImpl() {
   const steps = [
     { n: "01", title: "Set up your profile", body: "Tell us who you're caring for — yourself, a child, or a loved one." },
     { n: "02", title: "Track day to day", body: "Log meds, crises, and care visits in seconds. Most entries take under 30." },
