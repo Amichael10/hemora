@@ -637,29 +637,62 @@ export default function Crisis() {
 
           {step === "history" && (
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
-              <div className="flex items-center justify-between mb-5">
-                <h1 className="h-page">Crisis History</h1>
+              {/* Header */}
+              <div className="flex items-start justify-between mb-1">
+                <div>
+                  <h1 className="h-page">Crisis</h1>
+                  <p className="text-sm text-muted-foreground mt-1">You're not alone. We're here to help.</p>
+                </div>
+                {logs && logs.length > 0 && (
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={() => setLocation("/crisis/insights")}
+                      aria-label="Insights"
+                      className="w-9 h-9 rounded-full flex items-center justify-center bg-card border border-border/60 text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Chart size={16} />
+                    </button>
+                    <button
+                      onClick={() => setLocation("/crisis/share")}
+                      aria-label="Share history"
+                      className="w-9 h-9 rounded-full flex items-center justify-center bg-card border border-border/60 text-foreground hover:bg-muted transition-colors"
+                    >
+                      <ShareIcon size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
+
+              {/* Hero "In a crisis?" card */}
+              <div
+                className="relative overflow-hidden rounded-3xl p-5 mt-5 mb-6 text-white shadow-md"
+                style={{ background: "linear-gradient(135deg, #5b3fb8 0%, #7a5ca8 100%)" }}
+              >
+                <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3">In a crisis?</h3>
+                <ol className="space-y-1.5 text-sm leading-snug text-white/95 mb-4 max-w-[78%]">
+                  <li>1. Stay calm and follow your plan</li>
+                  <li>2. Take your pain medication</li>
+                  <li>3. Hydrate and rest</li>
+                  <li>4. Seek medical help if needed</li>
+                </ol>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/15 border-white/30 text-white hover:bg-white/25 backdrop-blur-sm rounded-full"
+                  onClick={() => setLocation("/emergency")}
+                >
+                  View Action Plan
+                </Button>
+                <div className="absolute -right-3 -bottom-2 w-28 h-28 opacity-90 pointer-events-none">
+                  <Lottie animationData={lottieMeds} loop autoplay className="w-full h-full" />
+                </div>
+              </div>
+
+              {/* Recent header */}
               {logs && logs.length > 0 && (
-                <>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
-                      <Plus size={16} /> Start log
-                    </Button>
-                    <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
-                      onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
-                      Urgent care
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <Button size="lg" variant="outline" className="w-full" onClick={() => setLocation("/crisis/insights")}>
-                      <Chart size={16} /> Insights
-                    </Button>
-                    <Button size="lg" variant="outline" className="w-full" onClick={() => setLocation("/crisis/share")}>
-                      <ShareIcon size={16} /> Share history
-                    </Button>
-                  </div>
-                </>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-serif text-base font-semibold text-foreground tracking-tight">Recent Crisis Logs</h2>
+                </div>
               )}
 
               {isLoadingLogs ? (
@@ -806,6 +839,15 @@ export default function Crisis() {
                       </div>
                     </motion.div>
                   ))}
+                </div>
+              )}
+
+              {/* Sticky bottom CTA */}
+              {logs && logs.length > 0 && (
+                <div className="sticky bottom-3 mt-6">
+                  <Button size="xl" className="w-full shadow-lg" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
+                    <Plus size={18} /> Start New Crisis Log
+                  </Button>
                 </div>
               )}
             </motion.div>
