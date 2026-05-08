@@ -342,6 +342,7 @@ export type Database = {
           frequency: string | null
           id: string
           name: string
+          next_refill_date: string | null
           notes: string | null
           refill_reminder_days: number | null
           reminder_enabled: boolean | null
@@ -359,6 +360,7 @@ export type Database = {
           frequency?: string | null
           id?: string
           name: string
+          next_refill_date?: string | null
           notes?: string | null
           refill_reminder_days?: number | null
           reminder_enabled?: boolean | null
@@ -376,6 +378,7 @@ export type Database = {
           frequency?: string | null
           id?: string
           name?: string
+          next_refill_date?: string | null
           notes?: string | null
           refill_reminder_days?: number | null
           reminder_enabled?: boolean | null
