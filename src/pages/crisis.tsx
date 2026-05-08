@@ -498,7 +498,6 @@ export default function Crisis() {
             );
           })()}
 
-          {step === "relief" && (
           {step === "relief" && (() => {
             const RELIEFS = [
               { key: "Rest",        anim: lottieRest,    bg: "#5C7A9B", caption: "Rest helps your body recover" },
