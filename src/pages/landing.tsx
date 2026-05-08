@@ -798,6 +798,7 @@ function Footer() {
             <li><a href="/about" className="hover:text-accent">About</a></li>
             <li><a href="/privacy" className="hover:text-accent">Privacy</a></li>
             <li><a href="/terms" className="hover:text-accent">Terms</a></li>
+          <li><a href="/brand" className="hover:text-accent">Brand</a></li>
           </ul>
         </div>
       </div>
