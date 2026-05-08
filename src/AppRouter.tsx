@@ -1,10 +1,11 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense, ComponentType } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
-import hemoraLogo from "@/assets/brand/Logo.png";
+import { HemoraLoader } from "@/components/HemoraLoader";
+import { RequireAuth } from "@/components/RequireAuth";
 
 // Lazy load pages
 const Splash = lazy(() => import("@/pages/splash"));
@@ -75,33 +76,19 @@ function HostRedirect() {
   return null;
 }
 
-function AppLoading() {
-  return (
-    <div
-      role="status"
-      aria-label="Loading Hemora"
-      className="min-h-[100dvh] w-full bg-background flex flex-col items-center justify-center gap-6"
-    >
-      <div className="relative flex items-center justify-center">
-        <span className="absolute inline-flex h-24 w-24 rounded-full bg-primary/15 animate-ping" />
-        <span className="absolute inline-flex h-16 w-16 rounded-full bg-primary/10" />
-        <img
-          src={hemoraLogo}
-          alt=""
-          className="relative w-12 h-12 animate-pulse [animation-duration:1.6s]"
-        />
-      </div>
-      <div className="flex flex-col items-center gap-1">
-        <p className="font-serif text-lg text-secondary tracking-[-0.2px]">Hemora</p>
-        <p className="text-xs text-muted-foreground">Getting things ready…</p>
-      </div>
-    </div>
+const protect = <P extends object>(Component: ComponentType<P>) => {
+  const Wrapped = (props: P) => (
+    <RequireAuth>
+      <Component {...props} />
+    </RequireAuth>
   );
-}
+  Wrapped.displayName = `Protected(${Component.displayName || Component.name || "Component"})`;
+  return Wrapped;
+};
 
 function Routes() {
   return (
-    <Suspense fallback={<AppLoading />}>
+    <Suspense fallback={<HemoraLoader />}>
       <Switch>
         <Route path="/" component={Landing} />
         <Route path="/welcome" component={Splash} />
@@ -109,30 +96,30 @@ function Routes() {
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
         <Route path="/auth/callback" component={AuthCallback} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/crisis" component={Crisis} />
-        <Route path="/crisis/insights" component={CrisisInsights} />
-        <Route path="/crisis/share" component={CrisisShare} />
-        <Route path="/crisis/:id" component={CrisisDetail} />
-        <Route path="/meds" component={Meds} />
-        <Route path="/meds/new" component={MedForm} />
-        <Route path="/meds/:id/edit" component={MedForm} />
-        <Route path="/meds/:id" component={MedDetail} />
-        <Route path="/records" component={Records} />
-        <Route path="/records/new" component={RecordForm} />
-        <Route path="/records/:id/edit" component={RecordForm} />
-        <Route path="/records/:id" component={RecordDetail} />
-        <Route path="/directory" component={Directory} />
-        <Route path="/directory/:id" component={DirectoryDetail} />
-        <Route path="/emergency" component={Emergency} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/profile/edit" component={ProfileEdit} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/settings/contacts" component={Contacts} />
-        <Route path="/settings/notifications" component={Notifications} />
+        <Route path="/dashboard" component={protect(Dashboard)} />
+        <Route path="/crisis" component={protect(Crisis)} />
+        <Route path="/crisis/insights" component={protect(CrisisInsights)} />
+        <Route path="/crisis/share" component={protect(CrisisShare)} />
+        <Route path="/crisis/:id" component={protect(CrisisDetail)} />
+        <Route path="/meds" component={protect(Meds)} />
+        <Route path="/meds/new" component={protect(MedForm)} />
+        <Route path="/meds/:id/edit" component={protect(MedForm)} />
+        <Route path="/meds/:id" component={protect(MedDetail)} />
+        <Route path="/records" component={protect(Records)} />
+        <Route path="/records/new" component={protect(RecordForm)} />
+        <Route path="/records/:id/edit" component={protect(RecordForm)} />
+        <Route path="/records/:id" component={protect(RecordDetail)} />
+        <Route path="/directory" component={protect(Directory)} />
+        <Route path="/directory/:id" component={protect(DirectoryDetail)} />
+        <Route path="/emergency" component={protect(Emergency)} />
+        <Route path="/profile" component={protect(Profile)} />
+        <Route path="/profile/edit" component={protect(ProfileEdit)} />
+        <Route path="/settings" component={protect(Settings)} />
+        <Route path="/settings/contacts" component={protect(Contacts)} />
+        <Route path="/settings/notifications" component={protect(Notifications)} />
         <Route path="/genotype-checker" component={GenotypeChecker} />
-        <Route path="/family" component={Family} />
-        <Route path="/school-letter" component={SchoolLetter} />
+        <Route path="/family" component={protect(Family)} />
+        <Route path="/school-letter" component={protect(SchoolLetter)} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/:id" component={ResourceDetail} />
         <Route path="/brand" component={Brand} />
