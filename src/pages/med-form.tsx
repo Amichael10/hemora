@@ -188,6 +188,28 @@ export default function MedForm() {
               <p className="text-xs text-muted-foreground">Pick the hour, minute, and AM or PM</p>
             </div>
             <div className="space-y-2">
+              <Label className="text-sm font-medium">Start date</Label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => { setStartDate(e.target.value); setStartDateTouched(true); }}
+                className="h-12 text-base rounded-xl bg-card border-border/60"
+              />
+              <p className="text-xs text-muted-foreground">
+                Defaults to today if your first dose time has already passed, otherwise tomorrow. You can change it.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Refill reminder</Label>
+              <Select value={refillDays} onValueChange={setRefillDays}>
+                <SelectTrigger className="h-12 rounded-xl bg-card border-border/60 text-base"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {REFILL_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">We'll nudge you this many days before you're due to run out.</p>
+            </div>
+            <div className="space-y-2">
               <Label className="text-sm font-medium">Notes</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional"
                 className="min-h-[88px] rounded-xl bg-card border-border/60 text-base" />
