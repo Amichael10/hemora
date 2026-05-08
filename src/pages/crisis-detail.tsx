@@ -96,7 +96,7 @@ export default function CrisisDetail() {
             {(log.whatHelped || []).length > 0 && (
               <div className="bg-card rounded-2xl border border-border/60 px-5 py-2 mb-4">
                 <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold pt-3 pb-1">Treatment</h3>
-                {(log.whatHelped || []).map(t => (
+                {(log.whatHelped || []).map((t: string) => (
                   <Row key={t} label={t} value="Used" />
                 ))}
               </div>
