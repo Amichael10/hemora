@@ -24,6 +24,30 @@ const FREQUENCIES = [
   "As needed", "Weekly", "Other",
 ];
 
+const REFILL_OPTIONS = [
+  { value: "0", label: "Off" },
+  { value: "1", label: "1 day before" },
+  { value: "3", label: "3 days before" },
+  { value: "5", label: "5 days before" },
+  { value: "7", label: "1 week before" },
+  { value: "14", label: "2 weeks before" },
+];
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+/** Default start date = today if the first scheduled time has already passed today, else tomorrow. */
+function defaultStartDate(reminder24: string): string {
+  if (!reminder24 || !/^\d{1,2}:\d{2}/.test(reminder24)) return todayISO();
+  const [hh, mm] = reminder24.split(":").map((s) => parseInt(s, 10));
+  const now = new Date();
+  const scheduled = new Date(); scheduled.setHours(hh, mm, 0, 0);
+  const d = scheduled.getTime() <= now.getTime() ? now : new Date(now.getTime() + 86400000);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
 function to24h(hour12: string, minute: string, period: "AM" | "PM"): string {
   if (!hour12) return "";
   let h = parseInt(hour12, 10);
@@ -60,6 +84,9 @@ export default function MedForm() {
   const [minute, setMinute] = useState("00");
   const [period, setPeriod] = useState<"AM" | "PM">("AM");
   const [notes, setNotes] = useState("");
+  const [refillDays, setRefillDays] = useState<string>("3");
+  const [startDate, setStartDate] = useState<string>(todayISO());
+  const [startDateTouched, setStartDateTouched] = useState(false);
 
   useEffect(() => {
     if (med) {
@@ -69,13 +96,28 @@ export default function MedForm() {
       const { h, m, p } = from24h(med.reminderTime ?? "");
       setHour(h); setMinute(m); setPeriod(p);
       setNotes(med.notes ?? "");
+      setRefillDays(med.refillReminderDays != null ? String(med.refillReminderDays) : "3");
+      if (med.startDate) { setStartDate(med.startDate); setStartDateTouched(true); }
     }
   }, [med]);
+
+  // Keep start date in sync with the time picker until the user edits it manually
+  useEffect(() => {
+    if (isEdit || startDateTouched) return;
+    setStartDate(defaultStartDate(to24h(hour, minute, period)));
+  }, [hour, minute, period, isEdit, startDateTouched]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const reminderTime = to24h(hour, minute, period);
-    const data = { name, dose, frequency, reminderTime, notes, profileId, status: CreateMedicationBodyStatus.ongoing, reminderEnabled: true };
+    const refillNum = parseInt(refillDays, 10);
+    const data = {
+      name, dose, frequency, reminderTime, notes, profileId,
+      status: CreateMedicationBodyStatus.ongoing,
+      reminderEnabled: true,
+      refillReminderDays: refillNum > 0 ? refillNum : null,
+      startDate: startDate || null,
+    };
     if (isEdit) {
       updateMed.mutate({ id, data }, {
         onSuccess: () => { toast({ title: "Medication updated" }); setLocation("/meds"); },
@@ -144,6 +186,28 @@ export default function MedForm() {
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground">Pick the hour, minute, and AM or PM</p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Start date</Label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => { setStartDate(e.target.value); setStartDateTouched(true); }}
+                className="h-12 text-base rounded-xl bg-card border-border/60"
+              />
+              <p className="text-xs text-muted-foreground">
+                Defaults to today if your first dose time has already passed, otherwise tomorrow. You can change it.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Refill reminder</Label>
+              <Select value={refillDays} onValueChange={setRefillDays}>
+                <SelectTrigger className="h-12 rounded-xl bg-card border-border/60 text-base"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {REFILL_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">We'll nudge you this many days before you're due to run out.</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium">Notes</Label>
