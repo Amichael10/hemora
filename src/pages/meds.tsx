@@ -131,7 +131,7 @@ export default function Meds() {
         <h2 className="eyebrow mb-4">Current Routine</h2>
 
         {isLoadingMeds ? (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {[1, 2].map(i => (
               <Card key={i} className="border-none shadow-sm">
                 <CardContent className="p-4 flex gap-4">
@@ -153,7 +153,7 @@ export default function Meds() {
             <Button variant="soft" onClick={() => setLocation("/meds/new")}>Add Medication</Button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {meds?.map((med) => (
               <Link key={med.id} href={`/meds/${med.id}`}>
               <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`med-card-${med.id}`}>
