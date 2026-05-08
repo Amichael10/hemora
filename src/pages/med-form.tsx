@@ -87,6 +87,7 @@ export default function MedForm() {
   const [refillDays, setRefillDays] = useState<string>("3");
   const [startDate, setStartDate] = useState<string>(todayISO());
   const [startDateTouched, setStartDateTouched] = useState(false);
+  const [nextRefillDate, setNextRefillDate] = useState<string>("");
 
   useEffect(() => {
     if (med) {
@@ -98,6 +99,7 @@ export default function MedForm() {
       setNotes(med.notes ?? "");
       setRefillDays(med.refillReminderDays != null ? String(med.refillReminderDays) : "3");
       if (med.startDate) { setStartDate(med.startDate); setStartDateTouched(true); }
+      if (med.nextRefillDate) setNextRefillDate(med.nextRefillDate);
     }
   }, [med]);
 
@@ -117,6 +119,7 @@ export default function MedForm() {
       reminderEnabled: true,
       refillReminderDays: refillNum > 0 ? refillNum : null,
       startDate: startDate || null,
+      nextRefillDate: nextRefillDate || null,
     };
     if (isEdit) {
       updateMed.mutate({ id, data }, {
