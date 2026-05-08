@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
+import Lottie from "lottie-react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftBold, HomeSmileBold, MagniferBold } from "solar-icon-set";
-import hemoraIcon from "@/assets/brand/Logos/Black Hemora Icon Svg.svg";
+import { ArrowLeftBold, HomeSmileBold } from "solar-icon-set";
+import meltingFace from "@/assets/lottie/1fae0.json";
 
 export default function NotFound() {
   const [, setLocation] = useLocation();
@@ -14,23 +15,16 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="flex flex-col items-center"
+          className="flex flex-col items-center flex-1 justify-center"
         >
-          <img src={hemoraIcon} alt="Hemora" className="w-16 h-16 mb-8 opacity-90" />
-
-          <div className="relative">
-            <h1 className="text-[120px] leading-none font-bold text-primary tracking-tight">
-              404
-            </h1>
-            <motion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-              className="absolute -top-2 -right-6 bg-accent text-accent-foreground rounded-full p-2 shadow-lg"
-            >
-              <MagniferBold size={20} />
-            </motion.div>
-          </div>
+          <Lottie
+            animationData={meltingFace}
+            loop
+            className="w-56 h-56"
+          />
+          <h1 className="text-[120px] leading-none font-bold text-primary tracking-tight mt-2">
+            404
+          </h1>
 
           <h2 className="h-display text-foreground mt-6 max-w-[280px]">
             We couldn't find that page.
