@@ -114,7 +114,7 @@ export default function Records() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {[1, 2, 3].map(i => (
               <Card key={i} className="border-none shadow-sm">
                 <CardContent className="p-4 flex gap-4">
@@ -136,7 +136,7 @@ export default function Records() {
             <Button variant="soft" onClick={() => setLocation("/records/new")}>Add Record</Button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {filteredRecords?.map((record) => (
               <Link key={record.id} href={`/records/${record.id}`}>
               <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`record-card-${record.id}`}>
