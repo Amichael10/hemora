@@ -212,6 +212,18 @@ export default function MedForm() {
               </Select>
               <p className="text-xs text-muted-foreground">We'll nudge you this many days before you're due to run out.</p>
             </div>
+            {refillDays !== "0" && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Next refill date</Label>
+                <Input
+                  type="date"
+                  value={nextRefillDate}
+                  onChange={(e) => setNextRefillDate(e.target.value)}
+                  className="h-12 text-base rounded-xl bg-card border-border/60"
+                />
+                <p className="text-xs text-muted-foreground">When do you expect to run out? We'll remind you ahead of this date.</p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Notes</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional"
