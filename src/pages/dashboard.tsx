@@ -331,6 +331,19 @@ export default function Dashboard() {
             )}
           </motion.section>
 
+          <motion.section variants={itemVariants}>
+            <button
+              onClick={() => setLocation("/resources")}
+              className="w-full text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors flex items-center justify-between gap-3"
+            >
+              <div>
+                <p className="text-[13px] font-semibold">Resources Library</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Trusted reads on SCD, treatment, and daily life.</p>
+              </div>
+              <ArrowRight size={14} />
+            </button>
+          </motion.section>
+
           {/* Next dose */}
           <motion.section variants={itemVariants}>
             <div className="flex items-end justify-between mb-3">
