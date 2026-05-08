@@ -22,8 +22,8 @@ import { UploadSquareLinear as Upload } from "solar-icon-set";
 
 export default function RecordForm() {
   const [, setLocation] = useLocation();
-  const [, params] = useRoute("/records/:id");
-  const id = params?.id && params.id !== "new" ? params.id : undefined;
+  const [, editParams] = useRoute("/records/:id/edit");
+  const id = editParams?.id;
   const isEdit = !!id;
   const { profileId } = useProfile();
   const { toast } = useToast();
