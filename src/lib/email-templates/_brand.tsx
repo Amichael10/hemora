@@ -28,7 +28,7 @@ export const brand = {
 // Absolute URL for the Hemora wordmark used inside emails.
 // Email clients require absolute URLs for images.
 export const HEMORA_WORDMARK_URL =
-  'https://project--c7428bd7-6c08-4d7b-a83f-109ec3907cba.lovable.app/email/hemora-wordmark.png'
+  'https://hemora.xyz/email/hemora-wordmark.png'
 
 const main: React.CSSProperties = {
   backgroundColor: '#ffffff',
