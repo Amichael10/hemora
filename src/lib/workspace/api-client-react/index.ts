@@ -71,6 +71,7 @@ const mapMed = (r: any) => ({
   status: r.status, notes: r.notes,
   refillReminderDays: r.refill_reminder_days ?? null,
   startDate: r.start_date ?? null,
+  nextRefillDate: r.next_refill_date ?? null,
   createdAt: r.created_at,
 });
 const mapMedLog = (r: any) => ({
@@ -235,6 +236,7 @@ export const useCreateMedication = () => {
         status: data.status ?? "ongoing", notes: data.notes ?? null,
         refill_reminder_days: data.refillReminderDays ?? null,
         start_date: data.startDate ?? null,
+        next_refill_date: data.nextRefillDate ?? null,
       }).select().single();
       if (error) throw new ApiError(error.message);
       qc.invalidateQueries({ queryKey: ["medications"] });
