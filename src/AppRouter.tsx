@@ -6,6 +6,7 @@ import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { HemoraLoader } from "@/components/HemoraLoader";
 import { RequireAuth } from "@/components/RequireAuth";
+import { useAuth } from "@/context/AuthContext";
 
 // Lazy load pages
 const Splash = lazy(() => import("@/pages/splash"));
@@ -65,14 +66,16 @@ const MARKETING_PATHS = new Set([
 
 function HostRedirect() {
   const [location, setLocation] = useLocation();
+  const { user, loading } = useAuth();
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (loading) return;
     const host = window.location.hostname;
     const isAppHost = host.startsWith(APP_HOST_PREFIX);
     if (isAppHost && MARKETING_PATHS.has(location)) {
-      setLocation("/dashboard");
+      setLocation(user ? "/dashboard" : "/login");
     }
-  }, [location, setLocation]);
+  }, [location, setLocation, user, loading]);
   return null;
 }
 
