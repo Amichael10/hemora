@@ -297,3 +297,221 @@ export async function exportSchoolLetterToPdf(input: SchoolLetterInput) {
   const safe = input.childName.replace(/[^\w\-]+/g, "_");
   doc.save(`Hemora-School-Letter-${safe}.pdf`);
 }
+
+// ---------- Crisis report (single log or insights) ----------
+export interface CrisisLogLike {
+  id?: string;
+  occurredAt?: string;
+  painLevel?: string;
+  painLocations?: string[];
+  triggers?: string[];
+  whatHelped?: string[];
+  hospitalVisit?: boolean;
+}
+
+export interface CrisisReportInput {
+  patientName?: string;
+  email?: string | null;
+  periodLabel: string;          // "Apr 12, 2024" or "This year (2024)"
+  include: {
+    details: boolean;
+    treatments: boolean;
+    insights: boolean;
+  };
+  logs: CrisisLogLike[];        // one or many
+}
+
+function fmtDate(iso?: string) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+export async function exportCrisisReportToPdf(input: CrisisReportInput) {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const marginX = 56;
+  const BRAND: [number, number, number] = [15, 65, 45];
+  const CREAM: [number, number, number] = [248, 244, 236];
+  const INK: [number, number, number] = [22, 28, 26];
+  const MUTED: [number, number, number] = [120, 120, 116];
+  const ACCENT: [number, number, number] = [168, 50, 74];
+  let y = 0;
+
+  // Header band
+  doc.setFillColor(...BRAND);
+  doc.rect(0, 0, pageW, 130, "F");
+  try {
+    const dataUrl = await loadImage(logoUrl);
+    doc.addImage(dataUrl, "PNG", marginX, 36, 40, 40);
+  } catch {}
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("Hemora", marginX + 52, 60);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(220, 220, 200);
+  doc.text("Crisis report  ·  Care team summary", marginX + 52, 76);
+  doc.setFontSize(9);
+  doc.text(new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }),
+    pageW - marginX, 60, { align: "right" });
+  doc.text("Confidential", pageW - marginX, 76, { align: "right" });
+
+  // Patient card
+  const cardY = 102;
+  doc.setFillColor(...CREAM);
+  doc.roundedRect(marginX, cardY, pageW - marginX * 2, 70, 10, 10, "F");
+  doc.setTextColor(...INK);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text(input.patientName || "Friend", marginX + 20, cardY + 28);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(...MUTED);
+  const sub = [input.email, `Period: ${input.periodLabel}`].filter(Boolean).join("  ·  ");
+  if (sub) doc.text(sub, marginX + 20, cardY + 46);
+
+  y = cardY + 70 + 28;
+
+  const ensureSpace = (need: number) => {
+    if (y + need > pageH - 60) { doc.addPage(); y = 64; }
+  };
+
+  const sectionTitle = (label: string) => {
+    ensureSpace(40);
+    doc.setFillColor(...BRAND);
+    doc.rect(marginX, y - 6, 18, 2, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(...BRAND);
+    doc.text(label.toUpperCase(), marginX + 26, y);
+    y += 18;
+  };
+
+  const renderRows = (rows: [string, string][]) => {
+    const rowH = 26;
+    const cardH = rows.length * rowH + 16;
+    ensureSpace(cardH + 8);
+    doc.setFillColor(252, 250, 246);
+    doc.roundedRect(marginX, y, pageW - marginX * 2, cardH, 8, 8, "F");
+    let ry = y + 22;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    rows.forEach(([label, value], i) => {
+      doc.setTextColor(...MUTED);
+      doc.text(label, marginX + 18, ry);
+      doc.setTextColor(...INK);
+      doc.setFont("helvetica", "bold");
+      const lines = doc.splitTextToSize(String(value || "—"), pageW - marginX * 2 - 200);
+      doc.text(lines, marginX + 180, ry);
+      doc.setFont("helvetica", "normal");
+      if (i < rows.length - 1) {
+        doc.setDrawColor(232, 226, 214);
+        doc.line(marginX + 18, ry + 9, pageW - marginX - 18, ry + 9);
+      }
+      ry += rowH;
+    });
+    y += cardH + 18;
+  };
+
+  // ---- Insights summary ----
+  if (input.include.insights) {
+    const total = input.logs.length;
+    const hospital = input.logs.filter(l => l.hospitalVisit).length;
+    const allTriggers = input.logs.flatMap(l => l.triggers || []);
+    const triggerCounts = allTriggers.reduce<Record<string, number>>((acc, t) => {
+      acc[t] = (acc[t] || 0) + 1; return acc;
+    }, {});
+    const topTriggers = Object.entries(triggerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const allHelped = input.logs.flatMap(l => l.whatHelped || []);
+    const helpedCounts = allHelped.reduce<Record<string, number>>((acc, t) => {
+      acc[t] = (acc[t] || 0) + 1; return acc;
+    }, {});
+    const topHelped = Object.entries(helpedCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+    sectionTitle("Insights");
+    // Stat tiles
+    const tileW = (pageW - marginX * 2 - 16) / 3;
+    const stats = [
+      { n: total, l: "Total crises" },
+      { n: hospital, l: "Hospital visits" },
+      { n: new Set(allTriggers).size, l: "Unique triggers" },
+    ];
+    ensureSpace(70);
+    stats.forEach((s, i) => {
+      const x = marginX + i * (tileW + 8);
+      doc.setFillColor(...CREAM);
+      doc.roundedRect(x, y, tileW, 60, 8, 8, "F");
+      doc.setTextColor(...ACCENT);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.text(String(s.n), x + 14, y + 30);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...MUTED);
+      doc.text(s.l, x + 14, y + 48);
+    });
+    y += 78;
+
+    if (topTriggers.length) {
+      sectionTitle("Most common triggers");
+      renderRows(topTriggers.map(([k, v]) => [k, `${v} time${v > 1 ? "s" : ""}`]));
+    }
+    if (topHelped.length) {
+      sectionTitle("What's helped most");
+      renderRows(topHelped.map(([k, v]) => [k, `${v} time${v > 1 ? "s" : ""}`]));
+    }
+  }
+
+  // ---- Per-log details ----
+  if (input.include.details) {
+    sectionTitle(input.logs.length > 1 ? "Crisis log entries" : "Crisis details");
+    input.logs.forEach((log, idx) => {
+      ensureSpace(140);
+      doc.setFillColor(...CREAM);
+      doc.roundedRect(marginX, y, pageW - marginX * 2, 24, 6, 6, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...INK);
+      doc.text(fmtDate(log.occurredAt), marginX + 14, y + 16);
+      if (log.hospitalVisit) {
+        doc.setFillColor(...ACCENT);
+        doc.roundedRect(pageW - marginX - 92, y + 5, 80, 14, 7, 7, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.text("Hospital visit", pageW - marginX - 86, y + 14);
+      }
+      y += 32;
+      renderRows([
+        ["Pain level", log.painLevel || "—"],
+        ["Locations", (log.painLocations || []).join(", ")],
+        ["Triggers", (log.triggers || []).join(", ")],
+        ["What helped", (log.whatHelped || []).join(", ")],
+      ]);
+      if (idx < input.logs.length - 1) y += 6;
+    });
+  }
+
+  if (input.include.treatments) {
+    sectionTitle("Treatments noted");
+    const treats = input.logs.flatMap(l => l.whatHelped || []);
+    const unique = Array.from(new Set(treats));
+    renderRows(unique.length ? unique.map(t => [t, "Used by patient"]) : [["—", "No treatments recorded"]]);
+  }
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(232, 226, 214);
+    doc.line(marginX, pageH - 44, pageW - marginX, pageH - 44);
+    doc.setFontSize(8.5);
+    doc.setTextColor(...MUTED);
+    doc.text("Hemora · hemora.xyz", marginX, pageH - 26);
+    doc.text(`Page ${i} of ${pageCount}`, pageW - marginX, pageH - 26, { align: "right" });
+  }
+
+  const safe = (input.patientName || "patient").replace(/[^\w\-]+/g, "_");
+  doc.save(`Hemora-Crisis-Report-${safe}.pdf`);
+}
