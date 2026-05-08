@@ -120,6 +120,7 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
           <a href="#how" className="hover:text-foreground transition">How it works</a>
+          <a href="#resources" className="hover:text-foreground transition">Resources</a>
           <a href="#stories" className="hover:text-foreground transition">Stories</a>
           <a href="#faq" className="hover:text-foreground transition">FAQ</a>
         </nav>
@@ -819,6 +820,7 @@ export default function Landing() {
         <ProductPreview />
         <Context />
         <Features />
+        <ResourcesPreview />
         <HowItWorks />
         <Stories />
         <Download />
