@@ -69,6 +69,9 @@ const mapMed = (r: any) => ({
   id: r.id, name: r.name, dose: r.dose, frequency: r.frequency,
   reminderTime: r.reminder_time, reminderEnabled: r.reminder_enabled,
   status: r.status, notes: r.notes,
+  refillReminderDays: r.refill_reminder_days ?? null,
+  startDate: r.start_date ?? null,
+  createdAt: r.created_at,
 });
 const mapMedLog = (r: any) => ({
   id: r.id, medicationId: r.medication_id, status: r.status,
@@ -230,6 +233,8 @@ export const useCreateMedication = () => {
         user_id, name: data.name, dose: data.dose, frequency: data.frequency,
         reminder_time: data.reminderTime, reminder_enabled: data.reminderEnabled ?? true,
         status: data.status ?? "ongoing", notes: data.notes ?? null,
+        refill_reminder_days: data.refillReminderDays ?? null,
+        start_date: data.startDate ?? null,
       }).select().single();
       if (error) throw new ApiError(error.message);
       qc.invalidateQueries({ queryKey: ["medications"] });
