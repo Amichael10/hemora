@@ -24,6 +24,7 @@ import Signup from "@/pages/signup";
 import MedForm from "@/pages/med-form";
 import MedDetail from "@/pages/med-detail";
 import RecordForm from "@/pages/record-form";
+import RecordDetail from "@/pages/record-detail";
 import CrisisDetail from "@/pages/crisis-detail";
 import CrisisInsights from "@/pages/crisis-insights";
 import CrisisShare from "@/pages/crisis-share";
@@ -56,7 +57,9 @@ function Routes() {
       <Route path="/meds/:id/edit" component={MedForm} />
       <Route path="/meds/:id" component={MedDetail} />
       <Route path="/records" component={Records} />
-      <Route path="/records/:id" component={RecordForm} />
+      <Route path="/records/new" component={RecordForm} />
+      <Route path="/records/:id/edit" component={RecordForm} />
+      <Route path="/records/:id" component={RecordDetail} />
       <Route path="/directory" component={Directory} />
       <Route path="/directory/:id" component={DirectoryDetail} />
       <Route path="/emergency" component={Emergency} />
