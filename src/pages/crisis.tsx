@@ -34,6 +34,12 @@ import lottieDehydration from "@/assets/lottie/1f4a7.json";
 import lottieExertion from "@/assets/lottie/1f624.json";
 import lottieMissed from "@/assets/lottie/23f0.json";
 import lottieOther from "@/assets/lottie/1fa7a.json";
+import lottieRest from "@/assets/lottie/1f634.json";
+import lottieFluids from "@/assets/lottie/1f4a7.json";
+import lottieMeds from "@/assets/lottie/1f917.json";
+import lottieBath from "@/assets/lottie/2668.json";
+import lottieMassage from "@/assets/lottie/1f64c.json";
+import lottieNothing from "@/assets/lottie/1f615.json";
 import { useToast } from "@/hooks/use-toast";
 import {
   HeartPulseBold as HeartCardiogramFilled,
@@ -493,21 +499,119 @@ export default function Crisis() {
           })()}
 
           {step === "relief" && (
-            <motion.div key="relief" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
-              <StepDots current={4} total={5} onStepClick={goToStep} />
-              <h2 className="h-page text-center mb-2">What has helped so far?</h2>
-              <p className="text-center body-md mb-8">Select all that apply</p>
-              <div className="flex flex-wrap gap-2 justify-center mb-auto">
-                {["Rest", "Fluids", "Pain meds", "Warm bath", "Massage", "Nothing yet"].map(help => {
-                  const isSelected = whatHelped.includes(help);
-                  return (
-                    <Button key={help} size="pill" variant={isSelected ? "default" : "outline"} className={isSelected ? "" : "bg-card"} onClick={() => toggleArrayItem(setWhatHelped, help)}>{help}</Button>
-                  );
-                })}
-              </div>
-              <Button size="xl" className="w-full mt-8" onClick={() => setStep("hospital")}>Next</Button>
-            </motion.div>
-          )}
+          {step === "relief" && (() => {
+            const RELIEFS = [
+              { key: "Rest",        anim: lottieRest,    bg: "#5C7A9B", caption: "Rest helps your body recover" },
+              { key: "Fluids",      anim: lottieFluids,  bg: "#3FA6B8", caption: "Hydration keeps cells flowing" },
+              { key: "Pain meds",   anim: lottieMeds,    bg: "#7A5CA8", caption: "Take your meds as prescribed" },
+              { key: "Warm bath",   anim: lottieBath,    bg: "#C97A4A", caption: "Warmth eases the muscles" },
+              { key: "Massage",     anim: lottieMassage, bg: "#A85C7A", caption: "Gentle touch can soothe pain" },
+              { key: "Nothing yet", anim: lottieNothing, bg: "#3D6B6B", caption: "It's okay — let's keep tracking" },
+            ] as const;
+            const DEFAULT_BG = "#3D6B6B";
+            const lastKey = whatHelped[whatHelped.length - 1];
+            const focused = RELIEFS.find(r => r.key === lastKey) ?? null;
+            const bgColor = focused?.bg ?? DEFAULT_BG;
+            return (
+              <motion.div
+                key="relief"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, backgroundColor: bgColor }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                transition={{ backgroundColor: { duration: 0.5, ease: "easeInOut" }, opacity: { duration: 0.3 } }}
+                className="flex-1 flex flex-col px-6 pt-10 pb-8 z-10 relative min-h-[100dvh]"
+                style={{ backgroundColor: bgColor }}
+              >
+                <motion.div
+                  aria-hidden
+                  animate={{ backgroundColor: bgColor }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-x-0 -bottom-40 h-40 -z-10 pointer-events-none"
+                  style={{ backgroundColor: bgColor }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setStep("triggers")}
+                  aria-label="Back"
+                  className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <StepDots current={4} total={5} onDark onStepClick={goToStep} />
+                <h2 className="font-serif text-[1.75rem] font-semibold text-center text-white tracking-[-0.5px] leading-[1.15] mb-2">
+                  What has helped so far?
+                </h2>
+                <p className="text-center text-white/75 text-sm">Tap all that apply</p>
+
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <motion.div
+                    key={focused?.key ?? "empty"}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: focused ? 1 : 0.55 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 16 }}
+                    className="w-44 h-44 flex items-center justify-center mb-2"
+                    style={{ filter: focused ? "drop-shadow(0 12px 24px rgba(0,0,0,0.25))" : "none" }}
+                  >
+                    <Lottie
+                      animationData={focused?.anim ?? lottieRest}
+                      loop
+                      autoplay
+                      className="w-full h-full"
+                      rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+                    />
+                  </motion.div>
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={focused?.key ?? "empty-cap"}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.25 }}
+                      className="text-center text-white/85 text-sm italic"
+                    >
+                      {focused ? `"${focused.caption}"` : "Tap what has helped below"}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 mb-6">
+                  {RELIEFS.map(r => {
+                    const isSelected = whatHelped.includes(r.key);
+                    return (
+                      <button
+                        key={r.key}
+                        onClick={() => toggleArrayItem(setWhatHelped, r.key)}
+                        className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-2xl transition-all"
+                        style={{
+                          background: isSelected ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.08)",
+                          border: `1.5px solid ${isSelected ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.12)"}`,
+                          transform: isSelected ? "translateY(-2px)" : "translateY(0)",
+                        }}
+                      >
+                        <div className="w-9 h-9">
+                          <Lottie animationData={r.anim} loop autoplay className="w-full h-full" />
+                        </div>
+                        <span
+                          className="text-[11px] font-semibold tracking-wide text-center"
+                          style={{ color: isSelected ? "#FFFFFF" : "rgba(255,255,255,0.75)" }}
+                        >
+                          {r.key}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  size="xl"
+                  className="w-full bg-white text-foreground hover:bg-white/95 shadow-lg"
+                  onClick={() => setStep("hospital")}
+                >
+                  <span className="flex items-center gap-2">Next <Check size={16} /></span>
+                </Button>
+              </motion.div>
+            );
+          })()}
 
           {step === "hospital" && (
             <motion.div key="hospital" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
