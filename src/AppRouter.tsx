@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 
 // Lazy load pages
 const Splash = lazy(() => import("@/pages/splash"));
@@ -62,6 +64,22 @@ const MARKETING_PATHS = new Set([
 
 function HostRedirect() {
   const [location, setLocation] = useLocation();
+  
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      App.addListener('appUrlOpen', (data) => {
+        // Parse the incoming URL: hemora://auth/callback#...
+        const slug = data.url.split("://").pop();
+        if (slug) {
+          // If it started with hemora://auth/callback, slug is "auth/callback#..."
+          // We want to ensure it starts with /
+          const path = slug.startsWith("/") ? slug : `/${slug}`;
+          setLocation(path);
+        }
+      });
+    }
+  }, [setLocation]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const host = window.location.hostname;
