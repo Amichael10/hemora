@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { ClockCircleLinear as Clock, CheckCircleBold as Check, AddCircleLinear as Plus, AltArrowLeftLinear as ChevronLeft } from "solar-icon-set";
+import { ChartSquareLinear as Chart, ShareLinear as ShareIcon } from "solar-icon-set";
 import Lottie from "lottie-react";
 import emojiMild from "@/assets/images/emoji-mild.png";
 import emojiModerate from "@/assets/images/emoji-moderate.png";
@@ -640,15 +641,25 @@ export default function Crisis() {
                 <h1 className="h-page">Crisis History</h1>
               </div>
               {logs && logs.length > 0 && (
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
-                    <Plus size={16} /> Start log
-                  </Button>
-                  <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
-                    onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
-                    Urgent care
-                  </Button>
-                </div>
+                <>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <Button size="xl" className="w-full" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
+                      <Plus size={16} /> Start log
+                    </Button>
+                    <Button size="xl" variant="outline" className="w-full border-accent/40 text-accent hover:bg-accent/5"
+                      onClick={() => setLocation("/emergency")} data-testid="btn-urgent-history">
+                      Urgent care
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <Button size="lg" variant="outline" className="w-full" onClick={() => setLocation("/crisis/insights")}>
+                      <Chart size={16} /> Insights
+                    </Button>
+                    <Button size="lg" variant="outline" className="w-full" onClick={() => setLocation("/crisis/share")}>
+                      <ShareIcon size={16} /> Share history
+                    </Button>
+                  </div>
+                </>
               )}
 
               {isLoadingLogs ? (
