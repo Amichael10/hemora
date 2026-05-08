@@ -196,6 +196,54 @@ export default function Brand() {
         </div>
       </section>
 
+      {/* The name */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 py-16 border-x border-border">
+          <div className="grid gap-10 md:grid-cols-[1fr_1.4fr] md:items-start">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[2px] text-primary/70">The name</p>
+              <h2 className="font-serif text-3xl sm:text-4xl font-semibold tracking-[-0.5px] text-secondary mt-2">
+                What "Hemora" means
+              </h2>
+              <div className="mt-6 rounded-2xl bg-card border border-border p-6">
+                <p className="text-xs uppercase tracking-[2px] text-accent">Pronunciation</p>
+                <p className="font-serif text-4xl font-semibold text-secondary mt-2 tracking-[-0.5px]">Hemora</p>
+                <p className="font-mono text-sm text-muted-foreground mt-2">heh-MOR-ah</p>
+                <p className="text-xs text-muted-foreground mt-4">
+                  Meaning · inspired by hemoglobin, care, and family connection.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <p className="font-serif text-2xl sm:text-3xl text-secondary leading-snug tracking-[-0.3px]">
+                Hemora means <em className="text-primary not-italic">care around the bloodline</em> — a calm
+                support system for families touched by sickle cell.
+              </p>
+              <div className="space-y-4 text-base text-foreground leading-relaxed">
+                <p>
+                  The name comes from <strong>"heme"</strong>, the part of hemoglobin that carries oxygen in
+                  red blood cells. We softened it into something warmer, more human, and less clinical — so
+                  the name connects quietly to the condition without sounding like a hospital, lab, or disease
+                  label.
+                </p>
+                <p>
+                  The <strong>"-ora"</strong> ending gives it a calmer, more caring feel — almost like
+                  <em> aura</em>, care, or support gathered around the family.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-secondary text-secondary-foreground p-6">
+                <p className="text-xs uppercase tracking-[2px] text-accent">Short brand line</p>
+                <p className="font-serif text-xl sm:text-2xl mt-2 leading-snug">
+                  Hemora is a warm name inspired by hemoglobin and family care. It represents support for
+                  every family touched by sickle cell.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Logos */}
       <section className="border-b border-border">
         <div className="mx-auto max-w-7xl px-6 sm:px-10 py-16 border-x border-border">
