@@ -25,6 +25,8 @@ import MedForm from "@/pages/med-form";
 import MedDetail from "@/pages/med-detail";
 import RecordForm from "@/pages/record-form";
 import CrisisDetail from "@/pages/crisis-detail";
+import CrisisInsights from "@/pages/crisis-insights";
+import CrisisShare from "@/pages/crisis-share";
 import Settings from "@/pages/settings";
 import Contacts from "@/pages/contacts";
 import Notifications from "@/pages/notifications";
@@ -44,6 +46,8 @@ function Routes() {
       <Route path="/auth/callback" component={AuthCallback} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/crisis" component={Crisis} />
+      <Route path="/crisis/insights" component={CrisisInsights} />
+      <Route path="/crisis/share" component={CrisisShare} />
       <Route path="/crisis/:id" component={CrisisDetail} />
       <Route path="/meds" component={Meds} />
       <Route path="/meds/new" component={MedForm} />
