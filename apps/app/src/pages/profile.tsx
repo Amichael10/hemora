@@ -1,6 +1,6 @@
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
@@ -52,6 +52,9 @@ export default function Profile() {
         {/* Profile header */}
         <div className="flex flex-col items-center text-center pt-2 pb-6 px-5">
           <Avatar className="w-20 h-20 mb-3 border border-border/60">
+            {profile?.avatarUrl && (
+              <AvatarImage src={profile.avatarUrl} alt={profile?.fullName ?? "Profile"} />
+            )}
             <AvatarFallback className="font-serif font-semibold text-xl bg-muted text-foreground">
               {getInitials(profile?.fullName)}
             </AvatarFallback>
@@ -86,7 +89,7 @@ export default function Profile() {
             <p className="eyebrow px-4 pt-4 pb-2">Personal</p>
             <Row label="Full name" value={profile?.fullName} />
             <Row label="Date of birth" value={profile?.dateOfBirth} />
-            <Row label="Sex" value={profile?.sex} />
+            <Row label="Sex" value={profile?.gender ?? profile?.sex} />
             <Row label="Country" value={profile?.country} />
             <Row label="State" value={profile?.state} />
           </div>

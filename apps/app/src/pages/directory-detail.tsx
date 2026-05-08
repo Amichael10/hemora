@@ -172,16 +172,14 @@ export default function DirectoryDetail() {
               {fullAddress && (
                 <Card className="border-none shadow-sm overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="aspect-[4/3] w-full bg-muted">
+                    <div className="aspect-[4/3] w-full bg-muted overflow-hidden relative">
                       <iframe
                         title={`Map of ${provider.name}`}
                         src={embedSrc}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                         data-testid="provider-map"
+                        style={{ border: 0, position: "absolute", top: -56, left: 0, width: "100%", height: "calc(100% + 56px)" }}
                       />
                     </div>
                     <div className="p-4">
