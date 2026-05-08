@@ -246,6 +246,86 @@ function DesktopMockup() {
 }
 
 function Hero() {
+  // injected below
+  return _Hero();
+}
+
+function MobileMockup() {
+  return (
+    <div className="relative mx-auto w-[260px] md:hidden">
+      <div
+        aria-hidden
+        className="absolute -inset-8 rounded-[3rem] blur-3xl opacity-20"
+        style={{ background: "var(--gradient-warm)" }}
+      />
+      <div className="relative rounded-[2.2rem] bg-card border border-border shadow-2xl overflow-hidden p-3">
+        <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-muted" />
+        <div className="rounded-[1.6rem] overflow-hidden border border-border">
+          <div className="flex items-center justify-between px-4 py-1.5 text-[9px] text-muted-foreground bg-muted/30">
+            <span>9:41</span>
+            <span>●●●●</span>
+          </div>
+          <div className="p-4 space-y-3 bg-background min-h-[440px]">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[9px] text-muted-foreground">Good morning</div>
+                <div className="font-serif text-base text-secondary leading-tight">Amara</div>
+              </div>
+              <div className="w-7 h-7 rounded-full bg-accent/30" />
+            </div>
+            <div
+              className="rounded-xl p-3 text-white relative overflow-hidden"
+              style={{ background: "var(--gradient-brand)" }}
+            >
+              <div className="text-[9px] opacity-80">Today's plan</div>
+              <div className="font-serif text-lg leading-tight mt-0.5">Feeling steady</div>
+              <div className="mt-2 flex gap-1">
+                <div className="flex-1 h-1 rounded-full bg-accent" />
+                <div className="flex-1 h-1 rounded-full bg-white/30" />
+                <div className="flex-1 h-1 rounded-full bg-white/30" />
+              </div>
+              <img src={dashboardEmoji} alt="" className="absolute -right-2 -bottom-2 w-14 h-14 opacity-90" />
+            </div>
+            <div className="rounded-xl bg-card p-2.5 flex items-center gap-2 border border-border">
+              <div className="w-7 h-7 rounded-lg bg-accent/20 grid place-items-center">
+                <Pills size={13} color="hsl(var(--accent))" />
+              </div>
+              <div className="flex-1">
+                <div className="text-[10px] font-semibold text-secondary">Hydroxyurea</div>
+                <div className="text-[8px] text-muted-foreground">8:00 AM · Taken</div>
+              </div>
+              <Check size={14} color="hsl(var(--accent))" />
+            </div>
+            <div className="rounded-xl bg-card p-2.5 flex items-center gap-2 border border-border">
+              <div className="w-7 h-7 rounded-lg bg-primary/15 grid place-items-center">
+                <HeartPulse size={13} color="hsl(var(--primary))" />
+              </div>
+              <div className="flex-1">
+                <div className="text-[10px] font-semibold text-secondary">Log a crisis</div>
+                <div className="text-[8px] text-muted-foreground">Track what helped</div>
+              </div>
+              <ArrowRight size={12} color="hsl(var(--muted-foreground))" />
+            </div>
+            <div className="rounded-xl bg-card p-3 border border-border">
+              <div className="text-[9px] text-muted-foreground mb-1.5">Pain · last 7 days</div>
+              <div className="flex items-end gap-1 h-12">
+                {[3, 5, 2, 6, 4, 2, 1].map((v, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 rounded-md"
+                    style={{ height: `${v * 14}%`, background: "hsl(var(--accent))" }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function _Hero() {
   const [, setLocation] = useLocation();
   return (
     <Section className="overflow-hidden" topRule={false}>
