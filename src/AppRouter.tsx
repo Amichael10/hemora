@@ -81,6 +81,7 @@ function HostRedirect() {
   }, [setLocation]);
 
   useEffect(() => {
+    if (Capacitor.isNativePlatform()) return;
     if (typeof window === "undefined") return;
     const host = window.location.hostname;
     const isAppHost = host.startsWith(APP_HOST_PREFIX);

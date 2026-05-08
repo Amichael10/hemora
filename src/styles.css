@@ -1,6 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
+
+/* Native Feel Enhancements */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+}
+
+body {
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none; /* Disable browser bounce */
+}
+
+/* Re-enable selection for inputs only */
+input, textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
