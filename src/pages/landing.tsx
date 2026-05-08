@@ -136,10 +136,10 @@ function Nav() {
 /** A desktop browser-style mockup of the in-app dashboard (Dub-style hero visual). */
 function DesktopMockup() {
   return (
-    <div className="relative mx-auto w-full max-w-3xl">
+    <div className="relative mx-auto w-full max-w-3xl hidden md:block">
       <div
         aria-hidden
-        className="absolute -inset-12 rounded-[3rem] blur-3xl opacity-50"
+        className="absolute -inset-12 rounded-[3rem] blur-3xl opacity-20"
         style={{ background: "var(--gradient-warm)" }}
       />
       <div className="relative rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
@@ -326,6 +326,7 @@ function ProductPreview() {
         </div>
         <div data-anim="hero-mockup">
           <DesktopMockup />
+          <MobileMockup />
         </div>
       </div>
     </Section>
