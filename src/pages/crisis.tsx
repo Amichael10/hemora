@@ -696,7 +696,7 @@ export default function Crisis() {
               )}
 
               {isLoadingLogs ? (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {[1, 2, 3].map(i => (
                     <Card key={i} className="border-none shadow-sm">
                       <CardContent className="p-4">
@@ -756,7 +756,7 @@ export default function Crisis() {
                   </div>
                 </motion.div>
               ) : (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {logs?.map((log, idx) => (
                     <motion.div
                       key={log.id}
