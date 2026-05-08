@@ -125,8 +125,8 @@ function Nav() {
           <a href="#faq" className="hover:text-foreground transition">FAQ</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild><a href="https://app.hemora.xyz/login">Sign in</a></Button>
-          <Button size="sm" asChild><a href="https://app.hemora.xyz/signup">Get started</a></Button>
+          <Button variant="ghost" size="sm" asChild><a href="https://app.hemora.xyz">Sign in</a></Button>
+          <Button size="sm" asChild><a href="https://app.hemora.xyz">Get started</a></Button>
         </div>
       </div>
     </header>
@@ -368,7 +368,7 @@ function _Hero() {
 
             <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
               <Button size="lg" asChild>
-                <a href="https://app.hemora.xyz/signup">Open the app <ArrowRight size={16} /></a>
+                <a href="https://app.hemora.xyz">Open the app <ArrowRight size={16} /></a>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <a href="#download">Download for mobile</a>
@@ -737,7 +737,7 @@ function Download() {
                 <span className="ml-2 text-[10px] uppercase tracking-wider bg-white/20 text-white px-2 py-0.5 rounded-full">Soon</span>
               </Button>
               <Button size="lg" className="bg-accent text-secondary hover:bg-accent/90" asChild>
-                <a href="https://app.hemora.xyz/signup">Install web app <ArrowRight size={16} /></a>
+                <a href="https://app.hemora.xyz">Install web app <ArrowRight size={16} /></a>
               </Button>
             </div>
             <p className="relative mt-4 text-white/70 text-sm">iOS and Android apps coming soon.</p>
