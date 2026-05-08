@@ -1,4 +1,4 @@
-import { useRoute, useLocation, Link } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useGetCrisisLog, useDeleteCrisisLog, useGetProfile } from "@workspace/api-client-react";
 import { useProfile } from "@/context/ProfileContext";
-import { exportCrisisReportToPdf } from "@/lib/profilePdf";
 import {
   TrashBinTrashLinear as Trash,
-  ChartSquareLinear as Chart,
   ShareLinear as Share,
-  DownloadLinear as Download,
 } from "solar-icon-set";
 
 function Row({ label, value }: { label: string; value?: React.ReactNode }) {
@@ -45,15 +42,34 @@ export default function CrisisDetail() {
     del.mutate({ id }, { onSuccess: () => { toast({ title: "Deleted" }); setLocation("/crisis"); } });
   };
 
-  const handleDownload = async () => {
-    if (!log) return;
-    await exportCrisisReportToPdf({
-      patientName: profile?.fullName,
-      periodLabel: log.occurredAt ? new Date(log.occurredAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "Crisis log",
-      include: { details: true, treatments: true, insights: false },
-      logs: [log],
-    });
-    toast({ title: "PDF downloaded", description: "Your crisis report is ready to share." });
+  const buildShareText = () => {
+    if (!log) return "";
+    const when = log.occurredAt ? new Date(log.occurredAt).toLocaleString() : "—";
+    const lines = [
+      `Hemora · Crisis log`,
+      profile?.fullName ? `Patient: ${profile.fullName}` : null,
+      `When: ${when}`,
+      `Pain: ${painLabel(log.painLevel)}`,
+      log.painLocations?.length ? `Location: ${log.painLocations.join(", ")}` : null,
+      log.triggers?.length ? `Triggers: ${log.triggers.join(", ")}` : null,
+      log.whatHelped?.length ? `Helped by: ${log.whatHelped.join(", ")}` : null,
+      `Hospital visit: ${log.hospitalVisit ? "Yes" : "No"}`,
+    ].filter(Boolean).join("\n");
+    return lines;
+  };
+
+  const handleShare = async () => {
+    const text = buildShareText();
+    if (!text) return;
+    try {
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share({ title: "Crisis log", text });
+        return;
+      }
+    } catch { /* user cancelled */ }
+    // Fallback: WhatsApp web
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -102,18 +118,12 @@ export default function CrisisDetail() {
               </div>
             )}
 
-            {/* Action grid */}
-            <div className="grid grid-cols-2 gap-3 mt-6">
-              <Button asChild size="xl" variant="outline" className="w-full">
-                <Link to="/crisis/insights"><Chart size={18} /> Insights</Link>
-              </Button>
-              <Button asChild size="xl" variant="outline" className="w-full">
-                <Link to="/crisis/share"><Share size={18} /> Share</Link>
-              </Button>
-            </div>
-            <Button size="xl" className="w-full mt-3" onClick={handleDownload}>
-              <Download size={18} /> Download PDF
+            <Button size="xl" className="w-full mt-6" onClick={handleShare}>
+              <Share size={18} /> Share this log
             </Button>
+            <p className="text-[11px] text-muted-foreground text-center mt-2">
+              Sends a quick summary via WhatsApp, Messages, or your share menu.
+            </p>
             <Button variant="ghost" size="xl" className="w-full mt-2 text-destructive hover:bg-destructive/10" onClick={handleDelete} disabled={del.isPending}>
               <Trash size={18} /> Delete log
             </Button>
