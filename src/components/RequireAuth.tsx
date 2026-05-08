@@ -3,15 +3,11 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 import { HemoraLoader } from "./HemoraLoader";
 
-const APP_HOST_PREFIX = "app.";
-
 /**
  * Gate any protected page behind an authenticated session.
- * - On non-app hosts (hemora.xyz, www, staging, previews), unauthenticated
- *   users are sent to the marketing landing page instead of /login. Auth is
- *   only enforced on app.hemora.xyz.
- * - While auth is loading, shows the branded loader.
- * - On the app host, unauthenticated users are redirected to /login.
+ * This project is the app shell — unauthenticated users are always sent to
+ * /login. The marketing landing page lives in a separate Lovable project on
+ * hemora.xyz / staging.hemora.xyz.
  */
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -19,17 +15,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loading || user) return;
-    if (typeof window === "undefined") {
-      setLocation("/login");
-      return;
-    }
-    const host = window.location.hostname;
-    const isAppHost = host.startsWith(APP_HOST_PREFIX);
-    if (isAppHost) {
-      setLocation("/login");
-    } else {
-      setLocation("/");
-    }
+    setLocation("/login");
   }, [loading, user, setLocation]);
 
   if (loading || !user) {
