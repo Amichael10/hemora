@@ -163,7 +163,14 @@ export default function MedDetail() {
 
   const bottle = bottleForMedication(med.name);
   const isPaused = med.status === "paused";
-  const startedOn = (med as any).createdAt ?? null;
+  const startedOn = (med as any).startDate ?? (med as any).createdAt ?? null;
+  const refillDays = (med as any).refillReminderDays;
+  const refillLabel =
+    refillDays == null ? "Off" :
+    refillDays === 1 ? "1 day before" :
+    refillDays === 7 ? "1 week before" :
+    refillDays === 14 ? "2 weeks before" :
+    `${refillDays} days before`;
 
   return (
     <MobileAppShell hideNav>
@@ -250,7 +257,7 @@ export default function MedDetail() {
                 <RefillIcon size={16} />
               </div>
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Refill reminder</p>
-              <p className="text-sm font-semibold text-foreground mt-0.5">3 days before</p>
+              <p className="text-sm font-semibold text-foreground mt-0.5">{refillLabel}</p>
             </CardContent>
           </Card>
         </div>
