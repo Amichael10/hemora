@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense, ComponentType } from "react";
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
@@ -10,7 +10,6 @@ import { useAuth } from "@/context/AuthContext";
 
 // Lazy load pages
 const Splash = lazy(() => import("@/pages/splash"));
-const Landing = lazy(() => import("@/pages/landing"));
 const Onboarding = lazy(() => import("@/pages/onboarding"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Crisis = lazy(() => import("@/pages/crisis"));
@@ -49,34 +48,17 @@ const Privacy = lazy(() => import("@/pages/info").then(m => ({ default: m.Privac
 const Terms = lazy(() => import("@/pages/info").then(m => ({ default: m.Terms })));
 
 /**
- * Host-based routing:
- * - app.hemora.xyz → always lands users inside the app (dashboard).
- *   Marketing routes (/, /about, /help, etc.) are redirected to /dashboard.
- * - Other hosts (hemora.xyz, www.hemora.xyz, staging.hemora.xyz, previews)
- *   keep the marketing landing page as the default.
+ * This project is the app shell only (app.hemora.xyz + Capacitor mobile build).
+ * The marketing landing page lives in a separate Lovable project and is served
+ * at hemora.xyz / www.hemora.xyz / staging.hemora.xyz.
+ *
+ * Therefore: the root path "/" here always sends users into the app — to the
+ * dashboard if authenticated, otherwise to /login (handled by RequireAuth).
  */
-const APP_HOST_PREFIX = "app.";
-const MARKETING_PATHS = new Set([
-  "/",
-  "/about",
-  "/help",
-  "/privacy",
-  "/terms",
-]);
-
-function HostRedirect() {
-  const [location, setLocation] = useLocation();
+function RootRedirect() {
   const { user, loading } = useAuth();
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (loading) return;
-    const host = window.location.hostname;
-    const isAppHost = host.startsWith(APP_HOST_PREFIX);
-    if (isAppHost && MARKETING_PATHS.has(location)) {
-      setLocation(user ? "/dashboard" : "/login");
-    }
-  }, [location, setLocation, user, loading]);
-  return null;
+  if (loading) return <HemoraLoader />;
+  return <Redirect to={user ? "/dashboard" : "/login"} />;
 }
 
 const protect = <P extends object>(Component: ComponentType<P>) => {
@@ -93,7 +75,7 @@ function Routes() {
   return (
     <Suspense fallback={<HemoraLoader />}>
       <Switch>
-        <Route path="/" component={Landing} />
+        <Route path="/" component={RootRedirect} />
         <Route path="/welcome" component={Splash} />
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/login" component={Login} />
@@ -147,7 +129,6 @@ export default function AppRouter() {
       <ProfileProvider>
         <TooltipProvider>
           <WouterRouter>
-            <HostRedirect />
             <Routes />
           </WouterRouter>
           <Toaster />
