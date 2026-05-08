@@ -106,7 +106,6 @@ function Nav() {
           <a href="/" className="hover:text-foreground transition">Home</a>
           <a href="/about" className="hover:text-foreground transition">About</a>
           <a href="/resources" className="hover:text-foreground transition">Resources</a>
-          <span className="text-foreground font-medium">Brand</span>
         </nav>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setLocation("/login")}>Sign in</Button>
