@@ -33,6 +33,8 @@ import Notifications from "@/pages/notifications";
 import GenotypeChecker from "@/pages/genotype-checker";
 import Family from "@/pages/family";
 import SchoolLetter from "@/pages/school-letter";
+import Resources from "@/pages/resources";
+import ResourceDetail from "@/pages/resource-detail";
 import { About, Help, Privacy, Terms } from "@/pages/info";
 
 function Routes() {
@@ -66,6 +68,8 @@ function Routes() {
       <Route path="/genotype-checker" component={GenotypeChecker} />
       <Route path="/family" component={Family} />
       <Route path="/school-letter" component={SchoolLetter} />
+      <Route path="/resources" component={Resources} />
+      <Route path="/resources/:id" component={ResourceDetail} />
       <Route path="/help" component={Help} />
       <Route path="/about" component={About} />
       <Route path="/privacy" component={Privacy} />
