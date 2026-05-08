@@ -756,7 +756,7 @@ export default function Crisis() {
                   </div>
                 </motion.div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {logs?.map((log, idx) => (
                     <motion.div
                       key={log.id}
