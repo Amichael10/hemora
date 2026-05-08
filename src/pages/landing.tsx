@@ -18,6 +18,7 @@ import {
   ArrowRightLinear as ArrowRight,
   CheckCircleBold as Check,
   StarBold as Star,
+  BookBold as BookFilled,
 } from "solar-icon-set";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 
@@ -119,6 +120,7 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
           <a href="#how" className="hover:text-foreground transition">How it works</a>
+          <a href="#resources" className="hover:text-foreground transition">Resources</a>
           <a href="#stories" className="hover:text-foreground transition">Stories</a>
           <a href="#faq" className="hover:text-foreground transition">FAQ</a>
         </nav>
@@ -458,6 +460,59 @@ function Features() {
 }
 
 function HowItWorks() {
+  return _HowItWorksImpl();
+}
+
+function ResourcesPreview() {
+  const [, setLocation] = useLocation();
+  const items = [
+    { tag: "Learn", title: "Understanding Sickle Cell", meta: "Article · 5 min" },
+    { tag: "Treatment", title: "Hydroxyurea: What You Should Know", meta: "Guide · 7 min" },
+    { tag: "Lifestyle", title: "Nutrition for Sickle Cell", meta: "Article · 4 min" },
+    { tag: "Treatment", title: "Managing Pain at Home", meta: "Guide · 6 min" },
+  ];
+  return (
+    <Section id="resources">
+      <div className="px-6 sm:px-10 py-20 lg:py-28">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-12 items-center">
+          <div data-reveal>
+            <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Resources Library</div>
+            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight">
+              Plain-language reads,<br />
+              <span className="italic text-muted-foreground">written for real life.</span>
+            </h2>
+            <p className="mt-5 text-muted-foreground leading-relaxed max-w-md">
+              Trusted articles and guides on sickle cell — what it is, how to manage day-to-day, and what to expect from treatment. No jargon, no scare tactics.
+            </p>
+            <div className="mt-7">
+              <Button onClick={() => setLocation("/signup")} size="lg" className="rounded-full">
+                Open the library <ArrowRight size={16} />
+              </Button>
+            </div>
+          </div>
+          <div data-stagger className="grid sm:grid-cols-2 gap-3">
+            {items.map((it) => (
+              <div
+                key={it.title}
+                data-stagger-item
+                className="group rounded-2xl bg-card border border-border p-5 hover:shadow-md transition-shadow"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
+                  <BookFilled size={18} />
+                </div>
+                <div className="mt-4 text-[10px] uppercase tracking-wider text-accent font-semibold">{it.tag}</div>
+                <h3 className="mt-1 font-serif text-lg text-secondary leading-snug">{it.title}</h3>
+                <p className="mt-2 text-xs text-muted-foreground">{it.meta}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function _HowItWorksImpl() {
   const steps = [
     { n: "01", title: "Set up your profile", body: "Tell us who you're caring for — yourself, a child, or a loved one." },
     { n: "02", title: "Track day to day", body: "Log meds, crises, and care visits in seconds. Most entries take under 30." },
@@ -765,6 +820,7 @@ export default function Landing() {
         <ProductPreview />
         <Context />
         <Features />
+        <ResourcesPreview />
         <HowItWorks />
         <Stories />
         <Download />
