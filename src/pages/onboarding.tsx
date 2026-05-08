@@ -283,13 +283,6 @@ export default function Onboarding() {
                         <FaGoogle className="w-[18px] h-[18px] shrink-0" />
                         {authBusy ? "Opening Google…" : "Continue with Google"}
                       </Button>
-                      <button
-                        className="w-full text-xs text-muted-foreground/70 hover:text-primary pt-3"
-                        onClick={next}
-                        data-testid="button-auth-skip"
-                      >
-                        Continue without signing in
-                      </button>
                     </>
                   )}
 
