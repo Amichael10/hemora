@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
+import hemoraLogo from "@/assets/brand/Logo.png";
 
 // Lazy load pages
 const Splash = lazy(() => import("@/pages/splash"));
@@ -74,9 +75,33 @@ function HostRedirect() {
   return null;
 }
 
+function AppLoading() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading Hemora"
+      className="min-h-[100dvh] w-full bg-background flex flex-col items-center justify-center gap-6"
+    >
+      <div className="relative flex items-center justify-center">
+        <span className="absolute inline-flex h-24 w-24 rounded-full bg-primary/15 animate-ping" />
+        <span className="absolute inline-flex h-16 w-16 rounded-full bg-primary/10" />
+        <img
+          src={hemoraLogo}
+          alt=""
+          className="relative w-12 h-12 animate-pulse [animation-duration:1.6s]"
+        />
+      </div>
+      <div className="flex flex-col items-center gap-1">
+        <p className="font-serif text-lg text-secondary tracking-[-0.2px]">Hemora</p>
+        <p className="text-xs text-muted-foreground">Getting things ready…</p>
+      </div>
+    </div>
+  );
+}
+
 function Routes() {
   return (
-    <Suspense fallback={<div className="min-h-[100dvh] w-full bg-secondary flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<AppLoading />}>
       <Switch>
         <Route path="/" component={Landing} />
         <Route path="/welcome" component={Splash} />
