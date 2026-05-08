@@ -394,6 +394,7 @@ export type Database = {
       profiles: {
         Row: {
           allergies: string | null
+          avatar_url: string | null
           blood_type: string | null
           conditions: string | null
           country: string | null
@@ -414,6 +415,7 @@ export type Database = {
         }
         Insert: {
           allergies?: string | null
+          avatar_url?: string | null
           blood_type?: string | null
           conditions?: string | null
           country?: string | null
@@ -434,6 +436,7 @@ export type Database = {
         }
         Update: {
           allergies?: string | null
+          avatar_url?: string | null
           blood_type?: string | null
           conditions?: string | null
           country?: string | null
