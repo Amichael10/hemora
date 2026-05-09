@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/context/ProfileContext";
@@ -159,6 +159,13 @@ export default function Dashboard() {
           <header className="flex items-center justify-between">
             <Link href="/profile" className="flex items-center gap-3 group">
               <Avatar className="w-11 h-11 ring-2 ring-white/30" data-testid="avatar-dashboard">
+                {profile?.avatarUrl && (
+                  <AvatarImage
+                    src={profile.avatarUrl}
+                    alt={profile.fullName || "Profile photo"}
+                    referrerPolicy="no-referrer"
+                  />
+                )}
                 <AvatarFallback className="font-serif font-semibold text-sm text-primary bg-white">
                   {getInitials(profile?.fullName)}
                 </AvatarFallback>
