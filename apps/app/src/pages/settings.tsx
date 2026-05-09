@@ -19,6 +19,8 @@ import {
   AltArrowRightLinear as ArrowRight,
   PenNewSquareLinear as EditIcon,
   BookLinear as BookIcon,
+  HeartPulseLinear as AmbulanceIcon,
+  ClipboardCheckLinear as ChecklistIcon,
 } from "solar-icon-set";
 
 function getInitials(name?: string | null) {
@@ -85,6 +87,8 @@ export default function Settings() {
         <Group>
           <Row icon={<UserIcon size={16} />} label="Profile" href="/profile" />
           <Row icon={<PhoneIcon size={16} />} label="Emergency contacts" href="/settings/contacts" />
+          <Row icon={<AmbulanceIcon size={16} />} label="Ambulance number" href="/settings/ambulance" />
+          <Row icon={<ChecklistIcon size={16} />} label="Hospital checklist" href="/settings/hospital-checklist" />
           <Row icon={<BellIcon size={16} />} label="Notifications" href="/settings/notifications" />
           <Row icon={<BookIcon size={16} />} label="Resources Library" href="/resources" />
           <Row icon={<ShieldIcon size={16} />} label="Privacy" href="/privacy" />
