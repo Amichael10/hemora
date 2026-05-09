@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "cd apps/app && bun run dev",
-    "build": "cd apps/app && bun run build"
+    "build": "cd apps/app && bun run build && cd ../.. && rm -rf dist && ln -s apps/app/dist dist"
   },
   "overrides": {
     "@tanstack/react-query": "5.100.9",
