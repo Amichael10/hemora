@@ -1,5 +1,8 @@
 {
   "version": 2,
   "framework": null,
-  "cleanUrls": true
+  "cleanUrls": true,
+  "buildCommand": "cd ../.. && pnpm --filter @hemora/landing build",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "outputDirectory": ".vercel/output"
 }
