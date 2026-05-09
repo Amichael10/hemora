@@ -18,6 +18,7 @@ Object.assign(process.env, serverEnv);
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
+    nitro: { preset: process.env.NITRO_PRESET || (process.env.VERCEL ? "vercel" : undefined) },
   },
   vite: {
     build: {
