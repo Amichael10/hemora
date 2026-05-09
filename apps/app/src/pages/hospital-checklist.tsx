@@ -1,7 +1,7 @@
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { DEFAULT_HOSPITAL_CHECKLIST, HOSPITAL_CHECKLIST_KEY, useLocalStorage } from "@/lib/localPrefs";
-import { CheckCircleBold as Check, InfoCircleLinear as Info, BuildingsLinear as Hospital } from "solar-icon-set";
+import { CheckCircleBold as Check, InfoCircleLinear as Info, HospitalLinear as Hospital } from "solar-icon-set";
 
 export default function HospitalChecklist() {
   const [checked, setChecked] = useLocalStorage<Record<string, boolean>>(HOSPITAL_CHECKLIST_KEY, {});
