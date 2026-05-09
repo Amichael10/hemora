@@ -98,7 +98,10 @@ function Routes() {
         <Route path="/records/:id" component={protect(RecordDetail)} />
         <Route path="/directory" component={protect(Directory)} />
         <Route path="/directory/:id" component={protect(DirectoryDetail)} />
-        <Route path="/emergency" component={protect(Emergency)} />
+        {/* Emergency is intentionally NOT protected — first-time / unauthenticated
+            users tapping "Need urgent care?" must always reach the ambulance
+            number and crisis guidance. */}
+        <Route path="/emergency" component={Emergency} />
         <Route path="/profile" component={protect(Profile)} />
         <Route path="/profile/edit" component={protect(ProfileEdit)} />
         <Route path="/settings" component={protect(Settings)} />
