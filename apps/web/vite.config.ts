@@ -30,5 +30,8 @@ export default defineConfig({
         "@workspace/api-client-react": path.resolve(__dirname, "src/lib/workspace/api-client-react/index.ts"),
       },
     },
+    ssr: {
+      noExternal: ["entities"],
+    },
   },
 });
