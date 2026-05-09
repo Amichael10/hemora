@@ -2,8 +2,8 @@
   "name": "hemora-monorepo",
   "private": true,
   "scripts": {
-    "dev": "pnpm -r dev",
-    "build": "pnpm -r build"
+    "dev": "cd apps/app && bun run dev",
+    "build": "cd apps/app && bun run build"
   },
   "overrides": {
     "entities": "4.5.0",
