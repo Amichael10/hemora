@@ -5,8 +5,8 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "build": "npm install @tailwindcss/oxide-linux-x64-gnu@4.2.4 @tailwindcss/oxide-linux-x64-musl@4.2.4 --no-save && npm run build --workspaces --if-present"
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build"
   },
   "overrides": {
     "entities": "4.5.0"
