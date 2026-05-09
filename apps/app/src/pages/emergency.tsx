@@ -7,6 +7,12 @@ import { useProfile } from "@/context/ProfileContext";
 import { useListEmergencyContacts, getListEmergencyContactsQueryKey } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  AMBULANCE_KEY,
+  HOSPITAL_CHECKLIST_KEY,
+  DEFAULT_HOSPITAL_CHECKLIST,
+  useLocalStorage,
+} from "@/lib/localPrefs";
+import {
   AltArrowLeftLinear as ChevronLeft,
   AddCircleLinear as Plus,
   HeartPulseBold as AmbulanceFilled,
@@ -15,11 +21,15 @@ import {
   HeartPulseLinear as AmbulanceOutline,
   PhoneLinear as PhoneOutline,
   DangerTriangleLinear as AccidentOutline,
+  SettingsLinear as SettingsIcon,
 } from "solar-icon-set";
 
 export default function Emergency() {
   const [, setLocation] = useLocation();
   const { profileId } = useProfile();
+  const [ambulance] = useLocalStorage<string>(AMBULANCE_KEY, "");
+  const [checked, setChecked] = useLocalStorage<Record<string, boolean>>(HOSPITAL_CHECKLIST_KEY, {});
+  const ambulanceNumber = (ambulance || "").trim() || "112";
 
   const { data: contacts, isLoading } = useListEmergencyContacts(
     { profileId },
@@ -39,7 +49,8 @@ export default function Emergency() {
             If you're experiencing severe pain, shortness of breath, or fever, seek immediate care.
           </p>
           <div className="space-y-3">
-            <Button className="group/amb w-full h-14 bg-destructive hover:bg-destructive/90 text-destructive-foreground font-semibold text-base shadow-md gap-2">
+            <a href={`tel:${ambulanceNumber}`} className="block">
+            <Button asChild={false} className="group/amb w-full h-14 bg-destructive hover:bg-destructive/90 text-destructive-foreground font-semibold text-base shadow-md gap-2">
               <span className="relative inline-flex shrink-0" style={{ width: 22, height: 22 }}>
                 <span className="absolute inset-0 transition-opacity duration-150 group-hover/amb:opacity-0">
                   <AmbulanceOutline size={22} />
@@ -48,11 +59,21 @@ export default function Emergency() {
                   <AmbulanceFilled size={22} />
                 </span>
               </span>
-              Call Ambulance (112)
+              Call Ambulance ({ambulanceNumber})
             </Button>
+            </a>
+            {!ambulance && (
+              <button
+                onClick={() => setLocation("/settings/ambulance")}
+                className="text-[11px] text-destructive/70 hover:text-destructive flex items-center gap-1 mx-auto"
+              >
+                <SettingsIcon size={12} /> Set your local ambulance number
+              </button>
+            )}
             {isLoading ? (
               <Skeleton className="w-full h-14 rounded-xl" />
             ) : contacts && contacts.length > 0 ? (
+              <a href={`tel:${contacts[0].phone}`} className="block">
               <Button variant="outline" className="group/call w-full h-14 border-destructive/20 text-destructive hover:bg-destructive/5 font-medium text-base shadow-sm gap-2">
                 <span className="relative inline-flex shrink-0" style={{ width: 20, height: 20 }}>
                   <span className="absolute inset-0 transition-opacity duration-150 group-hover/call:opacity-0">
@@ -64,8 +85,13 @@ export default function Emergency() {
                 </span>
                 Call {contacts[0].fullName}
               </Button>
+              </a>
             ) : (
-              <Button variant="outline" className="w-full h-14 border-destructive/20 text-destructive hover:bg-destructive/5 font-medium text-base shadow-sm gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/settings/contacts")}
+                className="w-full h-14 border-destructive/20 text-destructive hover:bg-destructive/5 font-medium text-base shadow-sm gap-2"
+              >
                 <Plus size={20} /> Add Caregiver
               </Button>
             )}
@@ -81,19 +107,41 @@ export default function Emergency() {
           ))}
         </div>
 
-        <h2 className="font-semibold text-xs text-primary mb-4 uppercase tracking-widest opacity-60 flex items-center gap-2">
-          <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="16" height="16" className="text-accent" active />
-          Hospital Bag Checklist
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-xs text-primary uppercase tracking-widest opacity-60 flex items-center gap-2">
+            <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="16" height="16" className="text-accent" active />
+            Hospital Bag Checklist
+          </h2>
+          <button
+            onClick={() => setLocation("/settings/hospital-checklist")}
+            className="text-[11px] font-medium text-primary/70 hover:text-primary"
+          >
+            Edit
+          </button>
+        </div>
         <Card className="border-none shadow-sm bg-card">
           <CardContent className="p-0">
             <div className="divide-y divide-border/50">
-              {["Health ID / Insurance Card", "Current Medications", "Comfortable Clothes", "Phone Charger", "Water Bottle"].map((item, i) => (
-                <div key={i} className="flex items-center p-4 gap-3">
-                  <div className="w-5 h-5 rounded-md border border-muted-foreground/25 shrink-0" />
-                  <span className="text-sm text-foreground">{item}</span>
-                </div>
-              ))}
+              {DEFAULT_HOSPITAL_CHECKLIST.map((item) => {
+                const isOn = !!checked[item.id];
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setChecked({ ...checked, [item.id]: !isOn })}
+                    className="w-full flex items-center p-4 gap-3 text-left hover:bg-muted/30 transition-colors"
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-md shrink-0 border flex items-center justify-center ${
+                        isOn ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground/25"
+                      }`}
+                    >
+                      {isOn && <span className="text-[11px] leading-none">✓</span>}
+                    </div>
+                    <span className={`text-sm ${isOn ? "text-muted-foreground line-through" : "text-foreground"}`}>{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </CardContent>
         </Card>

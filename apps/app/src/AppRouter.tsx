@@ -34,6 +34,8 @@ const CrisisShare = lazy(() => import("@/pages/crisis-share"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Contacts = lazy(() => import("@/pages/contacts"));
 const Notifications = lazy(() => import("@/pages/notifications"));
+const AmbulancePage = lazy(() => import("@/pages/ambulance"));
+const HospitalChecklist = lazy(() => import("@/pages/hospital-checklist"));
 const GenotypeChecker = lazy(() => import("@/pages/genotype-checker"));
 const Family = lazy(() => import("@/pages/family"));
 const SchoolLetter = lazy(() => import("@/pages/school-letter"));
@@ -102,6 +104,8 @@ function Routes() {
         <Route path="/settings" component={protect(Settings)} />
         <Route path="/settings/contacts" component={protect(Contacts)} />
         <Route path="/settings/notifications" component={protect(Notifications)} />
+        <Route path="/settings/ambulance" component={protect(AmbulancePage)} />
+        <Route path="/settings/hospital-checklist" component={protect(HospitalChecklist)} />
         <Route path="/genotype-checker" component={GenotypeChecker} />
         <Route path="/family" component={protect(Family)} />
         <Route path="/school-letter" component={protect(SchoolLetter)} />
