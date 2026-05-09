@@ -12,6 +12,7 @@ import {
   DEFAULT_HOSPITAL_CHECKLIST,
   useLocalStorage,
 } from "@/lib/localPrefs";
+import { exportHospitalChecklistToPdf } from "@/lib/hospitalChecklistPdf";
 import {
   AltArrowLeftLinear as ChevronLeft,
   AddCircleLinear as Plus,
@@ -22,6 +23,7 @@ import {
   PhoneLinear as PhoneOutline,
   DangerTriangleLinear as AccidentOutline,
   SettingsLinear as SettingsIcon,
+  ShareLinear as ShareIcon,
 } from "solar-icon-set";
 
 export default function Emergency() {
@@ -30,6 +32,10 @@ export default function Emergency() {
   const [ambulance] = useLocalStorage<string>(AMBULANCE_KEY, "");
   const [checked, setChecked] = useLocalStorage<Record<string, boolean>>(HOSPITAL_CHECKLIST_KEY, {});
   const ambulanceNumber = (ambulance || "").trim() || "112";
+
+  const completedCount = DEFAULT_HOSPITAL_CHECKLIST.filter((i) => checked[i.id]).length;
+  const totalCount = DEFAULT_HOSPITAL_CHECKLIST.length;
+  const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const { data: contacts, isLoading } = useListEmergencyContacts(
     { profileId },
@@ -112,13 +118,40 @@ export default function Emergency() {
             <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="16" height="16" className="text-accent" active />
             Hospital Bag Checklist
           </h2>
-          <button
-            onClick={() => setLocation("/settings/hospital-checklist")}
-            className="text-[11px] font-medium text-primary/70 hover:text-primary"
-          >
-            Edit
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() =>
+                exportHospitalChecklistToPdf({
+                  items: DEFAULT_HOSPITAL_CHECKLIST,
+                  checked,
+                })
+              }
+              className="text-[11px] font-medium text-primary/70 hover:text-primary inline-flex items-center gap-1"
+            >
+              <ShareIcon size={12} /> Share PDF
+            </button>
+            <button
+              onClick={() => setLocation("/settings/hospital-checklist")}
+              className="text-[11px] font-medium text-primary/70 hover:text-primary"
+            >
+              Edit
+            </button>
+          </div>
         </div>
+
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-muted-foreground">{completedCount} of {totalCount} packed</span>
+            <span className="text-xs font-medium text-primary">{progressPct}%</span>
+          </div>
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
+
         <Card className="border-none shadow-sm bg-card">
           <CardContent className="p-0">
             <div className="divide-y divide-border/50">
@@ -138,7 +171,12 @@ export default function Emergency() {
                     >
                       {isOn && <span className="text-[11px] leading-none">✓</span>}
                     </div>
-                    <span className={`text-sm ${isOn ? "text-muted-foreground line-through" : "text-foreground"}`}>{item.label}</span>
+                    <span className="flex-1 min-w-0">
+                      <span className={`block text-sm ${isOn ? "text-muted-foreground line-through" : "text-foreground"}`}>{item.label}</span>
+                      {item.description && (
+                        <span className="block text-[11px] text-muted-foreground mt-0.5">{item.description}</span>
+                      )}
+                    </span>
                   </button>
                 );
               })}
