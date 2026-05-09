@@ -1,9 +1,6 @@
 {
   "name": "hemora-monorepo",
   "private": true,
-  "workspaces": [
-    "apps/*"
-  ],
   "scripts": {
     "dev": "pnpm -r dev",
     "build": "pnpm -r build"
