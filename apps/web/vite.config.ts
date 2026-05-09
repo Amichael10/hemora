@@ -30,8 +30,11 @@ export default defineConfig({
         "@workspace/api-client-react": path.resolve(__dirname, "src/lib/workspace/api-client-react/index.ts"),
       },
     },
+    optimizeDeps: {
+      include: ["@tanstack/query-core"],
+    },
     ssr: {
-      noExternal: ["entities"],
+      noExternal: ["entities", "@tanstack/query-core"],
     },
   },
 });
