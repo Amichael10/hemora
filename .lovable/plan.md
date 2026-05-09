@@ -1,63 +1,46 @@
 ## Goal
 
-Make `apps/web` the real landing page (sourced from the standalone "Hemora Landing Page" Lovable project) and prep it to deploy as a static site on Vercel at `hemora.xyz`. Leave `apps/app` untouched on Cloudflare Workers at `app.hemora.xyz`.
+Fix the Vercel build for `apps/web` so `hemora.xyz` deploys successfully as a static SPA. No changes to `apps/app` (Cloudflare) and no changes to DNS — your current records are correct.
 
-## End state
+## Changes
 
-```text
-hemora.xyz       → Vercel    → apps/web   (static landing page)
-app.hemora.xyz   → Cloudflare → apps/app  (TanStack Start + Workers, unchanged)
+### 1. `apps/web/vercel.json`
+
+Point Vercel at the actual build output (`dist/client`) and add a SPA rewrite so client-side routes like `/blog` work on refresh.
+
+```json
+{
+  "version": 2,
+  "framework": null,
+  "cleanUrls": true,
+  "buildCommand": "cd ../.. && pnpm --filter @hemora/landing build",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "outputDirectory": "dist/client",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
 ```
 
-One GitHub repo, two independent deployments, two independent domains.
+### 2. `apps/web/package.json`
 
-## Steps
+Drop the unused `NITRO_PRESET=vercel` env var (the shared Lovable Vite config doesn't use it — output goes to `dist/client` either way):
 
-### 1. Pull landing page code into apps/web
-- Use cross-project tools to read the "Hemora Landing Page" project structure.
-- Replace the current `apps/web/src/` (which is a stale duplicate of `apps/app`) with the actual landing page source: routes, components, assets, styles, brand tokens.
-- Keep `apps/web/package.json` deps in sync with what the landing page imports (add/remove as needed).
+```json
+"build": "vite build"
+```
 
-### 2. Strip Cloudflare Worker bits from apps/web
-Landing page is static-only on Vercel, so remove server-runtime files:
-- Delete `apps/web/src/server.ts`
-- Delete `apps/web/src/start.ts`
-- Delete `apps/web/wrangler.jsonc`
-- Delete `apps/web/src/lib/error-capture.ts` and `error-page.ts` (Worker-specific)
-- Delete `apps/web/src/routes/lovable/email/**` (server route handlers — not needed on a static landing page)
-- Delete `apps/web/src/integrations/supabase/client.server.ts` and `auth-middleware.ts` (server-only)
-- Delete `apps/web/supabase/` migrations directory (the app project owns the DB schema)
-- Simplify `apps/web/vite.config.ts` to a plain Vite + React config (drop the TanStack Start server-entry override and Cloudflare-specific aliases not used by the landing page).
+### 3. `apps/web/README.md`
 
-### 3. Vercel configuration
-- Add `apps/web/vercel.json` with SPA fallback if the landing page uses client-side routing:
-  ```json
-  { "rewrites": [{ "source": "/(.*)", "destination": "/" }] }
-  ```
-- Otherwise rely on Vercel's Vite preset auto-detection.
-- No code changes needed to `apps/app` — it keeps building via wrangler.
+Update the "Deploy to Vercel" section to reflect the static SPA setup (output dir is `dist/client`, not `.vercel/output`).
 
-### 4. Verify the build
-- Run `apps/web` build locally in the sandbox to confirm it compiles cleanly without the Worker bits.
-- Confirm `apps/app` build still passes (no changes expected).
+## After implementation
 
-## What you do after I'm done (outside Lovable)
+1. Commit + push to GitHub.
+2. Vercel auto-redeploys → build succeeds → landing page live at the `*.vercel.app` URL.
+3. In Vercel → Settings → Domains, confirm `hemora.xyz` and `www.hemora.xyz` are attached. SSL auto-issues.
+4. `app.hemora.xyz` keeps working unchanged (your `app` A record beats the wildcard).
 
-1. Push the repo to GitHub (if not already).
-2. In Vercel: New Project → import the repo → set **Root Directory** = `apps/web` → Framework: Vite → Deploy.
-3. In Vercel project settings, add domains `hemora.xyz` and `www.hemora.xyz`. Vercel will show DNS records to add at your registrar.
-4. At your registrar, update DNS:
-   - `hemora.xyz` (apex) → Vercel's A record
-   - `www` → Vercel's CNAME
-   - `app` → leave pointing at Cloudflare (unchanged)
-5. In the standalone "Hemora Landing Page" Lovable project, **remove the `hemora.xyz` custom domain first** so DNS doesn't conflict, then archive/delete that project.
+## What stays the same
 
-## Notes & trade-offs
-
-- **No SSR or server functions on apps/web.** If the landing page has a contact form, newsletter signup, or anything that calls a server function today, those will break on Vercel-as-static. Options when we get there: (a) call `app.hemora.xyz` endpoints, (b) convert to Vercel serverless functions, (c) keep apps/web on Cloudflare instead. I'll flag any such code when I pull it in.
-- **Future edits**: marketing changes → prompt in this Lovable project, edit `apps/web/`. App changes → prompt in this project, edit `apps/app/`. The standalone landing-page Lovable project is retired.
-- **Lovable's preview** for this project will only show one app at a time (currently `apps/app`). To preview the landing page in Lovable, we may need to switch the project's default app, or just preview via Vercel's preview deployments on each push.
-
-## Open question I'll handle inline
-
-The standalone landing page project may have its own Supabase tables (waitlist, contact submissions, etc.). When I pull the code in, I'll list any DB-touching code and ask before wiring it to this project's Lovable Cloud or stripping it.
+- DNS records — your current setup is fine, no edits needed at the registrar.
+- `apps/app` — untouched, still on Cloudflare at `app.hemora.xyz`.
+- The `/blog` route — works as a static SPA route. When you add real posts later, use MDX-in-repo, a headless CMS, or Supabase reads — all compatible with static hosting.

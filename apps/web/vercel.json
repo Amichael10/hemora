@@ -4,5 +4,6 @@
   "cleanUrls": true,
   "buildCommand": "cd ../.. && pnpm --filter @hemora/landing build",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "outputDirectory": ".vercel/output"
+  "outputDirectory": "dist/client",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

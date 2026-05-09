@@ -25,7 +25,9 @@ pnpm --filter @hemora/landing dev
 pnpm --filter @hemora/landing build
 ```
 
-Output goes to `apps/web/.vercel/output/`, the format Vercel auto-detects.
+Output goes to `apps/web/dist/client/` (static SPA assets) and
+`apps/web/dist/server/` (unused on Vercel — the landing page is served as a
+static SPA).
 
 ## Deploy to Vercel
 
@@ -35,8 +37,10 @@ Output goes to `apps/web/.vercel/output/`, the format Vercel auto-detects.
    points the build command at the workspace).
 4. **Install command**: handled by `vercel.json` (`pnpm install` from repo root).
 5. **Build command**: handled by `vercel.json` (`pnpm --filter @hemora/landing build`).
-6. **Output Directory**: handled by `vercel.json` (`.vercel/output`).
-7. **Environment variables** — copy these from Lovable Cloud:
+6. **Output Directory**: handled by `vercel.json` (`dist/client`).
+7. **SPA rewrite**: handled by `vercel.json` (`/(.*) → /index.html`) so client-side
+   routes like `/blog` resolve on direct visit / refresh.
+8. **Environment variables** — copy these from Lovable Cloud:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_PUBLISHABLE_KEY`
    - `VITE_SUPABASE_PROJECT_ID`
