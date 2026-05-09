@@ -1,12 +1,14 @@
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { DEFAULT_HOSPITAL_CHECKLIST, HOSPITAL_CHECKLIST_KEY, useLocalStorage } from "@/lib/localPrefs";
-import { CheckCircleBold as Check, InfoCircleLinear as Info, HospitalLinear as Hospital } from "solar-icon-set";
+import { exportHospitalChecklistToPdf } from "@/lib/hospitalChecklistPdf";
+import { CheckCircleBold as Check, InfoCircleLinear as Info, HospitalLinear as Hospital, ShareLinear as ShareIcon } from "solar-icon-set";
 
 export default function HospitalChecklist() {
   const [checked, setChecked] = useLocalStorage<Record<string, boolean>>(HOSPITAL_CHECKLIST_KEY, {});
   const items = DEFAULT_HOSPITAL_CHECKLIST;
   const completedCount = items.filter((i) => checked[i.id]).length;
+  const progressPct = items.length > 0 ? Math.round((completedCount / items.length) * 100) : 0;
 
   const toggle = (id: string) => setChecked({ ...checked, [id]: !checked[id] });
 
@@ -26,6 +28,12 @@ export default function HospitalChecklist() {
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-sm font-semibold text-foreground">Checklist</h2>
           <span className="text-xs text-muted-foreground">{completedCount} / {items.length} completed</span>
+        </div>
+
+        <div className="mb-4 px-1">
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
+            <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progressPct}%` }} />
+          </div>
         </div>
 
         <div className="bg-card rounded-2xl border border-border/60 overflow-hidden divide-y divide-border/60 mb-5">
@@ -60,6 +68,14 @@ export default function HospitalChecklist() {
             Bring this checklist with you to your appointment.
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => exportHospitalChecklistToPdf({ items, checked })}
+          className="mt-5 w-full h-12 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+        >
+          <ShareIcon size={16} /> Share as PDF
+        </button>
       </div>
     </MobileAppShell>
   );
