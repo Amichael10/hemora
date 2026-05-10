@@ -15,7 +15,6 @@ import {
   UsersGroupTwoRoundedBold as Users,
   UsersGroupRoundedBold as UsersRound,
   StarsBold as Sparkles,
-  CheckCircleBold as CheckCircle2,
 } from "solar-icon-set";
 import { FaGoogle } from "react-icons/fa";
 import { useCreateProfile, CreateProfileBodySetupFor } from "@workspace/api-client-react";
