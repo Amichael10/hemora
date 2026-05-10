@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { AMBULANCE_KEY, useLocalStorage } from "@/lib/localPrefs";
-import { ShieldCheckLinear as Shield, HeartPulseBold as AmbulanceIcon } from "solar-icon-set";
+import { ShieldCheckLinear as Shield } from "solar-icon-set";
+import ambulanceImg from "@/assets/ambulance.png";
 
 export default function Ambulance() {
   const [stored, setStored] = useLocalStorage<string>(AMBULANCE_KEY, "");
@@ -25,9 +26,7 @@ export default function Ambulance() {
       <SubPageHeader title="Ambulance number" back="/settings" />
       <div className="px-5 pb-10">
         <div className="flex flex-col items-center text-center pt-2 pb-6">
-          <div className="w-20 h-20 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center mb-4">
-            <AmbulanceIcon size={36} />
-          </div>
+          <img src={ambulanceImg} alt="Ambulance" className="w-32 h-32 object-contain mb-4" />
           <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
             Set your local ambulance phone number so we can help you quickly in an emergency.
           </p>
