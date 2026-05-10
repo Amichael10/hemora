@@ -15,7 +15,6 @@ import {
   UsersGroupTwoRoundedBold as Users,
   UsersGroupRoundedBold as UsersRound,
   StarsBold as Sparkles,
-  CheckCircleBold as CheckCircle2,
 } from "solar-icon-set";
 import { FaGoogle } from "react-icons/fa";
 import { useCreateProfile, CreateProfileBodySetupFor } from "@workspace/api-client-react";
@@ -63,7 +62,7 @@ export default function Onboarding() {
   const { toast } = useToast();
   const createProfile = useCreateProfile();
   const { setProfileId } = useProfile();
-  const { user, signInWithGoogle, signInWithEmail } = useAuth();
+  const { user, signInWithGoogle, signUpWithPassword } = useAuth();
 
   const initialStep = (() => {
     if (typeof window === "undefined") return 0;
@@ -74,8 +73,9 @@ export default function Onboarding() {
 
   const [step, setStep] = useState<number>(initialStep);
   const [direction, setDirection] = useState<1 | -1>(1);
-  const [authMode, setAuthMode] = useState<"choose" | "email" | "email-sent">("choose");
+  const [authMode, setAuthMode] = useState<"choose" | "email">("choose");
   const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const redirectUrl = typeof window !== "undefined" ? authRedirectUrl() : "";
@@ -168,19 +168,23 @@ export default function Onboarding() {
       setAuthError("Please enter a valid email address.");
       return;
     }
+    if (passwordInput.length < 8) {
+      setAuthError("Password must be at least 8 characters.");
+      return;
+    }
     setAuthBusy(true);
     try {
-      const { error } = await signInWithEmail(trimmed);
+      const { error } = await signUpWithPassword(trimmed, passwordInput);
       if (error) {
         setAuthError(error);
-        toast({ title: "Couldn't send magic link", description: error, variant: "destructive" });
+        toast({ title: "Couldn't create account", description: error, variant: "destructive" });
         return;
       }
-      setAuthMode("email-sent");
+      // Auto-confirm is on; the auth listener sets `user` and useEffect advances to step 1.
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unexpected error";
       setAuthError(msg);
-      toast({ title: "Couldn't send magic link", description: msg, variant: "destructive" });
+      toast({ title: "Couldn't create account", description: msg, variant: "destructive" });
     } finally {
       setAuthBusy(false);
     }
@@ -307,7 +311,7 @@ export default function Onboarding() {
 
                   {authMode === "email" && (
                     <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground text-center">We'll send you a secure sign-in link.</p>
+                      <p className="text-sm text-muted-foreground text-center">Create your account with a password.</p>
                       <Input
                         type="email"
                         inputMode="email"
@@ -315,9 +319,19 @@ export default function Onboarding() {
                         placeholder="you@example.com"
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") handleEmailSubmit(); }}
                         className="h-[3.25rem] text-[15px] rounded-2xl border-primary/20 px-5"
                         data-testid="input-auth-email"
+                      />
+                      <Input
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder="Password (min 8 chars)"
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") handleEmailSubmit(); }}
+                        className="h-[3.25rem] text-[15px] rounded-2xl border-primary/20 px-5"
+                        data-testid="input-auth-password"
+                        minLength={8}
                       />
                       <Button
                         className="w-full h-[3.25rem] text-[15px] rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
@@ -325,7 +339,7 @@ export default function Onboarding() {
                         disabled={authBusy}
                         data-testid="button-auth-email-send"
                       >
-                        {authBusy ? "Sending…" : "Send sign-in link"}
+                        {authBusy ? "Creating…" : "Create account"}
                       </Button>
                       {authError && (
                         <p
@@ -337,25 +351,9 @@ export default function Onboarding() {
                       )}
                       <button
                         className="w-full text-xs text-muted-foreground hover:text-primary pt-1"
-                        onClick={() => { setAuthMode("choose"); setEmailInput(""); setAuthError(null); }}
+                        onClick={() => { setAuthMode("choose"); setEmailInput(""); setPasswordInput(""); setAuthError(null); }}
                       >
                         Use a different method
-                      </button>
-                    </div>
-                  )}
-
-                  {authMode === "email-sent" && (
-                    <div className="text-center space-y-3 py-2">
-                      <span className="mx-auto inline-flex text-primary"><CheckCircle2 size={40} /></span>
-                      <h3 className="font-serif text-lg text-primary">Check your inbox</h3>
-                      <p className="text-sm text-muted-foreground">
-                        We sent a sign-in link to <span className="text-primary">{emailInput}</span>. Open it on this device to continue.
-                      </p>
-                      <button
-                        className="w-full text-xs text-muted-foreground hover:text-primary pt-1"
-                        onClick={() => setAuthMode("choose")}
-                      >
-                        Use a different email
                       </button>
                     </div>
                   )}
