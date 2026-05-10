@@ -65,6 +65,11 @@ export default function Login() {
               <Label>Password</Label>
               <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" autoComplete="current-password" />
             </div>
+            <div className="flex justify-end">
+              <Link href="/forgot-password" className="text-xs text-primary font-medium hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <Button type="submit" size="xl" className="w-full" disabled={busy}>
               <Lock size={18} /> Sign in
             </Button>
