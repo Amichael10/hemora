@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
 import { LetterBold as Mail } from "solar-icon-set";
+import { authRedirectUrl } from "@/lib/supabase";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,13 @@ export default function Login() {
   const { signInWithGoogle, signInWithEmail, user } = useAuth();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const redirectUrl =
+    typeof window !== "undefined" ? authRedirectUrl() : "";
+  const isDev =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname.startsWith("127.") ||
+      window.location.hostname.endsWith(".lovable.app"));
 
   if (user) {
     setTimeout(() => setLocation("/dashboard"), 0);
@@ -66,6 +74,20 @@ export default function Login() {
           <Button variant="outline" size="xl" className="w-full" onClick={handleGoogle} disabled={busy}>
             <FaGoogle className="w-[18px] h-[18px]" /> Continue with Google
           </Button>
+
+          {isDev && redirectUrl && (
+            <div className="mt-6 p-3 rounded-md border border-dashed border-border bg-muted/40">
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                Auth diagnostics (dev only)
+              </p>
+              <p className="text-xs font-mono break-all text-foreground/80">
+                {redirectUrl}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Add this URL to Cloud → Users → URL Configuration → Additional Redirect URLs.
+              </p>
+            </div>
+          )}
         </motion.div>
 
         <p className="text-sm text-center text-muted-foreground pb-4">
