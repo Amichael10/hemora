@@ -63,7 +63,7 @@ export default function Onboarding() {
   const { toast } = useToast();
   const createProfile = useCreateProfile();
   const { setProfileId } = useProfile();
-  const { user, signInWithGoogle, signInWithEmail } = useAuth();
+  const { user, signInWithGoogle, signUpWithPassword } = useAuth();
 
   const initialStep = (() => {
     if (typeof window === "undefined") return 0;
