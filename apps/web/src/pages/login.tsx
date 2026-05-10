@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
-import { LetterBold as Mail } from "solar-icon-set";
+import { LockBold as Lock } from "solar-icon-set";
 import { authRedirectUrl } from "@/lib/supabase";
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { signInWithGoogle, signInWithEmail, user } = useAuth();
+  const { signInWithGoogle, signInWithPassword, user } = useAuth();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const redirectUrl =
     typeof window !== "undefined" ? authRedirectUrl() : "";
@@ -37,15 +38,15 @@ export default function Login() {
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !password) return;
     setBusy(true);
-    const { error } = await signInWithEmail(email);
+    const { error } = await signInWithPassword(email, password);
     setBusy(false);
     if (error) {
-      toast({ title: "Couldn't send link", description: error, variant: "destructive" });
-    } else {
-      toast({ title: "Check your email", description: "We sent you a secure sign-in link." });
+      toast({ title: "Couldn't sign in", description: error, variant: "destructive" });
+      return;
     }
+    setLocation("/dashboard");
   };
 
   return (
@@ -60,8 +61,12 @@ export default function Login() {
               <Label>Email</Label>
               <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
             </div>
+            <div className="space-y-1.5">
+              <Label>Password</Label>
+              <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" autoComplete="current-password" />
+            </div>
             <Button type="submit" size="xl" className="w-full" disabled={busy}>
-              <Mail size={18} /> Send sign-in link
+              <Lock size={18} /> Sign in
             </Button>
           </form>
 
