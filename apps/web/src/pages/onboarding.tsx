@@ -74,8 +74,9 @@ export default function Onboarding() {
 
   const [step, setStep] = useState<number>(initialStep);
   const [direction, setDirection] = useState<1 | -1>(1);
-  const [authMode, setAuthMode] = useState<"choose" | "email" | "email-sent">("choose");
+  const [authMode, setAuthMode] = useState<"choose" | "email">("choose");
   const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const redirectUrl = typeof window !== "undefined" ? authRedirectUrl() : "";
@@ -168,19 +169,23 @@ export default function Onboarding() {
       setAuthError("Please enter a valid email address.");
       return;
     }
+    if (passwordInput.length < 8) {
+      setAuthError("Password must be at least 8 characters.");
+      return;
+    }
     setAuthBusy(true);
     try {
-      const { error } = await signInWithEmail(trimmed);
+      const { error } = await signUpWithPassword(trimmed, passwordInput);
       if (error) {
         setAuthError(error);
-        toast({ title: "Couldn't send magic link", description: error, variant: "destructive" });
+        toast({ title: "Couldn't create account", description: error, variant: "destructive" });
         return;
       }
-      setAuthMode("email-sent");
+      // Auto-confirm is on; the auth listener sets `user` and useEffect advances to step 1.
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unexpected error";
       setAuthError(msg);
-      toast({ title: "Couldn't send magic link", description: msg, variant: "destructive" });
+      toast({ title: "Couldn't create account", description: msg, variant: "destructive" });
     } finally {
       setAuthBusy(false);
     }
