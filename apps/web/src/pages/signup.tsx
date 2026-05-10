@@ -7,13 +7,14 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
-import { LetterBold as Mail } from "solar-icon-set";
+import { LockBold as Lock } from "solar-icon-set";
 
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { signInWithGoogle, signInWithEmail, user } = useAuth();
+  const { signInWithGoogle, signUpWithPassword, user } = useAuth();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   if (user) {
@@ -29,15 +30,19 @@ export default function Signup() {
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !password) return;
+    if (password.length < 8) {
+      toast({ title: "Password too short", description: "Use at least 8 characters.", variant: "destructive" });
+      return;
+    }
     setBusy(true);
-    const { error } = await signInWithEmail(email);
+    const { error } = await signUpWithPassword(email, password);
     setBusy(false);
     if (error) {
-      toast({ title: "Couldn't send link", description: error, variant: "destructive" });
-    } else {
-      toast({ title: "Check your email", description: "We sent you a link to confirm your account." });
+      toast({ title: "Couldn't create account", description: error, variant: "destructive" });
+      return;
     }
+    setLocation("/dashboard");
   };
 
   return (
@@ -52,8 +57,12 @@ export default function Signup() {
               <Label>Email</Label>
               <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
             </div>
+            <div className="space-y-1.5">
+              <Label>Password</Label>
+              <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" autoComplete="new-password" minLength={8} />
+            </div>
             <Button type="submit" size="xl" className="w-full" disabled={busy}>
-              <Mail size={18} /> Sign up with email
+              <Lock size={18} /> Create account
             </Button>
           </form>
 
