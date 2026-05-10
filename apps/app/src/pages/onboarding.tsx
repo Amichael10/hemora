@@ -32,6 +32,7 @@ import botanical from "@/assets/images/botanical-illustration.png";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/context/ProfileContext";
 import { useAuth } from "@/context/AuthContext";
+import { authRedirectUrl } from "@/lib/supabase";
 
 type SetupFor = CreateProfileBodySetupFor;
 
@@ -77,6 +78,12 @@ export default function Onboarding() {
   const [emailInput, setEmailInput] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const redirectUrl = typeof window !== "undefined" ? authRedirectUrl() : "";
+  const isDev =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname.startsWith("127.") ||
+      window.location.hostname.endsWith(".lovable.app"));
 
   // If user lands here already signed in, skip past auth.
   useEffect(() => {
@@ -338,6 +345,20 @@ export default function Onboarding() {
                       >
                         Use a different email
                       </button>
+                    </div>
+                  )}
+
+                  {isDev && redirectUrl && (
+                    <div className="mt-4 p-3 rounded-md border border-dashed border-border bg-muted/40 text-left">
+                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                        Auth diagnostics (dev only)
+                      </p>
+                      <p className="text-xs font-mono break-all text-foreground/80">
+                        {redirectUrl}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-1">
+                        Add this URL to the URI allow list below.
+                      </p>
                     </div>
                   )}
                 </div>
