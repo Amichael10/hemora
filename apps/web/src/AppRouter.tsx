@@ -25,6 +25,8 @@ const ProfileEdit = lazy(() => import("@/pages/profile-edit"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Login = lazy(() => import("@/pages/login"));
 const Signup = lazy(() => import("@/pages/signup"));
+const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
+const ResetPassword = lazy(() => import("@/pages/reset-password"));
 const MedForm = lazy(() => import("@/pages/med-form"));
 const MedDetail = lazy(() => import("@/pages/med-detail"));
 const RecordForm = lazy(() => import("@/pages/record-form"));
@@ -99,6 +101,8 @@ function Routes() {
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
+        <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/dashboard" component={protect(Dashboard)} />
         <Route path="/crisis" component={protect(Crisis)} />
