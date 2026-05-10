@@ -8,7 +8,8 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<{ error: string | null }>;
-  signInWithEmail: (email: string) => Promise<{ error: string | null }>;
+  signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUpWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -41,9 +42,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null };
   }, []);
 
-  const signInWithEmail = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
+  const signInWithPassword = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message ?? null };
+  }, []);
+
+  const signUpWithPassword = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
       email,
+      password,
       options: { emailRedirectTo: authRedirectUrl() },
     });
     return { error: error?.message ?? null };
@@ -55,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user ?? null, loading, signInWithGoogle, signInWithEmail, signOut }}
+      value={{ session, user: session?.user ?? null, loading, signInWithGoogle, signInWithPassword, signUpWithPassword, signOut }}
     >
       {children}
     </AuthContext.Provider>
