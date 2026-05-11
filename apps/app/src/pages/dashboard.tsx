@@ -29,6 +29,7 @@ import {
   ClockCircleBold as Clock,
   CheckCircleBold as Check,
   ChartLinear as Chart,
+  BookLinear as Book,
 } from "solar-icon-set";
 
 function getGreeting() {
@@ -255,25 +256,25 @@ export default function Dashboard() {
           {/* Quick actions row */}
           <div className="mt-5 grid grid-cols-3 gap-3">
             <button
-              onClick={() => setLocation("/meds")}
-              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
-            >
-              <Plus size={20} />
-              <span className="text-[12px] font-semibold">Log dose</span>
-            </button>
-            <button
               onClick={() => setLocation("/crisis")}
               className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
             >
               <HeartPulse size={20} />
-              <span className="text-[12px] font-semibold">Crisis</span>
+              <span className="text-[12px] font-semibold">Log crisis</span>
             </button>
             <button
-              onClick={() => setLocation("/records")}
+              onClick={() => setLocation("/meds")}
               className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
             >
-              <DocText size={20} />
-              <span className="text-[12px] font-semibold">Records</span>
+              <Pill size={20} />
+              <span className="text-[12px] font-semibold">Add medication</span>
+            </button>
+            <button
+              onClick={() => setLocation("/resources")}
+              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
+            >
+              <Book size={20} />
+              <span className="text-[12px] font-semibold">Resources</span>
             </button>
           </div>
         </section>
