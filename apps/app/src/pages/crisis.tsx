@@ -668,7 +668,7 @@ export default function Crisis() {
                 className="relative overflow-hidden rounded-3xl p-5 mt-5 mb-6 text-white shadow-md"
                 style={{ background: "linear-gradient(135deg, #8c2a3a 0%, #a8324a 100%)" }}
               >
-                <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3">In a crisis?</h3>
+                <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3 text-gray-50">In a crisis?</h3>
                 <ol className="space-y-1.5 text-sm leading-snug text-white/95 mb-4 max-w-[78%]">
                   <li>1. Stay calm and follow your plan</li>
                   <li>2. Take your pain medication</li>
