@@ -89,7 +89,7 @@ export default function ProfileEdit() {
   };
 
   return (
-    <MobileAppShell>
+    <MobileAppShell hideNav>
       <SubPageHeader title="Edit profile" back="/profile" />
       <div className="px-5 pb-32 space-y-6">
         {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
