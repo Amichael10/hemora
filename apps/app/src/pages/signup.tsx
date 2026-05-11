@@ -42,7 +42,7 @@ export default function Signup() {
       toast({ title: "Couldn't create account", description: error, variant: "destructive" });
       return;
     }
-    setLocation("/dashboard");
+    setLocation("/onboarding?step=1");
   };
 
   return (
