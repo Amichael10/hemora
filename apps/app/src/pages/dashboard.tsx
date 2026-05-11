@@ -320,7 +320,24 @@ export default function Dashboard() {
             <div className="flex items-end justify-between px-5 mb-3">
               <p className="eyebrow">Tools for you</p>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 px-5 snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div
+              ref={toolsScrollerRef}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                const children = Array.from(el.children) as HTMLElement[];
+                if (!children.length) return;
+                const center = el.scrollLeft + el.clientWidth / 2;
+                let closest = 0;
+                let min = Infinity;
+                children.forEach((child, i) => {
+                  const c = child.offsetLeft + child.offsetWidth / 2;
+                  const d = Math.abs(c - center);
+                  if (d < min) { min = d; closest = i; }
+                });
+                if (closest !== activeTool) setActiveTool(closest);
+              }}
+              className="flex gap-3 overflow-x-auto pb-2 px-5 snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
               {(() => {
                 const cards = [
                   {
@@ -376,6 +393,23 @@ export default function Dashboard() {
                   </button>
                 ));
               })()}
+            </div>
+            <div className="flex justify-center gap-1.5 mt-3 px-5">
+              {[0, 1, 2].map((i) => (
+                <button
+                  key={i}
+                  aria-label={`Go to tool ${i + 1}`}
+                  onClick={() => {
+                    const el = toolsScrollerRef.current;
+                    if (!el) return;
+                    const child = el.children[i] as HTMLElement | undefined;
+                    if (child) el.scrollTo({ left: child.offsetLeft - 20, behavior: "smooth" });
+                  }}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    activeTool === i ? "w-5 bg-primary" : "w-1.5 bg-border"
+                  }`}
+                />
+              ))}
             </div>
           </motion.section>
 
