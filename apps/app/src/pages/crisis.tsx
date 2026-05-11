@@ -668,38 +668,50 @@ export default function Crisis() {
 
               {/* Hero "In a crisis?" card */}
               <div
-                className="relative overflow-hidden rounded-3xl p-5 mt-5 mb-6 text-white shadow-md"
-                style={{ background: "linear-gradient(135deg, #8c2a3a 0%, #a8324a 100%)" }}
+                className="relative overflow-hidden rounded-3xl mt-5 mb-6 text-white shadow-[0_18px_40px_-20px_rgba(80,15,25,0.55)] ring-1 ring-[#d8a55a]/30"
+                style={{ background: "radial-gradient(120% 80% at 0% 0%, #6a1d2c 0%, #4a121e 60%, #3a0d18 100%)" }}
               >
-                <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3 text-gray-50">In a crisis?</h3>
-                <ul className="space-y-2 text-sm leading-snug text-white/95 mb-4 max-w-[62%]">
-                  {[
-                    { Icon: HeartbeatFilled, t: "Stay calm and follow your plan" },
-                    { Icon: PillFilled, t: "Take your pain medication" },
-                    { Icon: WaterDropFilled, t: "Hydrate and rest" },
-                    { Icon: AccidentFilled, t: "Seek medical help if needed" },
-                  ].map(({ Icon, t }, i) => (
-                    <li key={i} className="flex items-center gap-2.5">
-                      <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                        <Icon size={14} color="#fff" />
-                      </span>
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="bg-white/15 border-white/30 text-white hover:bg-white/25 backdrop-blur-sm rounded-full"
-                  onClick={() => setLocation("/emergency")}
-                >
-                  View Action Plan
-                </Button>
+                {/* gold inner border */}
+                <div className="pointer-events-none absolute inset-1.5 rounded-[1.35rem] border border-[#d8a55a]/25" />
+                {/* mug — anchored bottom-right, larger */}
                 <img
                   src={crisisMug}
                   alt=""
-                  className="absolute -right-4 -bottom-2 w-36 h-36 object-contain pointer-events-none select-none"
+                  className="absolute -right-3 bottom-0 w-[148px] h-[148px] object-contain pointer-events-none select-none drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
                 />
+                <div className="relative p-5 pr-[140px] min-h-[230px] flex flex-col">
+                  <h3 className="font-serif text-[22px] leading-tight font-semibold tracking-[-0.5px] bg-gradient-to-b from-[#f1cf86] to-[#c9954a] bg-clip-text text-transparent">
+                    In a crisis?
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1.5 mb-3.5">
+                    <span className="h-px flex-1 bg-gradient-to-r from-[#d8a55a]/60 to-transparent" />
+                    <HeartbeatFilled size={11} color="#d8a55a" />
+                    <span className="h-px flex-1 bg-gradient-to-l from-[#d8a55a]/60 to-transparent" />
+                  </div>
+                  <ul className="space-y-2 text-[12.5px] leading-snug text-white/92 mb-4">
+                    {[
+                      { Icon: HeartbeatFilled, t: "Stay calm and follow your plan" },
+                      { Icon: PillFilled, t: "Take your pain medication" },
+                      { Icon: WaterDropFilled, t: "Hydrate and rest" },
+                      { Icon: AccidentFilled, t: "Seek medical help if needed" },
+                    ].map(({ Icon, t }, i) => (
+                      <li key={i} className="flex items-center gap-2.5">
+                        <span className="w-6 h-6 rounded-full bg-[#5a1622] ring-1 ring-[#d8a55a]/45 flex items-center justify-center shrink-0">
+                          <Icon size={12} color="#e8b96a" />
+                        </span>
+                        <span className="font-medium">{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setLocation("/emergency")}
+                    className="mt-auto self-start inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[12.5px] font-semibold text-[#3a0d18] shadow-[0_4px_12px_rgba(0,0,0,0.25)] hover:brightness-105 transition"
+                    style={{ background: "linear-gradient(180deg, #f3d28a 0%, #d8a55a 100%)" }}
+                  >
+                    View Action Plan
+                    <ChevronLeft size={12} className="rotate-180" />
+                  </button>
+                </div>
               </div>
 
               {/* Recent header */}
