@@ -51,6 +51,7 @@ export type SubscribePayload = {
   p256dh: string;
   auth: string;
   userAgent?: string;
+  timezone?: string;
 };
 
 export async function subscribeBrowser(): Promise<SubscribePayload | null> {
@@ -73,6 +74,7 @@ export async function subscribeBrowser(): Promise<SubscribePayload | null> {
     p256dh: arrayBufferToBase64(sub.getKey("p256dh")),
     auth: arrayBufferToBase64(sub.getKey("auth")),
     userAgent: navigator.userAgent.slice(0, 512),
+    timezone: getBrowserTimezone(),
   };
 }
 
@@ -106,4 +108,12 @@ export function isStandalonePwa(): boolean {
   // iOS Safari + Android both expose this in some form
   // @ts-ignore
   return window.matchMedia?.("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
+}
+
+export function getBrowserTimezone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+  } catch {
+    return undefined;
+  }
 }
