@@ -21,6 +21,7 @@ import {
   isIosSafari,
   isStandalonePwa,
 } from "@/lib/push-client";
+import { PwaInstallButton } from "@/components/PwaInstallButton";
 
 type Prefs = {
   notify_med_reminders: boolean;
@@ -165,6 +166,7 @@ export default function Notifications() {
     <MobileAppShell>
       <SubPageHeader title="Notifications" back="/settings" />
       <div className="px-5 pb-10 space-y-4">
+        <PwaInstallButton className="w-full" size="lg" />
         {showIosHint && (
           <div className="bg-accent/15 border border-accent/30 rounded-2xl px-4 py-3 text-xs text-foreground">
             <strong className="block mb-1">iPhone users:</strong>
