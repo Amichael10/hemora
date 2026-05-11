@@ -747,7 +747,7 @@ export default function Crisis() {
                       ))}
                     </div>
 
-                    <Button size="lg" className="w-full" onClick={() => setStep("entry")} data-testid="btn-empty-start-log">
+                    <Button size="lg" className="w-full" onClick={() => setStep("pain")} data-testid="btn-empty-start-log">
                       <Plus size={16} /> Log your first crisis
                     </Button>
                     <button
@@ -851,7 +851,7 @@ export default function Crisis() {
               {/* Sticky bottom CTA */}
               {logs && logs.length > 0 && (
                 <div className="sticky bottom-3 mt-6">
-                  <Button size="xl" className="w-full shadow-lg" onClick={() => setStep("entry")} data-testid="btn-start-log-history">
+                  <Button size="xl" className="w-full shadow-lg" onClick={() => setStep("pain")} data-testid="btn-start-log-history">
                     <Plus size={18} /> Start New Crisis Log
                   </Button>
                 </div>
