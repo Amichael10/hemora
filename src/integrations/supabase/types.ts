@@ -625,6 +625,27 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_providers: {
+        Row: {
+          created_at: string
+          id: string
+          provider_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          provider_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          provider_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_notifications: {
         Row: {
           body: string
