@@ -8,6 +8,7 @@ const SubscriptionSchema = z.object({
   p256dh: z.string().min(1).max(512),
   auth: z.string().min(1).max(512),
   userAgent: z.string().max(512).optional(),
+  timezone: z.string().max(64).optional(),
 });
 
 export const subscribeToPush = createServerFn({ method: "POST" })
@@ -27,6 +28,12 @@ export const subscribeToPush = createServerFn({ method: "POST" })
       { onConflict: "endpoint" }
     );
     if (error) throw error;
+    if (data.timezone) {
+      await (supabase as any)
+        .from("profiles")
+        .update({ timezone: data.timezone })
+        .eq("user_id", userId);
+    }
     return { ok: true };
   });
 
