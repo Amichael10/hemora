@@ -136,9 +136,9 @@ export default function Records() {
             <Button variant="soft" onClick={() => setLocation("/records/new")}>Add Record</Button>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div>
             {filteredRecords?.map((record) => (
-              <Link key={record.id} href={`/records/${record.id}`}>
+              <Link key={record.id} href={`/records/${record.id}`} className="block my-[6px]">
               <Card className="group border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer" data-testid={`record-card-${record.id}`}>
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
