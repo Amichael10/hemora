@@ -25,6 +25,40 @@ const FREQUENCIES = [
   "As needed", "Weekly", "Other",
 ];
 
+const COMMON_DRUGS = [
+  "Hydroxyurea", "Folic Acid", "Penicillin V", "L-Glutamine (Endari)",
+  "Paracetamol", "Ibuprofen", "Vitamin D", "Voxelotor",
+];
+
+const FREQ_OFFSETS: Record<string, number[]> = {
+  "Once daily": [0],
+  "Twice daily": [0, 12],
+  "Three times daily": [0, 8, 16],
+  "Four times daily": [0, 6, 12, 18],
+  "Every morning": [0],
+  "Every evening": [0],
+  "Every 8 hours": [0, 8, 16],
+  "Every 12 hours": [0, 12],
+  "Weekly": [0],
+  "As needed": [],
+  "Other": [0],
+};
+
+function formatHHMM12(hh: number, mm: string): string {
+  const ampm = hh >= 12 ? "PM" : "AM";
+  const h12 = ((hh + 11) % 12) + 1;
+  return `${h12}:${mm} ${ampm}`;
+}
+
+function dosePreview(reminder24: string, frequency: string): string[] {
+  if (!reminder24 || !/^\d{1,2}:\d{2}/.test(reminder24)) return [];
+  const offsets = FREQ_OFFSETS[frequency] ?? [0];
+  if (!offsets.length) return [];
+  const [h, m] = reminder24.split(":");
+  const baseH = parseInt(h, 10);
+  return offsets.map((off) => formatHHMM12((baseH + off) % 24, m));
+}
+
 const REFILL_OPTIONS = [
   { value: "0", label: "Off" },
   { value: "1", label: "1 day before" },
@@ -114,8 +148,8 @@ export default function MedForm() {
     e.preventDefault();
     const reminderTime = to24h(hour, minute, period);
     const refillNum = parseInt(refillDays, 10);
-    const data = {
-      name, dose, frequency, reminderTime, notes, profileId,
+    const baseData = {
+      name, dose, frequency, reminderTime, notes,
       status: CreateMedicationBodyStatus.ongoing,
       reminderEnabled: true,
       refillReminderDays: refillNum > 0 ? refillNum : null,
@@ -123,12 +157,12 @@ export default function MedForm() {
       nextRefillDate: nextRefillDate || null,
     };
     if (isEdit) {
-      updateMed.mutate({ id, data }, {
+      updateMed.mutate({ id, data: baseData }, {
         onSuccess: () => { toast({ title: "Medication updated" }); setLocation("/meds"); },
         onError: (e: any) => toast({ title: "Couldn't save", description: e?.message, variant: "destructive" }),
       });
     } else {
-      createMed.mutate({ data }, {
+      createMed.mutate({ data: { ...baseData, profileId } }, {
         onSuccess: () => {
           toast({ title: "Medication added" });
           maybeAskToEnableNotifications("first-med");
@@ -159,6 +193,22 @@ export default function MedForm() {
               <Label className="text-sm font-medium">Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Hydroxyurea"
                 className="h-12 text-base rounded-xl bg-card border-border/60" />
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {COMMON_DRUGS.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setName(d)}
+                    className={`px-3 h-8 rounded-full text-xs font-medium border transition-colors ${
+                      name === d
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-foreground border-border/60 hover:border-primary/40"
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium">Dose</Label>
@@ -175,7 +225,9 @@ export default function MedForm() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Reminder time</Label>
+              <Label className="text-sm font-medium">
+                {(FREQ_OFFSETS[frequency]?.length ?? 1) > 1 ? "First dose time" : "Reminder time"}
+              </Label>
               <div className="grid grid-cols-3 gap-2">
                 <Select value={hour} onValueChange={setHour}>
                   <SelectTrigger className="h-12 rounded-xl bg-card border-border/60 text-base"><SelectValue placeholder="Hour" /></SelectTrigger>
@@ -193,7 +245,17 @@ export default function MedForm() {
                   </SelectContent>
                 </Select>
               </div>
-              <p className="text-xs text-muted-foreground">Pick the hour, minute, and AM or PM</p>
+              {(() => {
+                const times = dosePreview(to24h(hour, minute, period), frequency);
+                if (times.length <= 1) {
+                  return <p className="text-xs text-muted-foreground">Pick the hour, minute, and AM or PM</p>;
+                }
+                return (
+                  <p className="text-xs text-muted-foreground">
+                    Doses today at <span className="font-medium text-foreground">{times.join(", ")}</span>
+                  </p>
+                );
+              })()}
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium">Start date</Label>
