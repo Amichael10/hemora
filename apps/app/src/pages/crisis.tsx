@@ -116,7 +116,7 @@ export default function Crisis() {
     const target = FLOW_STEPS[idx];
     if (target) setStep(target);
   };
-  const flowStepHideNav = ["pain", "location", "triggers", "relief", "hospital"].includes(step);
+  const flowStepHideNav = false;
 
   const toggleArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setter(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
@@ -177,7 +177,7 @@ export default function Crisis() {
 
   return (
     <MobileAppShell hideNav={flowStepHideNav}>
-      <div className={`min-h-full flex flex-col ${flowStepHideNav ? "" : "pb-8"}`}>
+      <div className="min-h-full flex flex-col pb-8">
         <AnimatePresence mode="wait">
 
           {step === "pain" && (() => {
