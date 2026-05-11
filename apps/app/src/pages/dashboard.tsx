@@ -132,7 +132,7 @@ export default function Dashboard() {
     const m: string[] = [];
     if (!profile.dateOfBirth) m.push("date of birth");
     if (!profile.gender) m.push("gender");
-    if (!profile.scdStatus) m.push("genotype");
+    if (!profile.genotype) m.push("genotype");
     if (!profile.country) m.push("location");
     return m;
   }, [profile]);
