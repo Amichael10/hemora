@@ -15,6 +15,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksProcessNotificationsRouteImport } from './routes/api/public/hooks/process-notifications'
+import { Route as ApiPublicHooksPredictCrisisRouteImport } from './routes/api/public/hooks/predict-crisis'
 import { Route as ApiPublicHooksBroadcastProductUpdateRouteImport } from './routes/api/public/hooks/broadcast-product-update'
 
 const SplatRoute = SplatRouteImport.update({
@@ -49,6 +50,12 @@ const ApiPublicHooksProcessNotificationsRoute =
     path: '/api/public/hooks/process-notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPredictCrisisRoute =
+  ApiPublicHooksPredictCrisisRouteImport.update({
+    id: '/api/public/hooks/predict-crisis',
+    path: '/api/public/hooks/predict-crisis',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBroadcastProductUpdateRoute =
   ApiPublicHooksBroadcastProductUpdateRouteImport.update({
     id: '/api/public/hooks/broadcast-product-update',
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
+  '/api/public/hooks/predict-crisis': typeof ApiPublicHooksPredictCrisisRoute
   '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -69,6 +77,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
+  '/api/public/hooks/predict-crisis': typeof ApiPublicHooksPredictCrisisRoute
   '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -79,6 +88,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
+  '/api/public/hooks/predict-crisis': typeof ApiPublicHooksPredictCrisisRoute
   '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/api/public/hooks/broadcast-product-update'
+    | '/api/public/hooks/predict-crisis'
     | '/api/public/hooks/process-notifications'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -99,6 +110,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/api/public/hooks/broadcast-product-update'
+    | '/api/public/hooks/predict-crisis'
     | '/api/public/hooks/process-notifications'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -108,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/api/public/hooks/broadcast-product-update'
+    | '/api/public/hooks/predict-crisis'
     | '/api/public/hooks/process-notifications'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -118,6 +131,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   ApiPublicHooksBroadcastProductUpdateRoute: typeof ApiPublicHooksBroadcastProductUpdateRoute
+  ApiPublicHooksPredictCrisisRoute: typeof ApiPublicHooksPredictCrisisRoute
   ApiPublicHooksProcessNotificationsRoute: typeof ApiPublicHooksProcessNotificationsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -168,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksProcessNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/predict-crisis': {
+      id: '/api/public/hooks/predict-crisis'
+      path: '/api/public/hooks/predict-crisis'
+      fullPath: '/api/public/hooks/predict-crisis'
+      preLoaderRoute: typeof ApiPublicHooksPredictCrisisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/broadcast-product-update': {
       id: '/api/public/hooks/broadcast-product-update'
       path: '/api/public/hooks/broadcast-product-update'
@@ -183,6 +204,7 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   ApiPublicHooksBroadcastProductUpdateRoute:
     ApiPublicHooksBroadcastProductUpdateRoute,
+  ApiPublicHooksPredictCrisisRoute: ApiPublicHooksPredictCrisisRoute,
   ApiPublicHooksProcessNotificationsRoute:
     ApiPublicHooksProcessNotificationsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
