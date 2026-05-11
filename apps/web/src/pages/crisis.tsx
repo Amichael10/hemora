@@ -42,6 +42,7 @@ import lottieBath from "@/assets/lottie/2668.json";
 import lottieMassage from "@/assets/lottie/1f64c.json";
 import lottieNothing from "@/assets/lottie/1f615.json";
 import { useToast } from "@/hooks/use-toast";
+import { maybeAskToEnableNotifications } from "@/components/NotifyEnablePrompt";
 import {
   HeartPulseBold as HeartCardiogramFilled,
   DangerTriangleBold as AccidentFilled,
@@ -133,6 +134,7 @@ export default function Crisis() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) });
           toast({ title: "Log saved", description: "Thanks for tracking — it helps you see patterns." });
+          maybeAskToEnableNotifications("first-crisis");
           // reset + go back to history
           setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText(""); setOtherTriggerText("");
           setStep("history");
