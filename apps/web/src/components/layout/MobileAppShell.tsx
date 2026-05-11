@@ -74,6 +74,7 @@ export function MobileAppShell({ children, hideNav = false }: MobileAppShellProp
         </nav>
         )}
       </div>
+      <NotifyEnablePrompt />
     </div>
   );
 }
