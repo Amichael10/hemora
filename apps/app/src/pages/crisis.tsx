@@ -666,26 +666,69 @@ export default function Crisis() {
 
               {/* Hero "In a crisis?" card */}
               <div
-                className="relative overflow-hidden rounded-3xl p-5 mt-5 mb-6 text-white shadow-md"
-                style={{ background: "linear-gradient(135deg, #8c2a3a 0%, #a8324a 100%)" }}
+                className="relative overflow-hidden rounded-3xl mt-5 mb-6 shadow-md ring-1 ring-[#d4a857]/30"
+                style={{ background: "linear-gradient(135deg, #5a1622 0%, #7a1f30 100%)" }}
               >
-                <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3 text-gray-50">In a crisis?</h3>
-                <ol className="space-y-1.5 text-sm leading-snug text-white/95 mb-4 max-w-[78%]">
-                  <li>1. Stay calm and follow your plan</li>
-                  <li>2. Take your pain medication</li>
-                  <li>3. Hydrate and rest</li>
-                  <li>4. Seek medical help if needed</li>
-                </ol>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="bg-white/15 border-white/30 text-white hover:bg-white/25 backdrop-blur-sm rounded-full"
-                  onClick={() => setLocation("/emergency")}
-                >
-                  View Action Plan
-                </Button>
-                <div className="absolute -right-3 -bottom-2 w-28 h-28 opacity-90 pointer-events-none">
-                  <Lottie animationData={lottieMeds} loop autoplay className="w-full h-full" />
+                {/* gold inner border */}
+                <div className="absolute inset-2 rounded-[20px] border border-[#d4a857]/35 pointer-events-none" />
+
+                <div className="relative flex items-stretch p-5 pr-3 gap-3">
+                  <div className="flex-1 min-w-0 z-10">
+                    <h3
+                      className="font-serif text-[1.6rem] leading-[1.05] font-semibold tracking-[-0.5px] mb-2"
+                      style={{
+                        background: "linear-gradient(180deg, #f4d98a 0%, #c99a3f 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      In a crisis?
+                    </h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="h-px flex-1 bg-[#d4a857]/40" />
+                      <span className="text-[#d4a857]/80 text-[10px]">♥</span>
+                      <span className="h-px flex-1 bg-[#d4a857]/40" />
+                    </div>
+
+                    <ul className="space-y-2 mb-4">
+                      {[
+                        { Icon: ShieldCheck, label: "Stay calm and follow your plan" },
+                        { Icon: Pill, label: "Take your pain medication" },
+                        { Icon: TeaCup, label: "Hydrate and rest" },
+                        { Icon: Hospital, label: "Seek medical help if needed" },
+                      ].map(({ Icon, label }, i) => (
+                        <li key={i} className="flex items-center gap-2.5">
+                          <span className="w-7 h-7 rounded-full bg-[#3d0d16]/60 ring-1 ring-[#d4a857]/40 flex items-center justify-center shrink-0 text-[#e9c573]">
+                            <Icon size={14} />
+                          </span>
+                          <span className="text-[12.5px] leading-snug text-white/95">{label}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => setLocation("/emergency")}
+                      className="inline-flex items-center gap-2 px-4 h-9 rounded-full text-[13px] font-semibold text-[#5a1622] shadow-sm hover:brightness-105 transition"
+                      style={{ background: "linear-gradient(180deg, #f4d98a 0%, #d4a857 100%)" }}
+                    >
+                      View Action Plan
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+
+                  <div className="relative w-[120px] shrink-0 self-end -mr-1 -mb-1">
+                    <div
+                      className="absolute inset-0 rounded-full opacity-60 blur-xl"
+                      style={{ background: "radial-gradient(circle, #f4d98a 0%, transparent 65%)" }}
+                    />
+                    <img
+                      src={crisisMug}
+                      alt=""
+                      draggable={false}
+                      className="relative w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_8px_18px_rgba(0,0,0,0.35)]"
+                    />
+                  </div>
                 </div>
               </div>
 
