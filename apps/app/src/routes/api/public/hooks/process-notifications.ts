@@ -81,14 +81,15 @@ export const Route = createFileRoute("/api/public/hooks/process-notifications")(
 
           const { data: meds } = await (supabaseAdmin as any)
             .from("medications")
-            .select("id, user_id, name, dose, dosage, schedule_time, reminder_enabled, status")
+            .select("id, user_id, name, dose, dosage, reminder_time, schedule_time, reminder_enabled, status")
             .eq("reminder_enabled", true)
             .eq("status", "ongoing");
 
           for (const med of (meds as any[]) ?? []) {
-            if (!med.schedule_time) continue;
-            // schedule_time comes back as "HH:MM:SS"
-            const medHM = String(med.schedule_time).slice(0, 5);
+            // Form writes `reminder_time` ("HH:MM" text). Older rows may use `schedule_time` ("HH:MM:SS" time).
+            const rawTime = med.reminder_time || med.schedule_time;
+            if (!rawTime) continue;
+            const medHM = String(rawTime).slice(0, 5);
             if (medHM !== target) continue;
 
             const { data: prof } = await (supabaseAdmin as any)
