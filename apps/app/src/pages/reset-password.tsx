@@ -154,7 +154,7 @@ export default function ResetPassword() {
           )}
         </motion.div>
 
-        <p className="text-sm text-center text-muted-foreground pb-4">
+        <p className="text-sm text-center text-muted-foreground pb-4 py-[12px]">
           <Link href="/login" className="text-primary font-semibold">Back to sign in</Link>
         </p>
       </div>
