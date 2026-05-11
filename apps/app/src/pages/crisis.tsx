@@ -41,6 +41,7 @@ import lottieMeds from "@/assets/lottie/1f917.json";
 import lottieBath from "@/assets/lottie/2668.json";
 import lottieMassage from "@/assets/lottie/1f64c.json";
 import lottieNothing from "@/assets/lottie/1f615.json";
+import crisisMug from "@/assets/images/crisis-mug.png";
 import { useToast } from "@/hooks/use-toast";
 import {
   HeartPulseBold as HeartCardiogramFilled,
@@ -669,12 +670,21 @@ export default function Crisis() {
                 style={{ background: "linear-gradient(135deg, #8c2a3a 0%, #a8324a 100%)" }}
               >
                 <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3 text-gray-50">In a crisis?</h3>
-                <ol className="space-y-1.5 text-sm leading-snug text-white/95 mb-4 max-w-[78%]">
-                  <li>1. Stay calm and follow your plan</li>
-                  <li>2. Take your pain medication</li>
-                  <li>3. Hydrate and rest</li>
-                  <li>4. Seek medical help if needed</li>
-                </ol>
+                <ul className="space-y-2 text-sm leading-snug text-white/95 mb-4 max-w-[62%]">
+                  {[
+                    { Icon: HeartbeatFilled, t: "Stay calm and follow your plan" },
+                    { Icon: PillFilled, t: "Take your pain medication" },
+                    { Icon: WaterDropFilled, t: "Hydrate and rest" },
+                    { Icon: AccidentFilled, t: "Seek medical help if needed" },
+                  ].map(({ Icon, t }, i) => (
+                    <li key={i} className="flex items-center gap-2.5">
+                      <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center shrink-0">
+                        <Icon size={14} color="#fff" />
+                      </span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
                 <Button
                   size="sm"
                   variant="outline"
@@ -683,9 +693,11 @@ export default function Crisis() {
                 >
                   View Action Plan
                 </Button>
-                <div className="absolute -right-3 -bottom-2 w-28 h-28 opacity-90 pointer-events-none">
-                  <Lottie animationData={lottieMeds} loop autoplay className="w-full h-full" />
-                </div>
+                <img
+                  src={crisisMug}
+                  alt=""
+                  className="absolute -right-4 -bottom-2 w-36 h-36 object-contain pointer-events-none select-none"
+                />
               </div>
 
               {/* Recent header */}
