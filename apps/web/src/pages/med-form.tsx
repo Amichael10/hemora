@@ -17,6 +17,7 @@ import {
   CreateMedicationBodyStatus,
 } from "@workspace/api-client-react";
 import { useProfile } from "@/context/ProfileContext";
+import { maybeAskToEnableNotifications } from "@/components/NotifyEnablePrompt";
 
 const FREQUENCIES = [
   "Once daily", "Twice daily", "Three times daily", "Four times daily",
@@ -128,7 +129,11 @@ export default function MedForm() {
       });
     } else {
       createMed.mutate({ data }, {
-        onSuccess: () => { toast({ title: "Medication added" }); setLocation("/meds"); },
+        onSuccess: () => {
+          toast({ title: "Medication added" });
+          maybeAskToEnableNotifications("first-med");
+          setLocation("/meds");
+        },
         onError: (e: any) => toast({ title: "Couldn't save", description: e?.message, variant: "destructive" }),
       });
     }
