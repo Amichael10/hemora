@@ -15,6 +15,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksProcessNotificationsRouteImport } from './routes/api/public/hooks/process-notifications'
+import { Route as ApiPublicHooksBroadcastProductUpdateRouteImport } from './routes/api/public/hooks/broadcast-product-update'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
@@ -48,10 +49,17 @@ const ApiPublicHooksProcessNotificationsRoute =
     path: '/api/public/hooks/process-notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBroadcastProductUpdateRoute =
+  ApiPublicHooksBroadcastProductUpdateRouteImport.update({
+    id: '/api/public/hooks/broadcast-product-update',
+    path: '/api/public/hooks/broadcast-product-update',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
   '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -60,6 +68,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
   '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -69,6 +78,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
   '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -79,6 +89,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$'
+    | '/api/public/hooks/broadcast-product-update'
     | '/api/public/hooks/process-notifications'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -87,6 +98,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/api/public/hooks/broadcast-product-update'
     | '/api/public/hooks/process-notifications'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -95,6 +107,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$'
+    | '/api/public/hooks/broadcast-product-update'
     | '/api/public/hooks/process-notifications'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -104,6 +117,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
+  ApiPublicHooksBroadcastProductUpdateRoute: typeof ApiPublicHooksBroadcastProductUpdateRoute
   ApiPublicHooksProcessNotificationsRoute: typeof ApiPublicHooksProcessNotificationsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -154,12 +168,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksProcessNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/broadcast-product-update': {
+      id: '/api/public/hooks/broadcast-product-update'
+      path: '/api/public/hooks/broadcast-product-update'
+      fullPath: '/api/public/hooks/broadcast-product-update'
+      preLoaderRoute: typeof ApiPublicHooksBroadcastProductUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  ApiPublicHooksBroadcastProductUpdateRoute:
+    ApiPublicHooksBroadcastProductUpdateRoute,
   ApiPublicHooksProcessNotificationsRoute:
     ApiPublicHooksProcessNotificationsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
