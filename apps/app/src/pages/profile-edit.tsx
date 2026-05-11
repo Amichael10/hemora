@@ -91,7 +91,7 @@ export default function ProfileEdit() {
   return (
     <MobileAppShell>
       <SubPageHeader title="Edit profile" back="/profile" />
-      <div className="px-5 pb-32 space-y-6">
+      <div className="px-5 pb-40 space-y-6">
         {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
 
         <section className="space-y-3">
@@ -176,7 +176,7 @@ export default function ProfileEdit() {
         </section>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto p-4 bg-background border-t border-border/60">
+      <div className="fixed bottom-20 left-0 right-0 max-w-[430px] mx-auto p-4 bg-background border-t border-border/60 z-40">
         <Button size="xl" className="w-full" onClick={onSave} disabled={update.isPending}>
           {update.isPending ? "Saving…" : "Save changes"}
         </Button>
