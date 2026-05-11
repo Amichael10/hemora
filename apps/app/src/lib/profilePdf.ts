@@ -515,3 +515,117 @@ export async function exportCrisisReportToPdf(input: CrisisReportInput) {
   const safe = (input.patientName || "patient").replace(/[^\w\-]+/g, "_");
   doc.save(`Hemora-Crisis-Report-${safe}.pdf`);
 }
+
+// ---------- Genotype risk report ----------
+export interface GenotypeReportInput {
+  partner1Name: string;
+  partner1Genotype: string;
+  partner2Name: string;
+  partner2Genotype: string;
+  outcomes: { genotype: string; percent: number; label: string; tone: "ok" | "warn" | "bad" }[];
+}
+
+export async function exportGenotypeReportToPdf(input: GenotypeReportInput) {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const marginX = 56;
+  const BRAND: [number, number, number] = [15, 65, 45];
+  const CREAM: [number, number, number] = [248, 244, 236];
+  const INK: [number, number, number] = [22, 28, 26];
+  const MUTED: [number, number, number] = [120, 120, 116];
+  const TONE: Record<string, [number, number, number]> = {
+    ok: [34, 120, 80],
+    warn: [180, 130, 30],
+    bad: [168, 50, 74],
+  };
+
+  // Header
+  doc.setFillColor(...BRAND);
+  doc.rect(0, 0, pageW, 130, "F");
+  try {
+    const dataUrl = await loadImage(logoUrl);
+    doc.addImage(dataUrl, "PNG", marginX, 36, 40, 40);
+  } catch {}
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("Hemora", marginX + 52, 60);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(220, 220, 200);
+  doc.text("Genotype risk report", marginX + 52, 76);
+  doc.setFontSize(9);
+  doc.text(
+    new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }),
+    pageW - marginX, 60, { align: "right" }
+  );
+
+  // Partners card
+  const cardY = 102;
+  doc.setFillColor(...CREAM);
+  doc.roundedRect(marginX, cardY, pageW - marginX * 2, 80, 10, 10, "F");
+  const colW = (pageW - marginX * 2) / 2;
+  doc.setTextColor(...MUTED);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text("PARTNER 1", marginX + 20, cardY + 22);
+  doc.text("PARTNER 2", marginX + colW + 20, cardY + 22);
+  doc.setTextColor(...INK);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text(input.partner1Name, marginX + 20, cardY + 42);
+  doc.text(input.partner2Name, marginX + colW + 20, cardY + 42);
+  doc.setTextColor(...BRAND);
+  doc.setFontSize(18);
+  doc.text(input.partner1Genotype, marginX + 20, cardY + 66);
+  doc.text(input.partner2Genotype, marginX + colW + 20, cardY + 66);
+
+  let y = cardY + 80 + 32;
+
+  // Outcomes section
+  doc.setFillColor(...BRAND);
+  doc.rect(marginX, y - 6, 18, 2, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...BRAND);
+  doc.text("POSSIBLE OUTCOMES PER PREGNANCY", marginX + 26, y);
+  y += 18;
+
+  for (const o of input.outcomes) {
+    const rowH = 56;
+    doc.setFillColor(252, 250, 246);
+    doc.roundedRect(marginX, y, pageW - marginX * 2, rowH, 8, 8, "F");
+    const tone = TONE[o.tone] || INK;
+    doc.setFillColor(...tone);
+    doc.roundedRect(marginX, y, 4, rowH, 2, 2, "F");
+    doc.setTextColor(...INK);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text(`${o.percent}%`, marginX + 18, y + 28);
+    doc.setFontSize(13);
+    doc.text(o.genotype, marginX + 90, y + 24);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(...MUTED);
+    doc.text(o.label, marginX + 90, y + 42);
+    y += rowH + 8;
+  }
+
+  y += 10;
+  doc.setTextColor(...MUTED);
+  doc.setFontSize(9.5);
+  const note = "Risk is the same for each pregnancy. These results are guidance, not a guarantee — please speak with a genetic counsellor for personal advice.";
+  const noteLines = doc.splitTextToSize(note, pageW - marginX * 2);
+  doc.text(noteLines, marginX, y);
+
+  // Footer
+  doc.setDrawColor(232, 226, 214);
+  doc.line(marginX, pageH - 44, pageW - marginX, pageH - 44);
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  doc.text("Hemora · hemora.xyz", marginX, pageH - 26);
+
+  const safe = `${input.partner1Name}-${input.partner2Name}`.replace(/[^\w\-]+/g, "_");
+  doc.save(`Hemora-Genotype-${safe}.pdf`);
+}
