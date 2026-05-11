@@ -668,38 +668,50 @@ export default function Crisis() {
 
               {/* Hero "In a crisis?" card */}
               <div
-                className="relative overflow-hidden rounded-3xl p-5 mt-5 mb-6 text-white shadow-md"
-                style={{ background: "linear-gradient(135deg, #8c2a3a 0%, #a8324a 100%)" }}
+                className="relative overflow-hidden rounded-3xl mt-5 mb-6 text-white shadow-[0_18px_40px_-20px_rgba(80,15,25,0.55)] ring-1 ring-[#d8a55a]/30"
+                style={{ background: "radial-gradient(120% 80% at 0% 0%, #6a1d2c 0%, #4a121e 60%, #3a0d18 100%)" }}
               >
-                <h3 className="font-serif text-xl font-semibold tracking-[-0.3px] mb-3 text-gray-50">In a crisis?</h3>
-                <ul className="space-y-2 text-sm leading-snug text-white/95 mb-4 max-w-[62%]">
-                  {[
-                    { Icon: HeartbeatFilled, t: "Stay calm and follow your plan" },
-                    { Icon: PillFilled, t: "Take your pain medication" },
-                    { Icon: WaterDropFilled, t: "Hydrate and rest" },
-                    { Icon: AccidentFilled, t: "Seek medical help if needed" },
-                  ].map(({ Icon, t }, i) => (
-                    <li key={i} className="flex items-center gap-2.5">
-                      <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                        <Icon size={14} color="#fff" />
-                      </span>
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="bg-white/15 border-white/30 text-white hover:bg-white/25 backdrop-blur-sm rounded-full"
-                  onClick={() => setLocation("/emergency")}
-                >
-                  View Action Plan
-                </Button>
+                {/* gold inner border */}
+                <div className="pointer-events-none absolute inset-1.5 rounded-[1.35rem] border border-[#d8a55a]/25" />
+                {/* mug — anchored bottom-right, larger */}
                 <img
                   src={crisisMug}
                   alt=""
-                  className="absolute -right-4 -bottom-2 w-36 h-36 object-contain pointer-events-none select-none"
+                  className="absolute -right-3 bottom-0 w-[148px] h-[148px] object-contain pointer-events-none select-none drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
                 />
+                <div className="relative p-5 pr-[140px] min-h-[230px] flex flex-col">
+                  <h3 className="font-serif text-[22px] leading-tight font-semibold tracking-[-0.5px] bg-gradient-to-b from-[#f1cf86] to-[#c9954a] bg-clip-text text-transparent">
+                    In a crisis?
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1.5 mb-3.5">
+                    <span className="h-px flex-1 bg-gradient-to-r from-[#d8a55a]/60 to-transparent" />
+                    <HeartbeatFilled size={11} color="#d8a55a" />
+                    <span className="h-px flex-1 bg-gradient-to-l from-[#d8a55a]/60 to-transparent" />
+                  </div>
+                  <ul className="space-y-2 text-[12.5px] leading-snug text-white/92 mb-4">
+                    {[
+                      { Icon: HeartbeatFilled, t: "Stay calm and follow your plan" },
+                      { Icon: PillFilled, t: "Take your pain medication" },
+                      { Icon: WaterDropFilled, t: "Hydrate and rest" },
+                      { Icon: AccidentFilled, t: "Seek medical help if needed" },
+                    ].map(({ Icon, t }, i) => (
+                      <li key={i} className="flex items-center gap-2.5">
+                        <span className="w-6 h-6 rounded-full bg-[#5a1622] ring-1 ring-[#d8a55a]/45 flex items-center justify-center shrink-0">
+                          <Icon size={12} color="#e8b96a" />
+                        </span>
+                        <span className="font-medium">{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setLocation("/emergency")}
+                    className="mt-auto self-start inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[12.5px] font-semibold text-[#3a0d18] shadow-[0_4px_12px_rgba(0,0,0,0.25)] hover:brightness-105 transition"
+                    style={{ background: "linear-gradient(180deg, #f3d28a 0%, #d8a55a 100%)" }}
+                  >
+                    View Action Plan
+                    <ChevronLeft size={12} className="rotate-180" />
+                  </button>
+                </div>
               </div>
 
               {/* Recent header */}
@@ -778,14 +790,18 @@ export default function Crisis() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.04, duration: 0.25 }}
                     >
-                      <div onClick={() => setLocation(`/crisis/${log.id}`)} className="cursor-pointer">
-                      <Card
-                        className={`bg-card border border-border border-l-4 ${getPainAccent(log.painLevel)} rounded-none shadow-none hover:bg-muted/30 transition-colors`}
+                      <div
+                        onClick={() => setLocation(`/crisis/${log.id}`)}
                         data-testid={`crisis-card-${log.id}`}
+                        className="group relative cursor-pointer rounded-2xl bg-card border border-border/60 shadow-[0_2px_10px_-6px_rgba(15,40,55,0.18)] hover:shadow-[0_8px_22px_-12px_rgba(15,40,55,0.25)] hover:-translate-y-0.5 transition-all overflow-hidden"
                       >
-                        <CardContent className="p-4">
+                        {/* gradient accent bar */}
+                        <span
+                          className={`absolute left-0 top-0 bottom-0 w-1 ${getPainAccent(log.painLevel).replace('border-l-', 'bg-')}`}
+                        />
+                        <div className="p-4 pl-5">
                           <div className="flex items-start gap-3">
-                            <div className="shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                            <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center ring-1 ring-border/50 ${getPainColor(log.painLevel)}`}>
                               <img
                                 src={getPainEmoji(log.painLevel)}
                                 alt={log.painLevel}
@@ -793,40 +809,40 @@ export default function Crisis() {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2 mb-1">
-                                <p className="font-serif font-semibold text-foreground capitalize tracking-tight">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="font-serif font-semibold text-foreground capitalize tracking-tight text-[15px]">
                                   {log.painLevel} pain
                                 </p>
                                 <Badge
                                   variant="outline"
-                                  className={`border-none text-[10px] px-2 py-0.5 font-medium ${getPainColor(log.painLevel)}`}
+                                  className={`border-none text-[10px] px-2 py-0.5 font-medium ${getPainColor(log.painLevel)} capitalize`}
                                 >
                                   {log.painLevel}
                                 </Badge>
                               </div>
-                              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3">
-                                <Clock size={12} />
+                              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5 mb-2.5">
+                                <Clock size={11} />
                                 {new Date(log.occurredAt).toLocaleDateString(undefined, {
                                   month: 'short', day: 'numeric', year: 'numeric',
                                 })}
-                                <span>·</span>
+                                <span className="opacity-60">·</span>
                                 {new Date(log.occurredAt).toLocaleTimeString(undefined, {
                                   hour: 'numeric', minute: '2-digit',
                                 })}
                               </div>
 
                               {log.painLocations && log.painLocations.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mb-1.5">
+                                <div className="flex flex-wrap gap-1 mb-2">
                                   {log.painLocations.slice(0, 4).map((loc: string) => (
                                     <span
                                       key={loc}
-                                      className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-foreground/80"
+                                      className="text-[10.5px] px-2 py-0.5 rounded-full bg-muted/70 text-foreground/80 font-medium"
                                     >
                                       {loc}
                                     </span>
                                   ))}
                                   {log.painLocations.length > 4 && (
-                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                    <span className="text-[10.5px] px-2 py-0.5 rounded-full bg-muted/70 text-muted-foreground">
                                       +{log.painLocations.length - 4}
                                     </span>
                                   )}
@@ -834,22 +850,21 @@ export default function Crisis() {
                               )}
 
                               {log.triggers && log.triggers.length > 0 && (
-                                <p className="text-[11px] text-muted-foreground">
-                                  <span className="font-medium text-foreground/80">Triggers: </span>
+                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                  <span className="font-semibold text-foreground/75">Triggers · </span>
                                   {log.triggers.join(", ")}
                                 </p>
                               )}
 
                               {log.hospitalVisit && (
-                                <div className="flex gap-1.5 items-center text-accent mt-2.5 font-semibold text-xs bg-accent/10 px-2 py-1 rounded-lg w-fit">
-                                  <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="14" height="14" active />
+                                <div className="flex gap-1.5 items-center text-accent mt-2.5 font-semibold text-[11px] bg-accent/10 px-2 py-1 rounded-lg w-fit">
+                                  <HealthIcon outline={AccidentOutline} filled={AccidentFilled} width="13" height="13" active />
                                   Hospital visit required
                                 </div>
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
