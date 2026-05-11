@@ -16,6 +16,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   if (user) {
     setTimeout(() => setLocation("/dashboard"), 0);
@@ -42,12 +43,24 @@ export default function Signup() {
       toast({ title: "Couldn't create account", description: error, variant: "destructive" });
       return;
     }
-    setLocation("/onboarding?step=1");
+    setSentTo(email);
   };
 
   return (
     <div className="min-h-[100dvh] w-full bg-secondary flex justify-center">
       <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col p-6 pt-16">
+        {sentTo ? (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex-1 flex flex-col justify-center text-center">
+            <h1 className="font-serif text-[28px] text-primary font-semibold tracking-[-0.5px]">Check your inbox</h1>
+            <p className="mt-3 text-sm text-muted-foreground">
+              We've sent a verification link to <span className="font-medium text-foreground">{sentTo}</span>. Click it to confirm your email and finish setting up your account.
+            </p>
+            <p className="mt-6 text-xs text-muted-foreground">Didn't get it? Check your spam folder, or try again in a moment.</p>
+            <Button variant="outline" size="xl" className="w-full mt-8" onClick={() => setSentTo(null)}>
+              Use a different email
+            </Button>
+          </motion.div>
+        ) : (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex-1 flex flex-col justify-center">
           <h1 className="font-serif text-[28px] text-primary font-semibold tracking-[-0.5px] text-center">Create your account</h1>
           <p className="mt-2 text-sm text-muted-foreground text-center">Start tracking care for you and your loved ones.</p>
@@ -82,6 +95,7 @@ export default function Signup() {
             <Link href="/privacy" className="underline">Privacy Policy</Link>.
           </p>
         </motion.div>
+        )}
 
         <p className="text-sm text-center text-muted-foreground pb-4">
           Already have an account?{" "}
