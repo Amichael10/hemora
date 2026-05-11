@@ -50,6 +50,8 @@ import {
   HeartPulseLinear as HeartCardiogramOutline,
   DangerTriangleLinear as AccidentOutline,
   HeartPulse2Linear as HeartbeatOutline,
+  PillBold as PillFilled,
+  WaterdropBold as WaterDropFilled,
 } from "solar-icon-set";
 
 type Step = "entry" | "pain" | "location" | "triggers" | "relief" | "hospital" | "success" | "history";
