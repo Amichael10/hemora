@@ -15,7 +15,7 @@ export const subscribeToPush = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SubscriptionSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("push_subscriptions").upsert(
+    const { error } = await (supabase as any).from("push_subscriptions").upsert(
       {
         user_id: userId,
         endpoint: data.endpoint,
@@ -37,7 +37,7 @@ export const unsubscribeFromPush = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("push_subscriptions")
       .delete()
       .eq("user_id", userId)
@@ -70,7 +70,7 @@ export const getNotificationPrefs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("profiles")
       .select(
         "notify_med_reminders, notify_daily_summary, notify_crisis_followups, notify_product_updates"
@@ -79,7 +79,7 @@ export const getNotificationPrefs = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw error;
     return (
-      data ?? {
+      (data as any) ?? {
         notify_med_reminders: true,
         notify_daily_summary: false,
         notify_crisis_followups: true,
@@ -93,7 +93,7 @@ export const updateNotificationPrefs = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => PrefsSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("profiles").update(data).eq("user_id", userId);
+    const { error } = await (supabase as any).from("profiles").update(data).eq("user_id", userId);
     if (error) throw error;
     return { ok: true };
   });

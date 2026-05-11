@@ -33,7 +33,7 @@ type SubscriptionRow = {
 
 export async function sendPushToUser(userId: string, payload: PushPayload): Promise<{ sent: number; removed: number }> {
   ensureConfigured();
-  const { data: subs, error } = await supabaseAdmin
+  const { data: subs, error } = await (supabaseAdmin as any)
     .from("push_subscriptions")
     .select("id, endpoint, p256dh, auth")
     .eq("user_id", userId);
@@ -59,7 +59,7 @@ export async function sendToSubscriptions(subs: SubscriptionRow[], payload: Push
         const status = err?.statusCode;
         if (status === 404 || status === 410) {
           // Subscription expired — clean up
-          await supabaseAdmin.from("push_subscriptions").delete().eq("id", sub.id);
+          await (supabaseAdmin as any).from("push_subscriptions").delete().eq("id", sub.id);
           removed++;
         } else {
           console.error("[push] send failed", { id: sub.id, status, message: err?.message });
