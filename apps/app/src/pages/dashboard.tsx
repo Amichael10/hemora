@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
+import genotype3d from "@/assets/tools/genotype-3d.png";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -311,45 +312,67 @@ export default function Dashboard() {
             </motion.button>
           )}
 
-          {/* Personalised tools by setupFor */}
-          <motion.section variants={itemVariants} className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setLocation("/genotype-checker")}
-              className="text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors"
-            >
-              <p className="text-[13px] font-semibold">Genotype checker</p>
-              <p className="text-[11px] text-muted-foreground mt-1">See pregnancy outcomes for any pairing.</p>
-            </button>
-            {profile?.setupFor === "my_child" ? (
-              <button
-                onClick={() => setLocation("/school-letter")}
-                className="text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors"
-              >
-                <p className="text-[13px] font-semibold">School letter</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Request accommodations for your child.</p>
-              </button>
-            ) : (
-              <button
-                onClick={() => setLocation("/family")}
-                className="text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors"
-              >
-                <p className="text-[13px] font-semibold">Family tree</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Add relatives and check shared risk.</p>
-              </button>
-            )}
-          </motion.section>
-
-          <motion.section variants={itemVariants}>
-            <button
-              onClick={() => setLocation("/resources")}
-              className="w-full text-left rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 transition-colors flex items-center justify-between gap-3"
-            >
-              <div>
-                <p className="text-[13px] font-semibold">Resources Library</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Trusted reads on SCD, treatment, and daily life.</p>
-              </div>
-              <ArrowRight size={14} />
-            </button>
+          {/* Personalised tools — horizontal slider */}
+          <motion.section variants={itemVariants} className="-mx-5">
+            <div className="flex items-end justify-between px-5 mb-3">
+              <p className="eyebrow">Tools for you</p>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 px-5 snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {(() => {
+                const cards = [
+                  {
+                    href: "/genotype-checker",
+                    title: "Genotype checker",
+                    desc: "See pregnancy outcomes for any pairing.",
+                    image: genotype3d,
+                    bg: "linear-gradient(160deg, #f5ead6 0%, #ecd9b8 100%)",
+                    text: "#3a2a1f",
+                  },
+                  profile?.setupFor === "my_child"
+                    ? {
+                        href: "/school-letter",
+                        title: "School letter",
+                        desc: "Request accommodations for your child.",
+                        bg: "linear-gradient(160deg, #e7efe6 0%, #c9dccb 100%)",
+                        text: "#1f2b22",
+                      }
+                    : {
+                        href: "/family",
+                        title: "Family tree",
+                        desc: "Add relatives and check shared risk.",
+                        bg: "linear-gradient(160deg, #e7efe6 0%, #c9dccb 100%)",
+                        text: "#1f2b22",
+                      },
+                  {
+                    href: "/resources",
+                    title: "Resources Library",
+                    desc: "Trusted reads on SCD, treatment, and daily life.",
+                    bg: "linear-gradient(160deg, #f3e3e3 0%, #e6c5c8 100%)",
+                    text: "#3a1f25",
+                  },
+                ];
+                return cards.map((c) => (
+                  <button
+                    key={c.href}
+                    onClick={() => setLocation(c.href)}
+                    className="snap-start shrink-0 w-[210px] h-[230px] rounded-3xl p-4 text-left flex flex-col justify-between relative overflow-hidden shadow-[0_10px_28px_-18px_rgba(15,40,55,0.25)] active:scale-[0.98] transition-transform border border-black/5"
+                    style={{ background: c.bg, color: c.text }}
+                  >
+                    <div className="h-[120px] flex items-center justify-center">
+                      {c.image ? (
+                        <img src={c.image} alt="" className="h-full w-full object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.12)]" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-2xl bg-white/40 backdrop-blur-sm" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-serif font-semibold text-[16px] tracking-[-0.3px] leading-tight">{c.title}</p>
+                      <p className="text-[11.5px] mt-1 opacity-75 leading-snug">{c.desc}</p>
+                    </div>
+                  </button>
+                ));
+              })()}
+            </div>
           </motion.section>
 
           {/* Next dose */}
