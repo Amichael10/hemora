@@ -54,7 +54,7 @@ import {
   WaterdropBold as WaterDropFilled,
 } from "solar-icon-set";
 
-type Step = "entry" | "pain" | "location" | "triggers" | "relief" | "hospital" | "success" | "history";
+type Step = "pain" | "location" | "triggers" | "relief" | "hospital" | "success" | "history";
 
 function StepDots({
   current,
@@ -179,29 +179,6 @@ export default function Crisis() {
     <MobileAppShell hideNav={flowStepHideNav}>
       <div className={`min-h-full flex flex-col ${flowStepHideNav ? "" : "pb-8"}`}>
         <AnimatePresence mode="wait">
-
-          {step === "entry" && (
-            <motion.div key="entry" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col flex-1 p-6 items-center justify-center text-center min-h-[70vh] relative">
-              <button
-                onClick={() => setStep("history")}
-                aria-label="Back"
-                className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-foreground bg-secondary hover:bg-secondary/80 transition-colors"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <div className="w-20 h-20 bg-accent/10 text-accent rounded-2xl flex items-center justify-center mb-8 shadow-sm">
-                <HealthIcon outline={HeartCardiogramOutline} filled={HeartCardiogramFilled} width="40" height="40" />
-              </div>
-              <h1 className="h-display text-primary mb-3">
-                You're doing your best.<br />We're here with you.
-              </h1>
-              <p className="body-md mb-12">Log what you're feeling so we can help you track patterns.</p>
-              <div className="w-full space-y-3">
-                <Button size="xl" className="w-full" onClick={() => setStep("pain")} data-testid="btn-start-log">Start log</Button>
-                <Button size="xl" variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/5" onClick={() => setLocation("/emergency")} data-testid="btn-urgent-care">Need urgent care?</Button>
-              </div>
-            </motion.div>
-          )}
 
           {step === "pain" && (() => {
             const PAIN_FACES = [
