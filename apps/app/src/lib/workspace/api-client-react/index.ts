@@ -160,10 +160,24 @@ export const useListProviders = (args: any, opts?: any) => {
       if (args?.country) q = q.eq("country", args.country);
       if (args?.state) q = q.eq("state", args.state);
       if (args?.type) q = q.eq("type", args.type);
-      if (args?.saved) q = q.eq("saved", true);
+      const { data: userRes } = await supabase.auth.getUser();
+      const uid = userRes?.user?.id ?? null;
+      let savedIds = new Set<string>();
+      if (uid) {
+        const { data: savedRows } = await supabase
+          .from("saved_providers")
+          .select("provider_id")
+          .eq("user_id", uid);
+        savedIds = new Set((savedRows ?? []).map((r: any) => r.provider_id));
+      }
       const { data, error } = await q;
       if (error) throw new ApiError(error.message);
-      return (data ?? []).map(mapProvider);
+      let rows = (data ?? []).map((r: any) => ({
+        ...mapProvider(r),
+        saved: savedIds.has(r.id),
+      }));
+      if (args?.saved) rows = rows.filter((r: any) => r.saved);
+      return rows;
     },
   }) as UseQueryResult<any[], Error>;
 };
@@ -191,7 +205,20 @@ export const useGetProvider = (id?: any, opts?: any) => {
       const { data, error } = await (supabase.from("providers") as any)
         .select("*").eq("id", id).maybeSingle();
       if (error) throw new ApiError(error.message);
-      return data ? mapProvider(data) : null;
+      if (!data) return null;
+      const { data: userRes } = await supabase.auth.getUser();
+      const uid = userRes?.user?.id ?? null;
+      let isSaved = false;
+      if (uid) {
+        const { data: savedRow } = await supabase
+          .from("saved_providers")
+          .select("id")
+          .eq("user_id", uid)
+          .eq("provider_id", id)
+          .maybeSingle();
+        isSaved = !!savedRow;
+      }
+      return { ...mapProvider(data), saved: isSaved };
     },
   }) as UseQueryResult<any, Error>;
 };
@@ -382,6 +409,30 @@ export const useUpdateProvider = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, data }: any) => {
+      // "saved" is per-user — routed through the saved_providers join table
+      if (Object.prototype.hasOwnProperty.call(data, "saved")) {
+        const user_id = await getUserId();
+        if (data.saved) {
+          const { error } = await supabase
+            .from("saved_providers")
+            .upsert({ user_id, provider_id: id }, { onConflict: "user_id,provider_id" });
+          if (error) throw new ApiError(error.message);
+        } else {
+          const { error } = await supabase
+            .from("saved_providers")
+            .delete()
+            .eq("user_id", user_id)
+            .eq("provider_id", id);
+          if (error) throw new ApiError(error.message);
+        }
+        const { saved: _omit, ...rest } = data;
+        if (Object.keys(rest).length === 0) {
+          qc.invalidateQueries({ queryKey: ["providers"] });
+          qc.invalidateQueries({ queryKey: ["provider", id] });
+          return { id, saved: !!data.saved };
+        }
+        data = rest;
+      }
       const patch: any = {};
       for (const [k, v] of Object.entries(data)) {
         const key = k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
