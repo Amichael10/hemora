@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { ClockCircleLinear as Clock, CheckCircleBold as Check, AddCircleLinear as Plus, AltArrowLeftLinear as ChevronLeft } from "solar-icon-set";
-import { ChartSquareLinear as Chart, ShareLinear as ShareIcon, ShieldCheckLinear as ShieldCheck, PillLinear as Pill, WaterdropLinear as Waterdrop, MedicalKitLinear as MedicalKit, AltArrowRightLinear as ChevronRight } from "solar-icon-set";
+import { ChartSquareLinear as Chart, ShareLinear as ShareIcon, ShieldCheckLinear as ShieldCheck, PillLinear as Pill, TeaCupLinear as TeaCup, HospitalLinear as Hospital, AltArrowRightLinear as ChevronRight } from "solar-icon-set";
 import Lottie from "lottie-react";
 import crisisMug from "@/assets/images/crisis-mug.png";
 import emojiMild from "@/assets/images/emoji-mild.png";
