@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.schedule_crisis_followup() FROM PUBLIC, anon, authenticated;
