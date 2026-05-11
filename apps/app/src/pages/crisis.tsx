@@ -618,7 +618,7 @@ export default function Crisis() {
           {step === "history" && (
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
               {/* Header */}
-              <div className="flex items-start justify-between mb-1">
+              <div className="p-4 flex items-center justify-between my-[6px]">
                 <div>
                   <h1 className="h-page">Crisis</h1>
                   <p className="text-sm text-muted-foreground mt-1">You're not alone. We're here to help.</p>
