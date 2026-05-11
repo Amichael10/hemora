@@ -355,19 +355,19 @@ export default function Dashboard() {
                   <button
                     key={c.href}
                     onClick={() => setLocation(c.href)}
-                    className="snap-start shrink-0 w-[210px] h-[230px] rounded-3xl p-4 text-left flex flex-col justify-between relative overflow-hidden shadow-[0_10px_28px_-18px_rgba(15,40,55,0.25)] active:scale-[0.98] transition-transform border border-black/5"
+                    className="snap-start shrink-0 w-[88%] max-w-[420px] h-[160px] rounded-3xl pl-3 pr-5 text-left flex items-center gap-3 relative overflow-hidden shadow-[0_10px_28px_-18px_rgba(15,40,55,0.25)] active:scale-[0.98] transition-transform border border-black/5"
                     style={{ background: c.bg, color: c.text }}
                   >
-                    <div className="h-[120px] flex items-center justify-center">
+                    <div className="h-[140px] w-[140px] shrink-0 flex items-center justify-center">
                       {c.image ? (
-                        <img src={c.image} alt="" className="h-full w-full object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.12)]" />
+                        <img src={c.image} alt="" className="h-full w-full object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.15)]" />
                       ) : (
-                        <div className="w-16 h-16 rounded-2xl bg-white/40 backdrop-blur-sm" />
+                        <div className="w-20 h-20 rounded-2xl bg-white/40 backdrop-blur-sm" />
                       )}
                     </div>
-                    <div>
-                      <p className="font-serif font-semibold text-[16px] tracking-[-0.3px] leading-tight">{c.title}</p>
-                      <p className="text-[11.5px] mt-1 opacity-75 leading-snug">{c.desc}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-serif font-semibold text-[20px] tracking-[-0.4px] leading-tight">{c.title}</p>
+                      <p className="text-[13px] mt-2 opacity-75 leading-snug">{c.desc}</p>
                     </div>
                   </button>
                 ));
