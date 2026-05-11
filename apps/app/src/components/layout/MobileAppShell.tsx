@@ -32,7 +32,7 @@ export function MobileAppShell({ children, hideNav = false }: MobileAppShellProp
 
   return (
     <div className="min-h-[100dvh] w-full bg-secondary flex justify-center">
-      <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col relative shadow-xl overflow-hidden">
+      <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col relative shadow-xl">
         <main className={cn("flex-1", hideNav ? "" : "pb-20")}>
           {children}
         </main>
