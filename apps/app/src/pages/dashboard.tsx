@@ -343,6 +343,7 @@ export default function Dashboard() {
                         href: "/family",
                         title: "Family tree",
                         desc: "Add relatives and check shared risk.",
+                        image: family3d,
                         bg: "linear-gradient(160deg, #e7efe6 0%, #c9dccb 100%)",
                         text: "#1f2b22",
                       },
