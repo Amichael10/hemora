@@ -100,7 +100,7 @@ export default function Login() {
           )}
         </motion.div>
 
-        <p className="text-sm text-center text-muted-foreground pb-4">
+        <p className="text-sm text-center text-muted-foreground pb-4 py-[12px]">
           New here?{" "}
           <Link href="/signup" className="text-primary font-semibold">Create an account</Link>
         </p>
