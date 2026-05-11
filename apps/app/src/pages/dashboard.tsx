@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import genotype3d from "@/assets/tools/genotype-3d.png";
+import family3d from "@/assets/tools/family-3d.png";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -67,6 +68,8 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [markingTaken, setMarkingTaken] = useState<number | null>(null);
   const [hideStats, setHideStats] = useState(false);
+  const [activeTool, setActiveTool] = useState(0);
+  const toolsScrollerRef = useRef<HTMLDivElement | null>(null);
 
   const { data: profile, isLoading: loadingProfile } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
@@ -317,7 +320,24 @@ export default function Dashboard() {
             <div className="flex items-end justify-between px-5 mb-3">
               <p className="eyebrow">Tools for you</p>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 px-5 snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div
+              ref={toolsScrollerRef}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                const children = Array.from(el.children) as HTMLElement[];
+                if (!children.length) return;
+                const center = el.scrollLeft + el.clientWidth / 2;
+                let closest = 0;
+                let min = Infinity;
+                children.forEach((child, i) => {
+                  const c = child.offsetLeft + child.offsetWidth / 2;
+                  const d = Math.abs(c - center);
+                  if (d < min) { min = d; closest = i; }
+                });
+                if (closest !== activeTool) setActiveTool(closest);
+              }}
+              className="flex gap-3 overflow-x-auto pb-2 px-5 snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
               {(() => {
                 const cards = [
                   {
@@ -340,6 +360,7 @@ export default function Dashboard() {
                         href: "/family",
                         title: "Family tree",
                         desc: "Add relatives and check shared risk.",
+                        image: family3d,
                         bg: "linear-gradient(160deg, #e7efe6 0%, #c9dccb 100%)",
                         text: "#1f2b22",
                       },
@@ -372,6 +393,23 @@ export default function Dashboard() {
                   </button>
                 ));
               })()}
+            </div>
+            <div className="flex justify-center gap-1.5 mt-3 px-5">
+              {[0, 1, 2].map((i) => (
+                <button
+                  key={i}
+                  aria-label={`Go to tool ${i + 1}`}
+                  onClick={() => {
+                    const el = toolsScrollerRef.current;
+                    if (!el) return;
+                    const child = el.children[i] as HTMLElement | undefined;
+                    if (child) el.scrollTo({ left: child.offsetLeft - 20, behavior: "smooth" });
+                  }}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    activeTool === i ? "w-5 bg-primary" : "w-1.5 bg-border"
+                  }`}
+                />
+              ))}
             </div>
           </motion.section>
 
