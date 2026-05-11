@@ -68,6 +68,8 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [markingTaken, setMarkingTaken] = useState<number | null>(null);
   const [hideStats, setHideStats] = useState(false);
+  const [activeTool, setActiveTool] = useState(0);
+  const toolsScrollerRef = useRef<HTMLDivElement | null>(null);
 
   const { data: profile, isLoading: loadingProfile } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
