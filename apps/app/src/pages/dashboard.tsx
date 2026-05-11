@@ -432,10 +432,10 @@ export default function Dashboard() {
             </div>
           </motion.section>
 
-          {/* Next dose */}
+          {/* Today's schedule */}
           <motion.section variants={itemVariants}>
             <div className="flex items-end justify-between mb-3">
-              <p className="eyebrow">Next dose</p>
+              <p className="eyebrow">Today's schedule</p>
               <Link
                 href="/meds"
                 className="text-[12px] font-semibold text-primary inline-flex items-center gap-0.5 hover:underline"
@@ -443,54 +443,6 @@ export default function Dashboard() {
                 See all <ArrowRight size={12} />
               </Link>
             </div>
-
-            {loadingSummary ? (
-              <Skeleton className="h-24 w-full rounded-2xl" />
-            ) : nextMed ? (
-              <div className="rounded-2xl bg-card border border-border/60 p-4 flex items-center gap-4 shadow-[0_8px_24px_-16px_rgba(15,40,55,0.12)]">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Pill size={20} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 text-primary">
-                    <Clock size={12} />
-                    <span className="text-[11px] font-semibold tracking-wide">
-                      {formatTime(nextMed.reminderTime) || "Scheduled"}
-                    </span>
-                  </div>
-                  <p className="font-serif font-semibold text-[17px] leading-tight tracking-[-0.3px] mt-0.5 text-foreground truncate">
-                    {nextMed.name}
-                  </p>
-                  <p className="text-[12px] text-muted-foreground truncate">{nextMed.dose}</p>
-                </div>
-                <button
-                  onClick={() => handleMarkTaken(nextMed.id, nextMed.name)}
-                  disabled={markingTaken === nextMed.id || takenTodayIds.has(nextMed.id)}
-                  className="shrink-0 h-10 px-4 rounded-full bg-primary text-primary-foreground text-[12px] font-semibold shadow-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
-                  data-testid="btn-mark-taken"
-                >
-                  {takenTodayIds.has(nextMed.id) ? "Taken ✓" : markingTaken === nextMed.id ? "…" : "Take"}
-                </button>
-              </div>
-            ) : (
-              <div className="rounded-2xl bg-card border border-border/60 p-6 flex flex-col items-center gap-3 text-center">
-                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Pill size={20} />
-                </div>
-                <p className="text-sm font-medium text-foreground">No medications scheduled</p>
-                <Link
-                  href="/meds"
-                  className="h-9 px-4 rounded-full bg-primary text-primary-foreground text-[13px] font-semibold inline-flex items-center"
-                >
-                  Add medication
-                </Link>
-              </div>
-            )}
-          </motion.section>
-
-          {/* Today's schedule */}
-          <motion.section variants={itemVariants}>
-            <p className="eyebrow mb-3">Today's schedule</p>
             {loadingMeds ? (
               <div className="space-y-3">
                 <Skeleton className="h-16 w-full rounded-2xl" />
