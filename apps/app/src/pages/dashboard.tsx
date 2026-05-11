@@ -1,9 +1,10 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import genotype3d from "@/assets/tools/genotype-3d.png";
 import family3d from "@/assets/tools/family-3d.png";
+import directory3d from "@/assets/tools/directory-3d.png";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -70,6 +71,21 @@ export default function Dashboard() {
   const [hideStats, setHideStats] = useState(false);
   const [activeTool, setActiveTool] = useState(0);
   const toolsScrollerRef = useRef<HTMLDivElement | null>(null);
+  const userInteractedToolsRef = useRef(false);
+
+  // Auto-advance the tools slider every 15s (pauses after user interaction)
+  useEffect(() => {
+    const id = setInterval(() => {
+      const el = toolsScrollerRef.current;
+      if (!el || userInteractedToolsRef.current) return;
+      const children = el.children as HTMLCollectionOf<HTMLElement>;
+      if (!children.length) return;
+      const next = (activeTool + 1) % children.length;
+      const child = children[next];
+      if (child) el.scrollTo({ left: child.offsetLeft - 20, behavior: "smooth" });
+    }, 15000);
+    return () => clearInterval(id);
+  }, [activeTool]);
 
   const { data: profile, isLoading: loadingProfile } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
@@ -322,6 +338,8 @@ export default function Dashboard() {
             </div>
             <div
               ref={toolsScrollerRef}
+              onPointerDown={() => { userInteractedToolsRef.current = true; }}
+              onTouchStart={() => { userInteractedToolsRef.current = true; }}
               onScroll={(e) => {
                 const el = e.currentTarget;
                 const children = Array.from(el.children) as HTMLElement[];
@@ -365,9 +383,10 @@ export default function Dashboard() {
                         text: "#1f2b22",
                       },
                   {
-                    href: "/resources",
-                    title: "Resources Library",
-                    desc: "Trusted reads on SCD, treatment, and daily life.",
+                    href: "/directory",
+                    title: "Directory",
+                    desc: "Find hospitals, clinics & SCD specialists near you.",
+                    image: directory3d,
                     bg: "linear-gradient(160deg, #f3e3e3 0%, #e6c5c8 100%)",
                     text: "#3a1f25",
                   },
