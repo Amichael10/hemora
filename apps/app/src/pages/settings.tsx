@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useGetProfile } from "@workspace/api-client-react";
 import {
   UserLinear as UserIcon,
@@ -21,6 +22,7 @@ import {
   BookLinear as BookIcon,
   HeartPulseLinear as AmbulanceIcon,
   ClipboardCheckLinear as ChecklistIcon,
+  SettingsLinear as AdminIcon,
 } from "solar-icon-set";
 
 function getInitials(name?: string | null) {
@@ -52,6 +54,7 @@ export default function Settings() {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
   });
   const { toast } = useToast();
+  const { isAdmin } = useIsAdmin();
 
   const handleLogout = async () => {
     await signOut();
@@ -91,8 +94,15 @@ export default function Settings() {
           <Row icon={<ChecklistIcon size={16} />} label="Hospital checklist" href="/settings/hospital-checklist" />
           <Row icon={<BellIcon size={16} />} label="Notifications" href="/settings/notifications" />
           <Row icon={<BookIcon size={16} />} label="Resources Library" href="/resources" />
+          <Row icon={<BookIcon size={16} />} label="Blog" href="/blog" />
           <Row icon={<ShieldIcon size={16} />} label="Privacy" href="/privacy" />
         </Group>
+
+        {isAdmin && (
+          <Group>
+            <Row icon={<AdminIcon size={16} />} label="Admin dashboard" href="/admin" />
+          </Group>
+        )}
 
         <Group>
           <Row icon={<HelpIcon size={16} />} label="Help & support" href="/help" />
