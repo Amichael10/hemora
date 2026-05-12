@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "blog images public read" ON storage.objects;

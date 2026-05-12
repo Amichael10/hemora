@@ -44,6 +44,9 @@ const SchoolLetter = lazy(() => import("@/pages/school-letter"));
 const Resources = lazy(() => import("@/pages/resources"));
 const ResourceDetail = lazy(() => import("@/pages/resource-detail"));
 const Brand = lazy(() => import("@/pages/brand"));
+const Admin = lazy(() => import("@/pages/admin"));
+const BlogIndex = lazy(() => import("@/pages/blog"));
+const BlogPost = lazy(() => import("@/pages/blog-post"));
 
 // Helper for Info pages
 const About = lazy(() => import("@/pages/info").then(m => ({ default: m.About })));
@@ -119,6 +122,9 @@ function Routes() {
         <Route path="/resources" component={Resources} />
         <Route path="/resources/:id" component={ResourceDetail} />
         <Route path="/brand" component={Brand} />
+        <Route path="/admin" component={protect(Admin)} />
+        <Route path="/blog" component={BlogIndex} />
+        <Route path="/blog/:slug" component={BlogPost} />
         <Route path="/help" component={Help} />
         <Route path="/about" component={About} />
         <Route path="/privacy" component={Privacy} />
