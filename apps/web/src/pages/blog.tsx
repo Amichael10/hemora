@@ -1,90 +1,56 @@
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import hemoraLogo from "@/assets/brand/Logo.png";
-import { BookBold as BookIcon, ArrowRightLinear as ArrowRight } from "solar-icon-set";
+import { useEffect, useState } from "react";
+import { Link } from "wouter";
+import { MobileAppShell } from "@/components/layout/MobileAppShell";
+import { SubPageHeader } from "@/components/layout/SubPageHeader";
+import { supabase } from "@/integrations/supabase/client";
 
-function Nav() {
-  const [, setLocation] = useLocation();
+type Post = { id: string; slug: string; title: string; excerpt: string | null; cover_url: string | null; published_at: string | null };
+
+export default function BlogIndex() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("id, slug, title, excerpt, cover_url, published_at")
+        .eq("status", "published")
+        .order("published_at", { ascending: false });
+      setPosts((data as Post[]) || []);
+      setLoading(false);
+    })();
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background/80 border-b border-border">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 h-16 flex items-center justify-between border-x border-border">
-        <button onClick={() => setLocation("/")} className="flex items-center gap-2">
-          <img src={hemoraLogo} alt="Hemora" className="w-8 h-8" />
-          <span className="font-serif text-xl text-secondary">Hemora</span>
-        </button>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-          <a href="/" className="hover:text-foreground transition">Home</a>
-          <a href="/blog" className="text-foreground transition">Blog</a>
-          <a href="https://app.hemora.xyz/resources" className="hover:text-foreground transition">Resources</a>
-        </nav>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild><a href="https://app.hemora.xyz/login">Sign in</a></Button>
-          <Button size="sm" asChild><a href="https://app.hemora.xyz/signup">Get started</a></Button>
-        </div>
+    <MobileAppShell hideNav>
+      <SubPageHeader title="Blog" back="/dashboard" />
+      <div className="px-5 pb-10 space-y-3">
+        {loading ? (
+          <p className="text-sm text-muted-foreground text-center py-8">Loading…</p>
+        ) : !posts.length ? (
+          <p className="text-sm text-muted-foreground text-center py-8">No posts yet.</p>
+        ) : (
+          posts.map((p) => (
+            <Link key={p.id} href={`/blog/${p.slug}`}>
+              <div className="bg-card rounded-2xl border border-border/60 overflow-hidden hover:bg-muted/40 transition-colors">
+                {p.cover_url && (
+                  <img src={p.cover_url} alt={p.title} className="w-full h-40 object-cover" loading="lazy" />
+                )}
+                <div className="p-4">
+                  <h2 className="font-serif font-semibold text-base text-foreground">{p.title}</h2>
+                  {p.excerpt && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{p.excerpt}</p>}
+                  {p.published_at && (
+                    <p className="text-[11px] text-muted-foreground mt-2">
+                      {new Date(p.published_at).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
       </div>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="bg-secondary text-secondary-foreground">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 py-10 text-sm border-x border-white/10 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <img src={hemoraLogo} alt="Hemora" className="w-7 h-7" />
-          <span className="font-serif text-lg">Hemora</span>
-        </div>
-        <div className="flex flex-wrap gap-5 text-secondary-foreground/80">
-          <a href="/" className="hover:text-accent">Home</a>
-          <a href="/about" className="hover:text-accent">About</a>
-          <a href="/blog" className="hover:text-accent">Blog</a>
-          <a href="/privacy" className="hover:text-accent">Privacy</a>
-          <a href="/terms" className="hover:text-accent">Terms</a>
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60">
-          © {new Date().getFullYear()} Hemora. All rights reserved.
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-export default function Blog() {
-  return (
-    <div className="min-h-[100dvh] w-full bg-background text-foreground antialiased">
-      <Nav />
-      <main className="mx-auto max-w-7xl px-6 sm:px-10 border-x border-border">
-        <section className="py-20 lg:py-28 max-w-2xl">
-          <div className="text-xs uppercase tracking-[0.18em] text-accent font-semibold">Hemora Blog</div>
-          <h1 className="mt-3 font-serif text-4xl sm:text-5xl lg:text-6xl text-secondary leading-tight tracking-[-0.02em]">
-            Stories & insights,<br />
-            <span className="italic text-muted-foreground">written with care.</span>
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            Family stories, plain-language care guides, and clear explainers on living
-            well with sickle cell. We're putting the first pieces together — check back soon.
-          </p>
-
-          <div className="mt-10 rounded-3xl border border-border bg-card p-8 sm:p-10 flex flex-col items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary grid place-items-center">
-              <BookIcon size={22} />
-            </div>
-            <div>
-              <h2 className="font-serif text-2xl text-secondary">No posts yet</h2>
-              <p className="mt-2 text-sm text-muted-foreground max-w-md">
-                Our first articles are on the way. In the meantime, explore the Resources
-                Library for curated reads on sickle cell care.
-              </p>
-            </div>
-            <Button asChild size="lg" className="rounded-full mt-2">
-              <a href="https://app.hemora.xyz/resources">Browse Resources <ArrowRight size={16} /></a>
-            </Button>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+    </MobileAppShell>
   );
 }
