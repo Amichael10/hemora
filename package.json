@@ -5,9 +5,16 @@
     "dev": "pnpm --filter @hemora/app dev",
     "build": "pnpm --filter @hemora/app build"
   },
-  "overrides": {
-    "@tanstack/react-query": "5.100.9",
-    "@tanstack/query-core": "5.100.9"
+  "pnpm": {
+    "overrides": {
+      "@tanstack/react-query": "5.100.9",
+      "@tanstack/query-core": "5.100.9",
+      "@tanstack/react-router": "1.166.8",
+      "@tanstack/react-start": "1.166.18",
+      "@tanstack/router-plugin": "1.166.14",
+      "@tanstack/router-generator": "1.166.13",
+      "@tanstack/start-plugin-core": "1.167.2"
+    }
   },
   "engines": {
     "node": ">=22.12.0"

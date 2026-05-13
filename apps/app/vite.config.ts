@@ -1,39 +1,31 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-// Load all (non VITE_-prefixed) env vars into process.env for server routes
-// (e.g. SUPABASE_SERVICE_ROLE_KEY, HEMORA_API_KEY). Do NOT expose via define.
-const serverEnv = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "");
-Object.assign(process.env, serverEnv);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
-    tanstackStart({
-      server: { entry: "src/server.ts" },
-    }),
-    react(),
+    tanstackStart(),
     tsconfigPaths(),
     tailwindcss(),
   ],
-  build: {
-    chunkSizeWarningLimit: 1000,
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@assets": path.resolve(__dirname, "src/lib/workspace/assets"),
-      "@workspace/regions": path.resolve(__dirname, "src/lib/workspace/regions/index.ts"),
-      "@workspace/api-client-react": path.resolve(__dirname, "src/lib/workspace/api-client-react/index.ts"),
+      "@workspace/regions": path.resolve(
+        __dirname,
+        "src/lib/workspace/regions/index.ts"
+      ),
+      "@workspace/api-client-react": path.resolve(
+        __dirname,
+        "src/lib/workspace/api-client-react/index.ts"
+      ),
     },
-  },
-  optimizeDeps: {
-    include: ["@tanstack/query-core"],
-  },
-  ssr: {
-    noExternal: ["entities", "@tanstack/query-core"],
   },
 });
