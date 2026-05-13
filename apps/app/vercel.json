@@ -1,24 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "pnpm --filter @hemora/app build",
-  "outputDirectory": "apps/app/dist/client",
-  "functions": {
-    "apps/app/dist/server/server.js": {
-      "runtime": "nodejs22.x"
-    }
-  },
-  "routes": [
-    {
-      "src": "/_build/(.*)",
-      "dest": "/apps/app/dist/client/_build/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|webmanifest|webp))",
-      "dest": "/apps/app/dist/client/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/apps/app/dist/server/server.js"
-    }
-  ]
+  "framework": null,
+  "buildCommand": "vite build && node scripts/build-vercel.js",
+  "outputDirectory": ".vercel/output",
+  "installCommand": "pnpm install --frozen-lockfile"
 }
