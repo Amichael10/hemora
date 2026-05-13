@@ -72,9 +72,8 @@ single source of truth.
 - `apps/web` is the marketing surface. Vercel's preview deployments per PR
   and zero-config domain wiring are nicer for marketing iteration.
 
-## Editing workflow in Lovable
+## Editing workflow
 
-- Marketing changes → prompt in this Lovable project, edits land in `apps/web/`.
-- App changes → prompt in this Lovable project, edits land in `apps/app/`.
-- Be explicit in your prompt about which app you mean (e.g. "on the landing
-  page hero…" vs "on the dashboard…") so the agent edits the right tree.
+- Marketing changes → edits land in `apps/web/`.
+- App changes → edits land in `apps/app/`.
+- Be explicit in your prompt about which app you mean (e.g. "on the landing page hero…" vs "on the dashboard…") so the correct tree is edited.

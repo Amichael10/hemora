@@ -2,8 +2,8 @@
   "name": "hemora-monorepo",
   "private": true,
   "scripts": {
-    "dev": "cd apps/app && bun run dev",
-    "build": "cd apps/app && bun run build && cd ../.. && rm -rf dist && ln -s apps/app/dist dist"
+    "dev": "pnpm --filter @hemora/app dev",
+    "build": "pnpm --filter @hemora/app build"
   },
   "overrides": {
     "@tanstack/react-query": "5.100.9",
@@ -13,18 +13,21 @@
     "node": ">=22.12.0"
   },
   "optionalDependencies": {
-    "@tailwindcss/oxide-linux-x64-gnu": "4.2.4",
-    "@tailwindcss/oxide-linux-x64-musl": "4.2.4",
-    "@tailwindcss/oxide-linux-arm64-gnu": "4.2.4",
-    "@tailwindcss/oxide-linux-arm64-musl": "4.2.4",
-    "@esbuild/linux-x64": "0.25.12",
     "@esbuild/linux-arm64": "0.25.12",
+    "@esbuild/linux-x64": "0.25.12",
     "@rollup/rollup-linux-x64-gnu": "4.24.0",
     "@rollup/rollup-linux-x64-musl": "4.24.0",
+    "@tailwindcss/oxide-linux-arm64-gnu": "4.2.4",
+    "@tailwindcss/oxide-linux-arm64-musl": "4.2.4",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.2.4",
+    "@tailwindcss/oxide-linux-x64-musl": "4.2.4",
     "lightningcss-linux-x64-gnu": "1.32.0",
     "lightningcss-linux-x64-musl": "1.32.0"
   },
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4"
+  }
 }

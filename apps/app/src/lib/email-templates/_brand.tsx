@@ -10,151 +10,268 @@ import {
   Section,
   Text,
   Img,
+  Link,
 } from '@react-email/components'
 
-// Hemora brand tokens (mirrors src/kindred-theme.css)
+// Hemora brand tokens
 export const brand = {
-  cream: '#f4ead8',
-  creamSoft: '#faf3e3',
-  teal: '#193b3f', // deep teal heading color
-  tealSoft: '#2c5a5f',
-  gold: '#c9a35a',
-  red: '#a8324a',
-  redHover: '#8c2a3d',
-  ink: '#2a2a2a',
-  muted: '#6b6256',
+  cream: '#F7EEDC',
+  creamLight: '#FFF8EC',
+  deepTeal: '#073F42',
+  tealSoft: '#DCEDEA',
+  oxblood: '#9B1E34',
+  oxbloodDark: '#781528',
+  gold: '#C59A45',
+  ink: '#132C2E',
+  muted: '#6B706D',
+  card: '#FFFDF7',
+  border: '#E7D9BD',
+  success: '#2F7D62',
 }
-
-// Absolute URL for the Hemora wordmark used inside emails.
-// Email clients require absolute URLs for images.
-export const HEMORA_WORDMARK_URL =
-  'https://hemora.xyz/email/hemora-wordmark.png'
 
 const main: React.CSSProperties = {
-  backgroundColor: '#ffffff',
-  fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+  backgroundColor: '#EFE4D1',
+  fontFamily: "Arial, Helvetica, sans-serif",
   margin: 0,
-  padding: '32px 16px',
+  padding: '48px 0',
 }
 
-const container: React.CSSProperties = {
-  maxWidth: '560px',
+const shell: React.CSSProperties = {
+  maxWidth: '680px',
   margin: '0 auto',
-  backgroundColor: brand.cream,
-  borderRadius: '14px',
-  padding: '40px 36px',
-  border: `1px solid ${brand.gold}33`,
+  backgroundColor: brand.creamLight,
+  borderRadius: '32px',
+  overflow: 'hidden',
+  border: `1px solid ${brand.border}`,
 }
 
-const wordmark: React.CSSProperties = {
-  height: '34px',
-  width: 'auto',
-  display: 'block',
-  margin: 0,
+const header: React.CSSProperties = {
+  background: `linear-gradient(135deg, ${brand.creamLight} 0%, ${brand.cream} 100%)`,
+  padding: '36px 44px 28px',
+  borderBottom: `1px solid ${brand.border}`,
 }
 
-const goldRule: React.CSSProperties = {
-  border: 'none',
-  borderTop: `2px solid ${brand.gold}`,
-  width: '40px',
-  margin: '20px 0 24px',
+const brandRow: React.CSSProperties = {
+  marginBottom: '34px',
+}
+
+const brandLogo: React.CSSProperties = {
+  width: '42px',
+  height: '42px',
+  backgroundColor: brand.oxblood,
+  borderRadius: '10px',
+  display: 'inline-block',
+  verticalAlign: 'middle',
+}
+
+const brandName: React.CSSProperties = {
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontSize: '28px',
+  color: brand.deepTeal,
+  letterSpacing: '-0.02em',
+  fontWeight: 700,
+  margin: '0 0 0 14px',
+  display: 'inline-block',
+  verticalAlign: 'middle',
+}
+
+const eyebrow: React.CSSProperties = {
+  color: brand.oxblood,
+  fontSize: '13px',
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  fontWeight: 700,
+  marginBottom: '14px',
 }
 
 const heading: React.CSSProperties = {
-  fontFamily: "'Fraunces', Georgia, serif",
-  fontSize: '26px',
-  fontWeight: 600,
-  color: brand.teal,
-  letterSpacing: '-0.01em',
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontSize: '44px',
+  lineHeight: 1.05,
+  letterSpacing: '-0.04em',
+  color: brand.deepTeal,
+  margin: '0 0 16px',
+}
+
+const headerCopy: React.CSSProperties = {
+  fontSize: '18px',
+  color: brand.ink,
+  margin: 0,
+}
+
+const body: React.CSSProperties = {
+  padding: '40px 44px 34px',
+}
+
+const hello: React.CSSProperties = {
+  fontSize: '18px',
   margin: '0 0 14px',
-  lineHeight: 1.2,
+  color: brand.deepTeal,
+  fontWeight: 700,
 }
 
 const text: React.CSSProperties = {
-  fontSize: '15px',
+  fontSize: '16px',
   color: brand.ink,
-  lineHeight: 1.6,
+  lineHeight: 1.5,
   margin: '0 0 18px',
 }
 
-const muted: React.CSSProperties = {
+const otpCard: React.CSSProperties = {
+  backgroundColor: brand.deepTeal,
+  borderRadius: '24px',
+  padding: '26px 28px',
+  textAlign: 'center' as const,
+  margin: '28px 0',
+}
+
+const otpLabel: React.CSSProperties = {
   fontSize: '13px',
-  color: brand.muted,
-  lineHeight: 1.6,
-  margin: '28px 0 0',
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  color: '#E4C37C',
+  fontWeight: 700,
+  marginBottom: '10px',
+}
+
+const otpCode: React.CSSProperties = {
+  fontSize: '42px',
+  letterSpacing: '0.18em',
+  fontWeight: 800,
+  color: '#ffffff',
 }
 
 const buttonStyle: React.CSSProperties = {
   display: 'inline-block',
-  backgroundColor: brand.teal,
+  backgroundColor: brand.oxblood,
   color: '#ffffff',
-  fontSize: '15px',
-  fontWeight: 600,
-  borderRadius: '10px',
-  padding: '14px 26px',
+  borderRadius: '18px',
+  padding: '16px 26px',
+  fontWeight: 800,
+  fontSize: '16px',
   textDecoration: 'none',
-  margin: '6px 0 8px',
-}
-
-const link: React.CSSProperties = {
-  color: brand.red,
-  textDecoration: 'underline',
-}
-
-const footerWrap: React.CSSProperties = {
-  maxWidth: '560px',
-  margin: '20px auto 0',
-  padding: '0 8px',
   textAlign: 'center' as const,
 }
 
+const muted: React.CSSProperties = {
+  color: brand.muted,
+  fontSize: '14px',
+  marginTop: '18px',
+  marginBotom: '0',
+}
+
+const fallbackLink: React.CSSProperties = {
+  wordBreak: 'break-all',
+  color: brand.oxblood,
+  fontSize: '14px',
+  margin: '10px 0 0',
+}
+
+const footer: React.CSSProperties = {
+  padding: '26px 44px 36px',
+  backgroundColor: '#F2E5CF',
+  borderTop: `1px solid ${brand.border}`,
+}
+
+const footerBrand: React.CSSProperties = {
+  color: brand.deepTeal,
+  fontWeight: 800,
+  marginBottom: '8px',
+  fontSize: '13px',
+}
+
 const footerText: React.CSSProperties = {
-  fontSize: '12px',
-  color: '#9a9388',
+  fontSize: '13px',
+  color: brand.muted,
   lineHeight: 1.5,
   margin: 0,
 }
 
+const footerLink: React.CSSProperties = {
+  color: brand.oxblood,
+  textDecoration: 'none',
+  marginRight: '16px',
+  fontWeight: 700,
+  fontSize: '13px',
+}
+
 export const styles = {
   main,
-  container,
-  wordmark,
-  goldRule,
+  shell,
+  header,
+  brandRow,
+  brandLogo,
+  brandName,
+  eyebrow,
   heading,
+  headerCopy,
+  body,
+  hello,
   text,
-  muted,
+  otpCard,
+  otpLabel,
+  otpCode,
   button: buttonStyle,
-  link,
+  muted,
+  fallbackLink,
+  footer,
+  footerBrand,
+  footerText,
+  footerLink,
+  link: {
+    color: brand.oxblood,
+    textDecoration: 'underline',
+  },
 }
 
 interface BrandLayoutProps {
   preview: string
   siteName: string
+  eyebrow?: string
+  heading?: string
+  headerCopy?: string
   children: React.ReactNode
 }
 
-export const BrandLayout = ({ preview, siteName, children }: BrandLayoutProps) => (
+export const BrandLayout = ({ 
+  preview, 
+  siteName, 
+  eyebrow, 
+  heading, 
+  headerCopy, 
+  children 
+}: BrandLayoutProps) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>{preview}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Section>
-          <Img
-            src={HEMORA_WORDMARK_URL}
-            alt={siteName}
-            height={34}
-            style={wordmark}
-          />
-          <Hr style={goldRule} />
+    <Body style={styles.main}>
+      <Container style={styles.shell}>
+        <Section style={styles.header}>
+          <Section style={styles.brandRow}>
+            <Section style={styles.brandLogo} />
+            <Text style={styles.brandName}>{siteName}</Text>
+          </Section>
+          {eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}
+          {heading && <Heading style={styles.heading}>{heading}</Heading>}
+          {headerCopy && <Text style={styles.headerCopy}>{headerCopy}</Text>}
         </Section>
-        {children}
-      </Container>
-      <Container style={footerWrap}>
-        <Text style={footerText}>
-          Sent with care by {siteName} — your sickle cell companion.
-        </Text>
+        
+        <Section style={styles.body}>
+          {children}
+        </Section>
+
+        <Section style={styles.footer}>
+          <Text style={styles.footerBrand}>{siteName}</Text>
+          <Text style={styles.footerText}>
+            Built for families. Guided by care.
+          </Text>
+          <Section style={{ marginTop: '14px' }}>
+            <Link href="https://hemora.xyz" style={styles.footerLink}>hemora.xyz</Link>
+            <Link href="https://hemora.xyz/support" style={styles.footerLink}>Support</Link>
+            <Link href="https://hemora.xyz/privacy" style={styles.footerLink}>Privacy</Link>
+          </Section>
+        </Section>
       </Container>
     </Body>
   </Html>
-)
+)

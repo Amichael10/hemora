@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import kindredWordmark from "@assets/Wordmark_1778055009011.png";
+
 import botanical from "@/assets/images/botanical-illustration.png";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/context/ProfileContext";
@@ -82,8 +82,7 @@ export default function Onboarding() {
   const isDev =
     typeof window !== "undefined" &&
     (window.location.hostname === "localhost" ||
-      window.location.hostname.startsWith("127.") ||
-      window.location.hostname.endsWith(".lovable.app"));
+      window.location.hostname.startsWith("127."));
 
   // If user lands here already signed in, skip past auth.
   useEffect(() => {
@@ -243,7 +242,7 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col p-6 pt-16"
               >
                 <div className="flex justify-center mb-10">
-                  <img src={kindredWordmark} alt="Kindred" className="h-8" />
+                  <h1 className="font-serif text-[1.875rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">Hemora</h1>
                 </div>
 
                 <div className="flex-1 flex flex-col justify-center items-center text-center -mt-4">
@@ -382,7 +381,7 @@ export default function Onboarding() {
                 <div className="mb-8">
                   <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step One</p>
                   <h2 className="font-serif text-[1.625rem] text-primary font-semibold leading-[1.2] tracking-[-0.5px]">
-                    Who are you setting up Kindred for?
+                    Who are you setting up Hemora for?
                   </h2>
                 </div>
 
@@ -768,9 +767,9 @@ export default function Onboarding() {
                     onClick={handleFinish}
                     disabled={createProfile.isPending}
                     className="w-full h-14 rounded-2xl text-base font-semibold shadow-md gap-2"
-                    data-testid="btn-enter-kindred"
+                    data-testid="btn-enter-hemora"
                   >
-                    {createProfile.isPending ? "Setting up your space..." : "Enter Kindred"}
+                    {createProfile.isPending ? "Setting up your space..." : "Enter Hemora"}
                     {!createProfile.isPending && <ArrowRight size={16} />}
                   </Button>
                 </motion.div>

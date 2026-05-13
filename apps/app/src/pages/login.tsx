@@ -22,8 +22,7 @@ export default function Login() {
   const isDev =
     typeof window !== "undefined" &&
     (window.location.hostname === "localhost" ||
-      window.location.hostname.startsWith("127.") ||
-      window.location.hostname.endsWith(".lovable.app"));
+      window.location.hostname.startsWith("127."));
 
   if (user) {
     setTimeout(() => setLocation("/dashboard"), 0);
@@ -94,7 +93,7 @@ export default function Login() {
                 {redirectUrl}
               </p>
               <p className="text-[11px] text-muted-foreground mt-1">
-                Add this URL to Cloud → Users → URL Configuration → Additional Redirect URLs.
+                Add this URL to your Supabase Dashboard → Authentication → URL Configuration → Additional Redirect URLs.
               </p>
             </div>
           )}

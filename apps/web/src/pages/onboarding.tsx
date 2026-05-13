@@ -82,8 +82,7 @@ export default function Onboarding() {
   const isDev =
     typeof window !== "undefined" &&
     (window.location.hostname === "localhost" ||
-      window.location.hostname.startsWith("127.") ||
-      window.location.hostname.endsWith(".lovable.app"));
+      window.location.hostname.startsWith("127."));
 
   // If user lands here already signed in, skip past auth.
   useEffect(() => {
@@ -367,7 +366,7 @@ export default function Onboarding() {
                         {redirectUrl}
                       </p>
                       <p className="text-[11px] text-muted-foreground mt-1">
-                        Add this URL to the URI allow list below.
+                        Ensure this URL is added to your Supabase project's auth redirect allow-list.
                       </p>
                     </div>
                   )}

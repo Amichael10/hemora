@@ -76,40 +76,40 @@
 
   /* Protective Crescent — cream canvas, deep teal surfaces, gold accent,
      sickle red reserved for primary CTAs / urgent moments. */
-  --background: 38 56% 90%;        /* cream #f4ead8 */
-  --foreground: 186 35% 12%;       /* deep ink-teal */
-  --primary: 347 55% 43%;          /* sickle red #a8324a */
-  --primary-foreground: 42 65% 95%;
-  --secondary: 184 33% 18%;        /* deep teal */
-  --secondary-foreground: 42 65% 95%;
-  --muted: 38 40% 86%;
-  --muted-foreground: 184 18% 32%;
-  --accent: 36 50% 57%;            /* gold #c9a35a */
-  --accent-foreground: 184 33% 14%;
-  --destructive: 347 60% 40%;
-  --destructive-foreground: 42 65% 95%;
-  --card: 42 65% 95%;              /* cream-card #fbf5e7 */
-  --card-foreground: 186 35% 12%;
-  --card-border: 38 30% 80%;
-  --border: 38 30% 82%;
-  --input: 38 30% 82%;
-  --ring: 347 55% 43%;
+  --background: 39 68% 91%;        /* cream #F7EEDC */
+  --foreground: 183 81% 15%;       /* deep teal #073F42 */
+  --primary: 349 68% 36%;          /* oxblood #9B1E34 */
+  --primary-foreground: 39 68% 98%;
+  --secondary: 183 81% 15%;        /* deep teal */
+  --secondary-foreground: 39 68% 95%;
+  --muted: 39 30% 85%;
+  --muted-foreground: 183 40% 35%;
+  --accent: 40 52% 52%;            /* gold #C59A45 */
+  --accent-foreground: 183 81% 10%;
+  --destructive: 349 70% 30%;
+  --destructive-foreground: 39 68% 98%;
+  --card: 42 65% 95%;              /* cream-card */
+  --card-foreground: 183 81% 15%;
+  --card-border: 39 30% 80%;
+  --border: 39 30% 82%;
+  --input: 39 30% 82%;
+  --ring: 349 68% 36%;
   --popover: 42 65% 95%;
-  --popover-foreground: 186 35% 12%;
-  --popover-border: 38 30% 80%;
-  --sidebar: 184 33% 18%;
-  --sidebar-foreground: 42 65% 95%;
-  --sidebar-border: 184 30% 12%;
-  --sidebar-primary: 36 50% 57%;
-  --sidebar-primary-foreground: 184 33% 14%;
-  --sidebar-accent: 184 30% 24%;
-  --sidebar-accent-foreground: 42 65% 95%;
-  --sidebar-ring: 36 50% 57%;
-  --chart-1: 184 33% 22%;          /* teal */
-  --chart-2: 36 50% 57%;           /* gold */
-  --chart-3: 347 55% 43%;          /* red */
-  --chart-4: 184 25% 45%;
-  --chart-5: 38 40% 78%;
+  --popover-foreground: 183 81% 15%;
+  --popover-border: 39 30% 80%;
+  --sidebar: 183 81% 12%;
+  --sidebar-foreground: 39 68% 95%;
+  --sidebar-border: 183 80% 8%;
+  --sidebar-primary: 40 52% 52%;
+  --sidebar-primary-foreground: 183 81% 10%;
+  --sidebar-accent: 183 40% 20%;
+  --sidebar-accent-foreground: 39 68% 95%;
+  --sidebar-ring: 40 52% 52%;
+  --chart-1: 183 81% 15%;          /* teal */
+  --chart-2: 40 52% 52%;           /* gold */
+  --chart-3: 349 68% 36%;          /* oxblood */
+  --chart-4: 183 40% 40%;
+  --chart-5: 39 30% 75%;
 
   --app-font-sans: 'Inter', 'Red Hat Display', system-ui, sans-serif;
   --app-font-serif: 'Fraunces', 'Red Hat Display', Georgia, serif;

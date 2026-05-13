@@ -18,6 +18,7 @@ import {
 interface MobileAppShellProps {
   children: ReactNode;
   hideNav?: boolean;
+  fullWidth?: boolean;
 }
 
 const navItems = [
@@ -28,13 +29,19 @@ const navItems = [
   { label: "Directory", path: "/directory", Outline: CommunityOutline, Filled: CommunityFilled },
 ];
 
-export function MobileAppShell({ children, hideNav = false }: MobileAppShellProps) {
+export function MobileAppShell({ children, hideNav = false, fullWidth = false }: MobileAppShellProps) {
   const [location] = useLocation();
 
   return (
-    <div className="min-h-[100dvh] w-full bg-secondary flex justify-center">
-      <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col relative shadow-xl">
-        <main className={cn("flex-1", hideNav ? "" : "pb-20")}>
+    <div className={cn(
+      "min-h-[100dvh] w-full flex justify-center",
+      fullWidth ? "bg-background" : "bg-secondary"
+    )}>
+      <div className={cn(
+        "w-full bg-background min-h-[100dvh] flex flex-col relative",
+        fullWidth ? "max-w-none shadow-none" : "max-w-[430px] shadow-xl"
+      )}>
+        <main className={cn("flex-1", hideNav ? "" : "pb-20", fullWidth ? "w-full" : "")}>
           {children}
         </main>
 

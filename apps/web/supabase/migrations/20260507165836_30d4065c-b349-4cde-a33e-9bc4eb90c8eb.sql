@@ -1,3 +1,1 @@
-
-REVOKE EXECUTE ON FUNCTION public.has_role(uuid, app_role) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO authenticated;
+-- Migration consolidated into root supabase/migrations/20260501000000_initial_schema.sql

@@ -1,12 +1,9 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
-import { parseEmailWebhookPayload } from '@lovable.dev/email-js'
-import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
 import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
-import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
@@ -14,7 +11,6 @@ import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 const EMAIL_SUBJECTS: Record<string, string> = {
   signup: 'Confirm your email',
   invite: "You've been invited",
-  magiclink: 'Your login link',
   recovery: 'Reset your password',
   email_change: 'Confirm your new email',
   reauthentication: 'Your verification code',
@@ -24,7 +20,6 @@ const EMAIL_SUBJECTS: Record<string, string> = {
 const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   signup: SignupEmail,
   invite: InviteEmail,
-  magiclink: MagicLinkEmail,
   recovery: RecoveryEmail,
   email_change: EmailChangeEmail,
   reauthentication: ReauthenticationEmail,
@@ -43,82 +38,53 @@ function redactEmail(email: string | null | undefined): string {
   return `${localPart[0]}***@${domain}`
 }
 
-export const Route = createFileRoute("/lovable/email/auth/webhook")({
+export const Route = createFileRoute("/api/email/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY
+        // Use a generic secret for webhook verification
+        const webhookSecret = process.env.EMAIL_WEBHOOK_SECRET
 
-        if (!apiKey) {
-          console.error('LOVABLE_API_KEY not configured')
+        if (!webhookSecret) {
+          console.error('EMAIL_WEBHOOK_SECRET not configured')
           return Response.json(
             { error: 'Server configuration error' },
             { status: 500 }
           )
         }
 
-        // Verify signature + timestamp, then parse payload.
+        // Verify authorization
+        const authHeader = request.headers.get('Authorization')
+        if (!authHeader || (authHeader !== `Bearer ${webhookSecret}` && authHeader !== webhookSecret)) {
+          console.error('Unauthorized webhook attempt')
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
         let payload: any
-        let run_id = ''
         try {
-          const verified = await verifyWebhookRequest({
-            req: request,
-            secret: apiKey,
-            parser: parseEmailWebhookPayload,
-          })
-          payload = verified.payload
-          run_id = payload.run_id
+          payload = await request.json()
         } catch (error) {
-          if (error instanceof WebhookError) {
-            switch (error.code) {
-              case 'invalid_signature':
-              case 'missing_timestamp':
-              case 'invalid_timestamp':
-              case 'stale_timestamp':
-                console.error('Invalid webhook signature', { error: error.message })
-                return Response.json(
-                  { error: 'Invalid signature' },
-                  { status: 401 }
-                )
-              case 'invalid_payload':
-              case 'invalid_json':
-                console.error('Invalid webhook payload', { error: error.message })
-                return Response.json(
-                  { error: 'Invalid webhook payload' },
-                  { status: 400 }
-                )
-            }
-          }
-
-          console.error('Webhook verification failed', { error })
+          console.error('Invalid JSON payload', { error })
           return Response.json(
             { error: 'Invalid webhook payload' },
             { status: 400 }
           )
         }
 
-        if (!run_id) {
-          console.error('Webhook payload missing run_id')
+        const run_id = payload.run_id || crypto.randomUUID()
+        const emailType = payload.data?.action_type || payload.type
+
+        if (!emailType) {
+          console.error('Webhook payload missing action_type', { run_id })
           return Response.json(
-            { error: 'Invalid webhook payload' },
+            { error: 'Invalid webhook payload: missing action_type' },
             { status: 400 }
           )
         }
 
-        if (payload.version !== '1') {
-          console.error('Unsupported payload version', { version: payload.version, run_id })
-          return Response.json(
-            { error: `Unsupported payload version: ${payload.version}` },
-            { status: 400 }
-          )
-        }
-
-        // The email action type is in payload.data.action_type (e.g., "signup", "recovery")
-        // payload.type is the hook event type ("auth")
-        const emailType = payload.data.action_type
         console.log('Received auth event', {
           emailType,
-          email_redacted: redactEmail(payload.data.email),
+          email_redacted: redactEmail(payload.data?.email),
           run_id,
         })
 
@@ -131,13 +97,13 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           )
         }
 
-        // Build template props from payload.data (HookData structure)
+        // Build template props from payload.data (Supabase Auth Hook structure)
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
           recipient: payload.data.email,
           confirmationUrl: payload.data.url,
-          token: payload.data.token,
+          otpCode: payload.data.token,
           email: payload.data.email,
           oldEmail: payload.data.old_email,
           newEmail: payload.data.new_email,
@@ -214,3 +180,4 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
     },
   },
 })
+

@@ -1,2 +1,1 @@
-ALTER TABLE public.medications
-  ADD COLUMN IF NOT EXISTS next_refill_date date;
+-- Superseded by 20260501000000_initial_schema.sql

@@ -6,8 +6,7 @@ import { HemoraLoader } from "./HemoraLoader";
 /**
  * Gate any protected page behind an authenticated session.
  * This project is the app shell — unauthenticated users are always sent to
- * /login. The marketing landing page lives in a separate Lovable project on
- * hemora.xyz / staging.hemora.xyz.
+ * /login. The marketing landing page lives at hemora.xyz / staging.hemora.xyz.
  */
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();

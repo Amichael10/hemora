@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
-import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiEmailWebhookRouteImport } from './routes/api/email/webhook'
+import { Route as ApiEmailProcessRouteImport } from './routes/api/email/process'
+import { Route as ApiEmailPreviewRouteImport } from './routes/api/email/preview'
+import { Route as ApiPublicHooksProcessNotificationsRouteImport } from './routes/api/public/hooks/process-notifications'
+import { Route as ApiPublicHooksPredictCrisisRouteImport } from './routes/api/public/hooks/predict-crisis'
+import { Route as ApiPublicHooksBroadcastProductUpdateRouteImport } from './routes/api/public/hooks/broadcast-product-update'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
@@ -25,75 +28,113 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
+const ApiEmailWebhookRoute = ApiEmailWebhookRouteImport.update({
+  id: '/api/email/webhook',
+  path: '/api/email/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailProcessRoute = ApiEmailProcessRouteImport.update({
+  id: '/api/email/process',
+  path: '/api/email/process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailPreviewRoute = ApiEmailPreviewRouteImport.update({
+  id: '/api/email/preview',
+  path: '/api/email/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksProcessNotificationsRoute =
+  ApiPublicHooksProcessNotificationsRouteImport.update({
+    id: '/api/public/hooks/process-notifications',
+    path: '/api/public/hooks/process-notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ApiPublicHooksPredictCrisisRoute =
+  ApiPublicHooksPredictCrisisRouteImport.update({
+    id: '/api/public/hooks/predict-crisis',
+    path: '/api/public/hooks/predict-crisis',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksBroadcastProductUpdateRoute =
+  ApiPublicHooksBroadcastProductUpdateRouteImport.update({
+    id: '/api/public/hooks/broadcast-product-update',
+    path: '/api/public/hooks/broadcast-product-update',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/api/email/preview': typeof ApiEmailPreviewRoute
+  '/api/email/process': typeof ApiEmailProcessRoute
+  '/api/email/webhook': typeof ApiEmailWebhookRoute
+  '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
+  '/api/public/hooks/predict-crisis': typeof ApiPublicHooksPredictCrisisRoute
+  '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/api/email/preview': typeof ApiEmailPreviewRoute
+  '/api/email/process': typeof ApiEmailProcessRoute
+  '/api/email/webhook': typeof ApiEmailWebhookRoute
+  '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
+  '/api/public/hooks/predict-crisis': typeof ApiPublicHooksPredictCrisisRoute
+  '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/api/email/preview': typeof ApiEmailPreviewRoute
+  '/api/email/process': typeof ApiEmailProcessRoute
+  '/api/email/webhook': typeof ApiEmailWebhookRoute
+  '/api/public/hooks/broadcast-product-update': typeof ApiPublicHooksBroadcastProductUpdateRoute
+  '/api/public/hooks/predict-crisis': typeof ApiPublicHooksPredictCrisisRoute
+  '/api/public/hooks/process-notifications': typeof ApiPublicHooksProcessNotificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
+    | '/api/email/preview'
+    | '/api/email/process'
+    | '/api/email/webhook'
+    | '/api/public/hooks/broadcast-product-update'
+    | '/api/public/hooks/predict-crisis'
+    | '/api/public/hooks/process-notifications'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
+    | '/api/email/preview'
+    | '/api/email/process'
+    | '/api/email/webhook'
+    | '/api/public/hooks/broadcast-product-update'
+    | '/api/public/hooks/predict-crisis'
+    | '/api/public/hooks/process-notifications'
   id:
     | '__root__'
     | '/'
     | '/$'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
+    | '/api/email/preview'
+    | '/api/email/process'
+    | '/api/email/webhook'
+    | '/api/public/hooks/broadcast-product-update'
+    | '/api/public/hooks/predict-crisis'
+    | '/api/public/hooks/process-notifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
-  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
-  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  ApiEmailPreviewRoute: typeof ApiEmailPreviewRoute
+  ApiEmailProcessRoute: typeof ApiEmailProcessRoute
+  ApiEmailWebhookRoute: typeof ApiEmailWebhookRoute
+  ApiPublicHooksBroadcastProductUpdateRoute: typeof ApiPublicHooksBroadcastProductUpdateRoute
+  ApiPublicHooksPredictCrisisRoute: typeof ApiPublicHooksPredictCrisisRoute
+  ApiPublicHooksProcessNotificationsRoute: typeof ApiPublicHooksProcessNotificationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -112,25 +153,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/api/email/webhook': {
+      id: '/api/email/webhook'
+      path: '/api/email/webhook'
+      fullPath: '/api/email/webhook'
+      preLoaderRoute: typeof ApiEmailWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+    '/api/email/process': {
+      id: '/api/email/process'
+      path: '/api/email/process'
+      fullPath: '/api/email/process'
+      preLoaderRoute: typeof ApiEmailProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+    '/api/email/preview': {
+      id: '/api/email/preview'
+      path: '/api/email/preview'
+      fullPath: '/api/email/preview'
+      preLoaderRoute: typeof ApiEmailPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/process-notifications': {
+      id: '/api/public/hooks/process-notifications'
+      path: '/api/public/hooks/process-notifications'
+      fullPath: '/api/public/hooks/process-notifications'
+      preLoaderRoute: typeof ApiPublicHooksProcessNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/predict-crisis': {
+      id: '/api/public/hooks/predict-crisis'
+      path: '/api/public/hooks/predict-crisis'
+      fullPath: '/api/public/hooks/predict-crisis'
+      preLoaderRoute: typeof ApiPublicHooksPredictCrisisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/broadcast-product-update': {
+      id: '/api/public/hooks/broadcast-product-update'
+      path: '/api/public/hooks/broadcast-product-update'
+      fullPath: '/api/public/hooks/broadcast-product-update'
+      preLoaderRoute: typeof ApiPublicHooksBroadcastProductUpdateRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -139,9 +201,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
-  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
-  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  ApiEmailPreviewRoute: ApiEmailPreviewRoute,
+  ApiEmailProcessRoute: ApiEmailProcessRoute,
+  ApiEmailWebhookRoute: ApiEmailWebhookRoute,
+  ApiPublicHooksBroadcastProductUpdateRoute:
+    ApiPublicHooksBroadcastProductUpdateRoute,
+  ApiPublicHooksPredictCrisisRoute: ApiPublicHooksPredictCrisisRoute,
+  ApiPublicHooksProcessNotificationsRoute:
+    ApiPublicHooksProcessNotificationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

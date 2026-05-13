@@ -1,1 +1,1 @@
-REVOKE EXECUTE ON FUNCTION public.schedule_crisis_followup() FROM PUBLIC, anon, authenticated;
+-- Migration consolidated into 20260501000000_initial_schema.sql

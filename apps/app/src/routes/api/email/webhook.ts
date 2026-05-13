@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
-import { parseEmailWebhookPayload } from '@lovable.dev/email-js'
-import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
 import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { SignupEmail } from '@/lib/email-templates/signup'
@@ -43,60 +41,56 @@ function redactEmail(email: string | null | undefined): string {
   return `${localPart[0]}***@${domain}`
 }
 
-export const Route = createFileRoute("/lovable/email/auth/webhook")({
+interface EmailWebhookPayload {
+  version: string;
+  run_id: string;
+  type: string;
+  data: {
+    action_type: string;
+    email: string;
+    url?: string;
+    token?: string;
+    old_email?: string;
+    new_email?: string;
+  };
+}
+
+export const Route = createFileRoute("/api/email/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY
+        const apiKey = process.env.HEMORA_API_KEY
 
         if (!apiKey) {
-          console.error('LOVABLE_API_KEY not configured')
+          console.error('HEMORA_API_KEY not configured')
           return Response.json(
             { error: 'Server configuration error' },
             { status: 500 }
           )
         }
 
-        // Verify signature + timestamp, then parse payload.
-        let payload: any
-        let run_id = ''
-        try {
-          const verified = await verifyWebhookRequest({
-            req: request,
-            secret: apiKey,
-            parser: parseEmailWebhookPayload,
-          })
-          payload = verified.payload
-          run_id = payload.run_id
-        } catch (error) {
-          if (error instanceof WebhookError) {
-            switch (error.code) {
-              case 'invalid_signature':
-              case 'missing_timestamp':
-              case 'invalid_timestamp':
-              case 'stale_timestamp':
-                console.error('Invalid webhook signature', { error: error.message })
-                return Response.json(
-                  { error: 'Invalid signature' },
-                  { status: 401 }
-                )
-              case 'invalid_payload':
-              case 'invalid_json':
-                console.error('Invalid webhook payload', { error: error.message })
-                return Response.json(
-                  { error: 'Invalid webhook payload' },
-                  { status: 400 }
-                )
-            }
-          }
-
-          console.error('Webhook verification failed', { error })
+        // Simple API key verification in Authorization header
+        const authHeader = request.headers.get('Authorization')
+        if (authHeader !== `Bearer ${apiKey}`) {
+          console.error('Unauthorized webhook request')
           return Response.json(
-            { error: 'Invalid webhook payload' },
+            { error: 'Unauthorized' },
+            { status: 401 }
+          )
+        }
+
+        let payload: EmailWebhookPayload
+        try {
+          payload = await request.json()
+        } catch (error) {
+          console.error('Invalid JSON payload', { error })
+          return Response.json(
+            { error: 'Invalid JSON payload' },
             { status: 400 }
           )
         }
 
+        const run_id = payload.run_id
         if (!run_id) {
           console.error('Webhook payload missing run_id')
           return Response.json(
@@ -113,8 +107,6 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           )
         }
 
-        // The email action type is in payload.data.action_type (e.g., "signup", "recovery")
-        // payload.type is the hook event type ("auth")
         const emailType = payload.data.action_type
         console.log('Received auth event', {
           emailType,
@@ -131,7 +123,6 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           )
         }
 
-        // Build template props from payload.data (HookData structure)
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
@@ -143,12 +134,10 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           newEmail: payload.data.new_email,
         }
 
-        // Render React Email to HTML and plain text
         const element = React.createElement(EmailTemplate, templateProps)
         const html = await render(element)
         const text = await render(element, { plainText: true })
 
-        // Enqueue email for async processing by the dispatcher (process-email-queue).
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -163,7 +152,6 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
         const messageId = crypto.randomUUID()
 
-        // Log pending BEFORE enqueue so we have a record even if enqueue crashes
         await supabase.from('email_send_log').insert({
           message_id: messageId,
           template_name: emailType,

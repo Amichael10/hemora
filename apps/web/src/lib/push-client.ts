@@ -31,7 +31,7 @@ function isPreviewOrIframe(): boolean {
     return true;
   }
   const host = window.location.hostname;
-  return host.includes("id-preview--") || host.includes("lovableproject.com");
+  return host.includes("id-preview--");
 }
 
 export async function ensureServiceWorker(): Promise<ServiceWorkerRegistration | null> {

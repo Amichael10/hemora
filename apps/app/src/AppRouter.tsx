@@ -56,8 +56,7 @@ const Terms = lazy(() => import("@/pages/info").then(m => ({ default: m.Terms })
 
 /**
  * This project is the app shell only (app.hemora.xyz + Capacitor mobile build).
- * The marketing landing page lives in a separate Lovable project and is served
- * at hemora.xyz / www.hemora.xyz / staging.hemora.xyz.
+ * The marketing landing page is served at hemora.xyz / www.hemora.xyz / staging.hemora.xyz.
  *
  * Therefore: the root path "/" here always sends users into the app — to the
  * dashboard if authenticated, otherwise to /login (handled by RequireAuth).

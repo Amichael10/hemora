@@ -3,18 +3,18 @@ import { render } from '@react-email/components'
 import { createFileRoute } from '@tanstack/react-router'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
-import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
+import { WelcomeEmail } from '@/lib/email-templates/welcome'
 
 const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   signup: SignupEmail,
   invite: InviteEmail,
-  magiclink: MagicLinkEmail,
   recovery: RecoveryEmail,
   email_change: EmailChangeEmail,
   reauthentication: ReauthenticationEmail,
+  welcome: WelcomeEmail,
 }
 
 // Configuration
@@ -34,10 +34,7 @@ const SAMPLE_DATA: Record<string, object> = {
     siteUrl: SAMPLE_PROJECT_URL,
     recipient: SAMPLE_EMAIL,
     confirmationUrl: SAMPLE_PROJECT_URL,
-  },
-  magiclink: {
-    siteName: SITE_NAME,
-    confirmationUrl: SAMPLE_PROJECT_URL,
+    otpCode: '123456',
   },
   recovery: {
     siteName: SITE_NAME,
@@ -52,19 +49,24 @@ const SAMPLE_DATA: Record<string, object> = {
     siteName: SITE_NAME,
     oldEmail: SAMPLE_EMAIL,
     email: SAMPLE_EMAIL,
-    newEmail: SAMPLE_EMAIL,
+    newEmail: 'new-user@example.test',
     confirmationUrl: SAMPLE_PROJECT_URL,
   },
   reauthentication: {
-    token: '123456',
+    siteName: SITE_NAME,
+    otpCode: '654321',
+  },
+  welcome: {
+    siteName: SITE_NAME,
+    siteUrl: SAMPLE_PROJECT_URL,
   },
 }
 
-export const Route = createFileRoute("/lovable/email/auth/preview")({
+export const Route = createFileRoute("/api/email/preview")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY
+        const apiKey = process.env.EMAIL_WEBHOOK_SECRET
 
         if (!apiKey) {
           return Response.json(
@@ -73,9 +75,9 @@ export const Route = createFileRoute("/lovable/email/auth/preview")({
           )
         }
 
-        // Verify the caller is authorized with LOVABLE_API_KEY
+        // Verify the caller is authorized
         const authHeader = request.headers.get('Authorization')
-        if (!authHeader || authHeader !== `Bearer ${apiKey}`) {
+        if (!authHeader || (authHeader !== `Bearer ${apiKey}` && authHeader !== apiKey)) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 

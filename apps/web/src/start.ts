@@ -3,7 +3,7 @@ import { createStart, createMiddleware } from "@tanstack/react-start";
 import { renderErrorPage } from "./lib/error-page";
 
 const errorMiddleware = createMiddleware().server(async ({ pathname, next }) => {
-  if (pathname.startsWith("/lovable/")) {
+  if (pathname.startsWith("/api/email/")) {
     return next();
   }
   try {

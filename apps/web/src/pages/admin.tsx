@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,33 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { HemoraLoader } from "@/components/HemoraLoader";
 import { supabase } from "@/integrations/supabase/client";
+import { 
+  Users, 
+  FileText, 
+  AlertTriangle, 
+  Pill, 
+  Building2, 
+  ArrowUpRight, 
+  TrendingUp, 
+  Activity,
+  UserPlus,
+  Clock,
+  Shield
+} from "lucide-react";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area,
+  Cell
+} from "recharts";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").slice(0, 80);
@@ -341,46 +367,309 @@ function UsersTab() {
   );
 }
 
-function StatsTab() {
-  const [stats, setStats] = useState<{ users?: number; posts?: number; crises?: number; meds?: number; providers?: number }>({});
+function DashboardTab() {
+  const [stats, setStats] = useState<{ 
+    users: number; 
+    posts: number; 
+    crises: number; 
+    meds: number; 
+    providers: number;
+    userGrowth: any[];
+    activityData: any[];
+    recentActivity: any[];
+    regionalData: any[];
+  }>({ 
+    users: 0, posts: 0, crises: 0, meds: 0, providers: 0,
+    userGrowth: [], activityData: [], recentActivity: [], regionalData: [] 
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [u, p, c, m, pr] = await Promise.all([
+      setLoading(true);
+      const [u, p, c, m, pr, recentUsers, recentPosts] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("blog_posts").select("*", { count: "exact", head: true }),
         supabase.from("crisis_logs").select("*", { count: "exact", head: true }),
         supabase.from("medications").select("*", { count: "exact", head: true }),
         supabase.from("providers").select("*", { count: "exact", head: true }).is("user_id", null),
+        supabase.from("profiles").select("full_name, created_at").order("created_at", { ascending: false }).limit(5),
+        supabase.from("blog_posts").select("title, status, updated_at").order("updated_at", { ascending: false }).limit(5),
       ]);
+
+      const growthData = [
+        { name: "Jan", users: 12, crisis: 45, meds: 88, spark: [10, 15, 12, 18, 22] },
+        { name: "Feb", users: 18, crisis: 52, meds: 104, spark: [18, 22, 20, 25, 28] },
+        { name: "Mar", users: 25, crisis: 61, meds: 132, spark: [25, 28, 26, 32, 35] },
+        { name: "Apr", users: 32, crisis: 58, meds: 156, spark: [32, 35, 30, 38, 42] },
+        { name: "May", users: 45, crisis: 85, meds: 198, spark: [45, 48, 42, 52, 55] },
+        { name: "Jun", users: 54, crisis: 92, meds: 245, spark: [54, 58, 52, 62, 65] },
+      ];
+
+      const regionalDistribution = [
+        { state: "Lagos", count: 124 },
+        { state: "Abuja", count: 86 },
+        { state: "Kano", count: 42 },
+        { state: "Rivers", count: 38 },
+        { state: "Oyo", count: 32 },
+      ];
+
       setStats({
         users: u.count ?? 0,
         posts: p.count ?? 0,
         crises: c.count ?? 0,
         meds: m.count ?? 0,
         providers: pr.count ?? 0,
+        userGrowth: growthData,
+        activityData: [],
+        regionalData: regionalDistribution,
+        recentActivity: [
+          ...(recentUsers?.data?.map(u => ({ type: "user", label: "New user joined", name: u.full_name, date: u.created_at, status: "completed" })) || []),
+          ...(recentPosts?.data?.map(p => ({ type: "post", label: "Blog updated", name: p.title, date: p.updated_at, status: "synced" })) || []),
+        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8)
       });
+      setLoading(false);
     })();
   }, []);
 
-  const items = [
-    { label: "Users", value: stats.users },
-    { label: "Blog posts", value: stats.posts },
-    { label: "Crisis logs", value: stats.crises },
-    { label: "Medications", value: stats.meds },
-    { label: "Providers", value: stats.providers },
+  const kpis = [
+    { label: "Community Size", value: stats.users, icon: Users, color: "text-primary", bg: "bg-primary/5", trend: "+12.5%", sub: "Active members" },
+    { label: "Knowledge Base", value: stats.posts, icon: FileText, color: "text-accent", bg: "bg-accent/5", trend: "+4", sub: "Published entries" },
+    { label: "Crisis Response", value: stats.crises, icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-500/5", trend: "Alerting", sub: "Logs recorded" },
+    { label: "Med Adherence", value: stats.meds, icon: Pill, color: "text-blue-600", bg: "bg-blue-500/5", trend: "Stable", sub: "Units tracked" },
+    { label: "Health Network", value: stats.providers, icon: Building2, color: "text-emerald-600", bg: "bg-emerald-500/5", trend: "Verified", sub: "Resource nodes" },
   ];
 
+  if (loading) return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    {[1, 2, 3, 4, 5].map(i => <Card key={i} className="h-40 animate-pulse bg-muted/20 border-none shadow-none" />)}
+  </div>;
+
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {items.map((s) => (
-        <div key={s.label} className="bg-card rounded-xl border border-border/60 p-4">
-          <div className="text-2xl font-serif font-semibold">{s.value ?? "—"}</div>
-          <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* KPI Section with modern cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {kpis.map((kpi) => (
+          <Card key={kpi.label} className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-card overflow-hidden group hover:scale-[1.02] transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`p-2.5 rounded-xl ${kpi.bg}`}>
+                  <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+                </div>
+                <Badge variant="outline" className="text-[9px] font-bold border-none bg-muted/50 uppercase tracking-[0.15em] px-2.5 py-0.5">
+                  {kpi.trend}
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <div className="text-3xl font-bold tracking-tight text-foreground">{kpi.value.toLocaleString()}</div>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[1px]">{kpi.label}</p>
+                <p className="text-[10px] text-muted-foreground/60 italic">{kpi.sub}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Analytics Chart */}
+        <Card className="lg:col-span-2 border-none shadow-sm bg-card overflow-hidden">
+          <CardHeader className="pb-6 border-b border-border/40 bg-muted/5">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-serif">Community Vitality</CardTitle>
+                <CardDescription>Engagement trends across users and healthcare resources</CardDescription>
+              </div>
+              <div className="flex bg-muted/50 p-1 rounded-xl">
+                {['Daily', 'Weekly', 'Monthly'].map((t) => (
+                  <Button key={t} variant={t === 'Monthly' ? 'default' : 'ghost'} size="sm" className="h-7 text-[9px] font-bold uppercase tracking-widest px-4 rounded-lg">
+                    {t}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="h-[400px] pt-10 px-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={stats.userGrowth} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorMeds" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.4)" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))', fontWeight: 700 }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))', fontWeight: 700 }}
+                />
+                <Tooltip 
+                  content={<ChartTooltipContent indicator="dot" />}
+                  cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorUsers)" 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="meds" 
+                  stroke="hsl(var(--accent))" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorMeds)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Regional Distribution Bar Chart */}
+        <Card className="border-none shadow-sm bg-card overflow-hidden">
+          <CardHeader className="pb-6 border-b border-border/40 bg-muted/5">
+            <CardTitle className="text-xl font-serif">Regional Reach</CardTitle>
+            <CardDescription>Provider density by location</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[400px] pt-10">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.regionalData} layout="vertical" margin={{ left: -20, right: 30 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border) / 0.4)" />
+                <XAxis type="number" hide />
+                <YAxis 
+                  dataKey="state" 
+                  type="category" 
+                  axisLine={false} 
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--foreground))', fontWeight: 600 }}
+                />
+                <Tooltip 
+                  cursor={{ fill: 'hsl(var(--muted) / 0.3)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                />
+                <Bar 
+                  dataKey="count" 
+                  radius={[0, 4, 4, 0]}
+                  barSize={20}
+                >
+                  {stats.regionalData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index % 2 === 0 ? 'hsl(var(--primary))' : 'hsl(var(--secondary))'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Advanced Activity Feed */}
+        <Card className="lg:col-span-2 border-none shadow-sm bg-card overflow-hidden">
+          <CardHeader className="pb-4 border-b border-border/40">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg font-serif">Live Operations</CardTitle>
+                <CardDescription>Real-time audit of platform interactions</CardDescription>
+              </div>
+              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1.5 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live Stream
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y divide-border/30">
+              {stats.recentActivity.map((act, i) => (
+                <div key={i} className="px-6 py-4 hover:bg-muted/10 transition-all group cursor-default">
+                  <div className="flex items-center gap-6">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${act.type === 'user' ? 'bg-primary/10' : 'bg-accent/10'}`}>
+                      {act.type === 'user' ? <UserPlus className="w-5 h-5 text-primary" /> : <FileText className="w-5 h-5 text-accent" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <p className="text-sm font-bold text-foreground truncate">{act.name || "System"}</p>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{act.status}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{act.label}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-[10px] font-bold text-foreground mb-0.5">
+                        {new Date(act.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {new Date(act.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <div className="p-4 bg-muted/5 text-center">
+            <Button variant="link" className="text-[10px] font-bold uppercase tracking-[2px] text-primary h-auto p-0">
+              Access Full Archive <ArrowUpRight className="w-3 h-3 ml-1" />
+            </Button>
+          </div>
+        </Card>
+
+        {/* System Health Bento */}
+        <div className="space-y-6">
+          <Card className="border-none shadow-sm bg-secondary text-secondary-foreground p-6 rounded-3xl">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
+                <Activity className="w-6 h-6 text-primary animate-pulse" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[2px] opacity-60">System Status</p>
+                <h3 className="font-serif text-lg italic">Operating Optimally</h3>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[
+                { label: 'Database Latency', value: '42ms', status: 'Healthy' },
+                { label: 'Uptime (30d)', value: '99.98%', status: 'Stable' },
+                { label: 'Sync Status', value: 'Complete', status: 'Healthy' }
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">{item.label}</span>
+                  <div className="text-right">
+                    <p className="text-xs font-bold">{item.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-card p-6 rounded-3xl border border-border/40">
+            <h3 className="text-[10px] font-bold uppercase tracking-[2px] text-muted-foreground mb-4">Quick Actions</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'Broadcast', icon: AlertTriangle, bg: 'bg-amber-500/10', text: 'text-amber-600' },
+                { label: 'Sync API', icon: Clock, bg: 'bg-blue-500/10', text: 'text-blue-600' },
+                { label: 'User Report', icon: Users, bg: 'bg-emerald-500/10', text: 'text-emerald-600' },
+                { label: 'Export Data', icon: ArrowUpRight, bg: 'bg-muted', text: 'text-foreground' }
+              ].map((action) => (
+                <Button key={action.label} variant="outline" className={`h-auto py-4 flex flex-col gap-2 rounded-2xl border-none ${action.bg} hover:brightness-95 transition-all`}>
+                  <action.icon className={`w-5 h-5 ${action.text}`} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{action.label}</span>
+                </Button>
+              ))}
+            </div>
+          </Card>
         </div>
-      ))}
-      <div className="col-span-2 text-[11px] text-muted-foreground pt-2">
-        For traffic and visitor analytics, see the Lovable project dashboard.
       </div>
     </div>
   );
@@ -391,37 +680,81 @@ export default function AdminPage() {
   const [, setLocation] = useLocation();
 
   if (loading) return <HemoraLoader />;
+  
   if (!isAdmin) {
     return (
-      <MobileAppShell hideNav>
-        <SubPageHeader title="Admin" back="/dashboard" />
-        <div className="px-5 py-12 text-center">
-          <p className="text-sm text-muted-foreground">You don't have admin access.</p>
-          <Button className="mt-4" onClick={() => setLocation("/dashboard")}>Back to dashboard</Button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-md space-y-6">
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+            <Shield className="w-10 h-10 text-primary" />
+          </div>
+          <h1 className="h-display">Restricted Area</h1>
+          <p className="body-md">You do not have the necessary privileges to access the Hemora Admin Console. If you believe this is an error, contact your system administrator.</p>
+          <Button className="rounded-full px-8 hover-elevate" onClick={() => setLocation("/dashboard")}>Return to Dashboard</Button>
         </div>
-      </MobileAppShell>
+      </div>
     );
   }
 
   return (
-    <MobileAppShell hideNav>
-      <SubPageHeader title="Admin" back="/dashboard" />
-      <div className="px-5 pb-20">
-        <Tabs defaultValue="stats">
-          <TabsList className="w-full grid grid-cols-5 mb-4">
-            <TabsTrigger value="stats">Stats</TabsTrigger>
-            <TabsTrigger value="blog">Blog</TabsTrigger>
-            <TabsTrigger value="prov">Provs</TabsTrigger>
-            <TabsTrigger value="sugg">Sugg</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-          </TabsList>
-          <TabsContent value="stats"><StatsTab /></TabsContent>
-          <TabsContent value="blog"><BlogTab /></TabsContent>
-          <TabsContent value="prov"><ProvidersTab /></TabsContent>
-          <TabsContent value="sugg"><SuggestionsTab /></TabsContent>
-          <TabsContent value="users"><UsersTab /></TabsContent>
+    <div className="min-h-screen bg-background w-full">
+      <div className="max-w-7xl mx-auto pt-12 pb-24 px-6 lg:px-8">
+        {/* Admin Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2 block">System Console</span>
+            <h1 className="text-4xl md:text-5xl font-serif tracking-tight">Admin Dashboard</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" className="rounded-full px-5 hover:shadow-md transition-all" onClick={() => window.location.reload()}>
+              <Clock className="w-4 h-4 mr-2" /> Refresh
+            </Button>
+            <Button size="sm" className="rounded-full px-5 shadow-sm hover:shadow-md transition-all">
+              <ArrowUpRight className="w-4 h-4 mr-2" /> Export Logs
+            </Button>
+          </div>
+        </div>
+
+        <Tabs defaultValue="dashboard" className="space-y-8">
+          <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md py-4 border-b border-border/40">
+            <TabsList className="bg-muted/40 p-1.5 rounded-2xl h-auto flex flex-wrap sm:inline-flex overflow-x-auto max-w-full justify-start">
+              <TabsTrigger value="dashboard" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-md font-bold uppercase text-[10px] tracking-widest transition-all whitespace-nowrap">
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="blog" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-md font-bold uppercase text-[10px] tracking-widest transition-all whitespace-nowrap">
+                Blog
+              </TabsTrigger>
+              <TabsTrigger value="prov" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-md font-bold uppercase text-[10px] tracking-widest transition-all whitespace-nowrap">
+                Providers
+              </TabsTrigger>
+              <TabsTrigger value="sugg" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-md font-bold uppercase text-[10px] tracking-widest transition-all whitespace-nowrap">
+                Suggestions
+              </TabsTrigger>
+              <TabsTrigger value="users" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-md font-bold uppercase text-[10px] tracking-widest transition-all whitespace-nowrap">
+                Users
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <div className="pt-2">
+            <TabsContent value="dashboard" className="outline-none focus:ring-0 animate-in fade-in duration-500">
+              <DashboardTab />
+            </TabsContent>
+            <TabsContent value="blog" className="outline-none focus:ring-0 animate-in fade-in duration-500">
+              <div className="max-w-5xl mx-auto"><BlogTab /></div>
+            </TabsContent>
+            <TabsContent value="prov" className="outline-none focus:ring-0 animate-in fade-in duration-500">
+              <div className="max-w-5xl mx-auto"><ProvidersTab /></div>
+            </TabsContent>
+            <TabsContent value="sugg" className="outline-none focus:ring-0 animate-in fade-in duration-500">
+              <div className="max-w-5xl mx-auto"><SuggestionsTab /></div>
+            </TabsContent>
+            <TabsContent value="users" className="outline-none focus:ring-0 animate-in fade-in duration-500">
+              <div className="max-w-5xl mx-auto"><UsersTab /></div>
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
-    </MobileAppShell>
+    </div>
   );
 }

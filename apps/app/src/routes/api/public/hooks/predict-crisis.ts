@@ -18,31 +18,35 @@ type CrisisRow = {
 };
 
 async function aiBlurb(reason: string, fallback: string): Promise<string> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) return fallback;
-  try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You write short, warm, non-medical reminder messages (max 140 chars) for a sickle cell support app. No diagnosis, no medical advice, no emojis at start.",
-          },
-          { role: "user", content: `Write a gentle heads-up notification body. Context: ${reason}` },
-        ],
-      }),
-    });
-    if (!res.ok) return fallback;
-    const json: any = await res.json();
-    const text = json?.choices?.[0]?.message?.content?.trim();
-    return text && text.length < 200 ? text : fallback;
-  } catch {
-    return fallback;
+  const grokKey = process.env.GROK_API_KEY || process.env.XAI_API_KEY;
+
+  if (grokKey) {
+    try {
+      const res = await fetch("https://api.x.ai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${grokKey}` },
+        body: JSON.stringify({
+          model: "grok-2-latest",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You write short, warm, non-medical reminder messages (max 140 chars) for a sickle cell support app. No diagnosis, no medical advice, no emojis at start.",
+            },
+            { role: "user", content: `Write a gentle heads-up notification body. Context: ${reason}` },
+          ],
+        }),
+      });
+      if (!res.ok) return fallback;
+      const json: any = await res.json();
+      const text = json?.choices?.[0]?.message?.content?.trim();
+      return text && text.length < 200 ? text : fallback;
+    } catch {
+      return fallback;
+    }
   }
+
+  return fallback;
 }
 
 export const Route = createFileRoute("/api/public/hooks/predict-crisis")({

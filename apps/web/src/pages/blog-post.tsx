@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
-import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { WebNav } from "@/components/layout/WebNav";
+import { WebFooter } from "@/components/layout/WebFooter";
 
 type Post = {
   id: string; slug: string; title: string; excerpt: string | null;
@@ -48,9 +50,17 @@ export default function BlogPost() {
   }, [slug]);
 
   return (
-    <MobileAppShell hideNav>
-      <SubPageHeader title={post?.title || "Post"} back="/blog" />
-      <article className="px-5 pb-16">
+    <div className="min-h-screen bg-background font-serif text-foreground flex flex-col">
+      <WebNav />
+      <header className="border-b border-border/40 bg-card py-6">
+        <div className="max-w-4xl mx-auto px-6">
+          <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to Blog
+          </button>
+        </div>
+      </header>
+      <div className="flex-1">
+      <article className="max-w-4xl mx-auto px-6 py-16">
         {loading ? (
           <p className="text-sm text-muted-foreground text-center py-12">Loading…</p>
         ) : notFound || !post ? (
@@ -58,19 +68,27 @@ export default function BlogPost() {
         ) : (
           <>
             {post.cover_url && (
-              <img src={post.cover_url} alt={post.title} className="w-full h-48 object-cover rounded-2xl mb-4" />
+              <img src={post.cover_url} alt={post.title} className="w-full h-[40vh] object-cover rounded-2xl mb-12 shadow-xl" />
             )}
-            <h1 className="font-serif font-semibold text-2xl text-foreground tracking-[-0.5px]">{post.title}</h1>
-            {post.published_at && (
-              <p className="text-xs text-muted-foreground mt-1">{new Date(post.published_at).toLocaleDateString()}</p>
-            )}
+            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6">
+              <span>Blog Entry</span>
+              {post.published_at && (
+                <>
+                  <div className="w-8 h-[1px] bg-primary/30" />
+                  <span>{new Date(post.published_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                </>
+              )}
+            </div>
+            <h1 className="font-serif text-5xl md:text-6xl text-foreground tracking-tight leading-[1.1] mb-12">{post.title}</h1>
             <div
-              className="prose prose-sm dark:prose-invert mt-5 max-w-none [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif [&_a]:text-primary [&_a]:underline [&_p]:my-3 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-1"
+              className="prose prose-lg dark:prose-invert max-w-none [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif [&_a]:text-primary [&_a]:underline [&_p]:my-6 [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-2"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(post.body_markdown) }}
             />
           </>
         )}
       </article>
-    </MobileAppShell>
+      </div>
+      <WebFooter />
+    </div>
   );
 }

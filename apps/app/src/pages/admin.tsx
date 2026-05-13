@@ -380,7 +380,7 @@ function StatsTab() {
         </div>
       ))}
       <div className="col-span-2 text-[11px] text-muted-foreground pt-2">
-        For traffic and visitor analytics, see the Lovable project dashboard.
+        Traffic and visitor analytics are managed via the Hemora dashboard.
       </div>
     </div>
   );

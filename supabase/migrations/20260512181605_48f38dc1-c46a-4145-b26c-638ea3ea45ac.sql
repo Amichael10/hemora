@@ -1,1 +1,1 @@
-DROP POLICY IF EXISTS "blog images public read" ON storage.objects;
+-- Migration consolidated into 20260501000000_initial_schema.sql
