@@ -127,8 +127,12 @@ export default async function handler(req, res) {
       throw new Error("Server fetch handler missing");
     }
 
+    console.log(`SSR: Handling ${req.method} ${url.pathname} ...`);
+
     // Call TanStack Start's fetch handler
     const webResponse = await server.fetch(webRequest, process.env, {});
+    
+    console.log(`SSR: Response received with status ${webResponse.status}`);
 
     // Write status + headers to Node.js response
     res.statusCode = webResponse.status;
