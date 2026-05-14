@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Hemora",
+    "slug": "hemora",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/brand/app-icon.png",
+    "scheme": "hemora",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/brand/hemora-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f4ead8"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hemora.app"
+    },
+    "android": {
+      "package": "com.hemora.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/brand/app-icon.png",
+        "backgroundColor": "#f4ead8"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "supabaseUrl": "https://ajxbzhysnlchfxjxahcv.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqeGJ6aHlzbmxjaGZ4anhhaGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMzEzMTEsImV4cCI6MjA5MzcwNzMxMX0.NXSg1Ihgc1uAWtSqlAGXbhQZLzDbGNsHuIcGqkgNqAA",
+      "authRedirectUrl": "exp://127.0.0.1:8081/--/auth-callback",
+      "router": {},
+      "eas": {
+        "projectId": "7c17aa8e-fe25-46a3-bbd8-08d6a0329ee2"
+      }
+    },
+    "owner": "amichaelwale"
+  }
+}

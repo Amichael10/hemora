@@ -1,0 +1,28 @@
+# EAS uploads the git workspace — keep the archive small so compress fits on disk.
+# (Mobile app lives in apps/mobile; these paths are not needed for that native build.)
+#
+# When this file exists at the repo root, EAS does NOT apply .gitignore (see expo.fyi/eas-build-archive).
+# Untracked npm lockfiles would otherwise be uploaded and can make the worker run `npm ci` instead of pnpm.
+
+**/node_modules/
+
+# Keep apps/web in the archive — root `workspaces` includes it; do not ignore the whole app folder.
+apps/web/node_modules/
+
+# Monorepo uses pnpm + pnpm-lock.yaml only — never ship npm lockfiles to the builder.
+package-lock.json
+**/package-lock.json
+npm-shrinkwrap.json
+
+# Capacitor / Vite build outputs — not used by Expo native
+apps/app/dist/
+apps/app/android/
+apps/app/ios/
+
+# Local scratch / worktrees (can be huge)
+.claude/
+
+# Common junk
+.DS_Store
+Thumbs.db
+*.log
