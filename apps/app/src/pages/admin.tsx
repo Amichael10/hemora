@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { MobileAppShell } from "@/components/layout/MobileAppShell";
-import { SubPageHeader } from "@/components/layout/SubPageHeader";
+import { 
+  LayoutDashboard, 
+  BookOpen, 
+  Users, 
+  Stethoscope, 
+  MessageSquare,
+  ArrowLeft,
+  Search,
+  Bell,
+  Settings,
+  Plus
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { HemoraLoader } from "@/components/HemoraLoader";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").slice(0, 80);
@@ -78,82 +88,118 @@ function BlogTab() {
 
   if (editing) {
     return (
-      <div className="space-y-3">
-        <Input
-          placeholder="Title"
-          value={editing.title || ""}
-          onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-        />
-        <Input
-          placeholder="Slug (auto from title)"
-          value={editing.slug || ""}
-          onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
-        />
-        <Textarea
-          placeholder="Excerpt (short summary)"
-          value={editing.excerpt || ""}
-          onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })}
-          rows={2}
-        />
-        <Input
-          placeholder="Cover image URL"
-          value={editing.cover_url || ""}
-          onChange={(e) => setEditing({ ...editing, cover_url: e.target.value })}
-        />
-        <Textarea
-          placeholder="Body (Markdown supported)"
-          value={editing.body_markdown || ""}
-          onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })}
-          rows={14}
-          className="font-mono text-sm"
-        />
-        <div className="flex gap-2">
-          {(["draft", "published", "archived"] as const).map((s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={editing.status === s ? "default" : "outline"}
-              onClick={() => setEditing({ ...editing, status: s })}
-            >
-              {s}
-            </Button>
-          ))}
+      <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden">
+        <div className="p-6 border-b border-border/40 bg-[#F9F6F2] flex items-center justify-between">
+          <h3 className="font-serif font-bold text-lg">{editing.id ? "Edit Article" : "New Publication"}</h3>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setEditing(null)}>Discard</Button>
+            <Button size="sm" onClick={save}>Save Changes</Button>
+          </div>
         </div>
-        <div className="flex gap-2 pt-2">
-          <Button onClick={save} className="flex-1">Save</Button>
-          <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+        <div className="p-8 space-y-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+               <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Title</label>
+                <Input placeholder="Enter a compelling title..." value={editing.title || ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="rounded-xl border-stone-200" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Slug</label>
+                <Input placeholder="article-url-slug" value={editing.slug || ""} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="rounded-xl border-stone-200" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Cover Image</label>
+                <Input placeholder="https://unsplash.com/..." value={editing.cover_url || ""} onChange={(e) => setEditing({ ...editing, cover_url: e.target.value })} className="rounded-xl border-stone-200" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Status</label>
+                <div className="flex gap-2">
+                  {(["draft", "published", "archived"] as const).map((s) => (
+                    <Button key={s} size="sm" variant={editing.status === s ? "default" : "outline"} onClick={() => setEditing({ ...editing, status: s })} className="rounded-full px-4 capitalize">
+                      {s}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Summary</label>
+            <Textarea placeholder="Brief summary for social sharing..." value={editing.excerpt || ""} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className="rounded-xl border-stone-200" />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Content (Markdown)</label>
+            <Textarea placeholder="Write your story..." value={editing.body_markdown || ""} onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })} rows={15} className="rounded-xl border-stone-200 font-mono text-sm leading-relaxed" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <Button onClick={() => setEditing({ status: "draft", body_markdown: "" })} className="w-full">
-        + New post
-      </Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">Blog Management</h3>
+          <p className="text-xs text-muted-foreground">Manage articles, health guides, and company news.</p>
+        </div>
+        <Button onClick={() => setEditing({ status: "draft", body_markdown: "" })} className="rounded-full gap-2">
+          <Plus className="w-4 h-4" /> New Article
+        </Button>
+      </div>
+
       {loading ? (
-        <p className="text-sm text-muted-foreground text-center py-4">Loading…</p>
+        <p className="text-sm text-muted-foreground text-center py-12">Loading content library…</p>
       ) : posts.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-4">No posts yet.</p>
+        <div className="bg-white rounded-3xl border border-dashed border-border/60 p-12 text-center space-y-4">
+          <BookOpen className="w-12 h-12 text-stone-200 mx-auto" />
+          <p className="text-sm text-muted-foreground">No articles published yet. Start your first draft!</p>
+        </div>
       ) : (
-        posts.map((p) => (
-          <div key={p.id} className="bg-card rounded-xl border border-border/60 p-3 space-y-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-medium text-sm truncate">{p.title}</span>
-              <Badge variant={p.status === "published" ? "default" : "secondary"}>{p.status}</Badge>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((p) => (
+            <div key={p.id} className="bg-white rounded-3xl border border-border/40 overflow-hidden flex flex-col group hover:shadow-xl hover:shadow-black/5 transition-all">
+              <div className="h-32 bg-stone-100 relative overflow-hidden shrink-0">
+                {p.cover_url ? (
+                  <img src={p.cover_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BookOpen className="w-8 h-8 text-stone-200" />
+                  </div>
+                )}
+                <div className="absolute top-3 right-3">
+                  <Badge className={cn(
+                    "capitalize",
+                    p.status === "published" ? "bg-green-500 hover:bg-green-600" : 
+                    p.status === "draft" ? "bg-stone-500 hover:bg-stone-600" : "bg-red-500 hover:bg-red-600"
+                  )}>
+                    {p.status}
+                  </Badge>
+                </div>
+              </div>
+              <div className="p-5 flex-1 flex flex-col">
+                <h4 className="font-serif font-bold text-base text-[#1A1A1A] line-clamp-2 mb-2">{p.title}</h4>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-4">{p.excerpt || "No summary provided."}</p>
+                <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/30">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Date(p.updated_at).toLocaleDateString()}</span>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="ghost" onClick={() => setEditing(p)}>Edit</Button>
+                    <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600" onClick={() => remove(p.id)}>Delete</Button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground truncate">/{p.slug}</p>
-            <div className="flex gap-2 pt-1">
-              <Button size="sm" variant="outline" onClick={() => setEditing(p)}>Edit</Button>
-              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(p.id)}>Delete</Button>
-            </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );
 }
+
 
 type Provider = {
   id: string;
@@ -319,27 +365,67 @@ function UsersTab() {
   };
   useEffect(() => { load(); }, []);
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center py-4">Loading…</p>;
+  if (loading) return <p className="text-sm text-muted-foreground text-center py-12">Loading user directory…</p>;
+
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-muted-foreground">{users.length} users · {adminIds.size} admins</p>
-      {users.map((u) => (
-        <div key={u.user_id} className="bg-card rounded-xl border border-border/60 p-3 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <div className="text-sm font-medium truncate">{u.full_name || "Unnamed"}</div>
-            <p className="text-[11px] text-muted-foreground truncate">{u.user_id}</p>
-          </div>
-          {adminIds.has(u.user_id) ? (
-            <Badge>admin</Badge>
-          ) : (
-            <Badge variant="secondary">user</Badge>
-          )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">User Directory</h3>
+          <p className="text-xs text-muted-foreground">{users.length} active users · {adminIds.size} administrators</p>
         </div>
-      ))}
-      <p className="text-[11px] text-muted-foreground pt-2">Role changes require backend access — contact dev.</p>
+        <Button size="sm" variant="outline" className="rounded-full gap-2">
+          <Plus className="w-4 h-4" /> Export CSV
+        </Button>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-border/40 overflow-hidden">
+        <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-[#F9F6F2] border-b border-border/40 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <div className="col-span-5">User Profile</div>
+          <div className="col-span-4">Identifier</div>
+          <div className="col-span-2">Access Role</div>
+          <div className="col-span-1 text-right">Actions</div>
+        </div>
+        <div className="divide-y divide-border/30">
+          {users.map((u) => (
+            <div key={u.user_id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-stone-50/50 transition-colors">
+              <div className="col-span-5 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-[#1A1A1A] font-bold text-xs uppercase">
+                  {(u.full_name || "U")[0]}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-[#1A1A1A] truncate">{u.full_name || "Anonymous User"}</div>
+                  <div className="text-[10px] text-muted-foreground">Joined {new Date(u.created_at).toLocaleDateString()}</div>
+                </div>
+              </div>
+              <div className="col-span-4 font-mono text-[10px] text-muted-foreground truncate">{u.user_id}</div>
+              <div className="col-span-2">
+                {adminIds.has(u.user_id) ? (
+                  <Badge className="bg-[#1A1A1A] text-white hover:bg-[#1A1A1A]">Admin</Badge>
+                ) : (
+                  <Badge variant="secondary" className="bg-stone-100 text-stone-600 border-none">Patient</Badge>
+                )}
+              </div>
+              <div className="col-span-1 text-right">
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                  <Settings className="w-4 h-4 text-muted-foreground" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3 items-start">
+        <Bell className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+        <p className="text-xs text-blue-700 leading-relaxed">
+          <strong>Pro-tip:</strong> Role modifications currently require Direct SQL access for security. Please contact the technical lead to promote or demote users.
+        </p>
+      </div>
     </div>
   );
 }
+
 
 function StatsTab() {
   const [stats, setStats] = useState<{ users?: number; posts?: number; crises?: number; meds?: number; providers?: number }>({});
@@ -364,64 +450,160 @@ function StatsTab() {
   }, []);
 
   const items = [
-    { label: "Users", value: stats.users },
-    { label: "Blog posts", value: stats.posts },
-    { label: "Crisis logs", value: stats.crises },
-    { label: "Medications", value: stats.meds },
-    { label: "Providers", value: stats.providers },
+    { label: "Total Users", value: stats.users, description: "Registered profiles in database", icon: Users },
+    { label: "Blog Content", value: stats.posts, description: "Drafts and published articles", icon: BookOpen },
+    { label: "Crisis Reports", value: stats.crises, description: "Total recorded health events", icon: Bell },
+    { label: "Managed Meds", value: stats.meds, description: "Active prescriptions tracked", icon: Stethoscope },
+    { label: "Health Providers", value: stats.providers, description: "Directory entries", icon: Search },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {items.map((s) => (
-        <div key={s.label} className="bg-card rounded-xl border border-border/60 p-4">
-          <div className="text-2xl font-serif font-semibold">{s.value ?? "—"}</div>
-          <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {items.map((s) => (
+          <div key={s.label} className="bg-white rounded-3xl border border-border/40 p-6 hover:shadow-lg hover:shadow-black/5 transition-all group">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 bg-[#F9F6F2] rounded-2xl group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
+                <s.icon className="w-6 h-6" />
+              </div>
+              <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-100">+0%</Badge>
+            </div>
+            <div className="text-4xl font-serif font-bold text-[#1A1A1A] tracking-tight">{s.value ?? "—"}</div>
+            <h3 className="text-sm font-semibold text-[#1A1A1A] mt-1">{s.label}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{s.description}</p>
+          </div>
+        ))}
+      </div>
+      
+      <div className="bg-[#1A1A1A] rounded-[2rem] p-8 text-white relative overflow-hidden">
+        <div className="relative z-10">
+          <h3 className="text-2xl font-serif font-bold mb-2">System Health</h3>
+          <p className="text-stone-400 max-w-md text-sm">All systems are operational. Global traffic and detailed visitor analytics are managed via the external Hemora Analytics dashboard.</p>
+          <Button variant="outline" className="mt-6 border-stone-700 hover:bg-stone-800 text-white hover:text-white">
+            View Live Reports
+          </Button>
         </div>
-      ))}
-      <div className="col-span-2 text-[11px] text-muted-foreground pt-2">
-        Traffic and visitor analytics are managed via the Hemora dashboard.
+        <div className="absolute top-0 right-0 w-64 h-64 bg-stone-800/50 rounded-full blur-3xl -mr-20 -mt-20" />
       </div>
     </div>
   );
 }
 
+
+
 export default function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
   const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState("stats");
 
   if (loading) return <HemoraLoader />;
   if (!isAdmin) {
     return (
-      <MobileAppShell hideNav>
-        <SubPageHeader title="Admin" back="/dashboard" />
-        <div className="px-5 py-12 text-center">
-          <p className="text-sm text-muted-foreground">You don't have admin access.</p>
-          <Button className="mt-4" onClick={() => setLocation("/dashboard")}>Back to dashboard</Button>
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF8F1] px-4">
+        <div className="max-w-md w-full text-center space-y-4">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-border/50">
+            <h1 className="text-2xl font-serif font-bold text-[#1A1A1A] mb-2">Restricted Access</h1>
+            <p className="text-sm text-muted-foreground">You don't have permission to access the management tools.</p>
+            <Button className="mt-6 w-full bg-[#1A1A1A] hover:bg-[#333]" onClick={() => setLocation("/dashboard")}>
+              Back to dashboard
+            </Button>
+          </div>
         </div>
-      </MobileAppShell>
+      </div>
     );
   }
 
+  const menuItems = [
+    { id: "stats", label: "Overview", icon: LayoutDashboard },
+    { id: "blog", label: "Blog Posts", icon: BookOpen },
+    { id: "prov", label: "Providers", icon: Stethoscope },
+    { id: "sugg", label: "Suggestions", icon: MessageSquare },
+    { id: "users", label: "User Directory", icon: Users },
+  ];
+
   return (
-    <MobileAppShell hideNav>
-      <SubPageHeader title="Admin" back="/dashboard" />
-      <div className="px-5 pb-20">
-        <Tabs defaultValue="stats">
-          <TabsList className="w-full grid grid-cols-5 mb-4">
-            <TabsTrigger value="stats">Stats</TabsTrigger>
-            <TabsTrigger value="blog">Blog</TabsTrigger>
-            <TabsTrigger value="prov">Provs</TabsTrigger>
-            <TabsTrigger value="sugg">Sugg</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-          </TabsList>
-          <TabsContent value="stats"><StatsTab /></TabsContent>
-          <TabsContent value="blog"><BlogTab /></TabsContent>
-          <TabsContent value="prov"><ProvidersTab /></TabsContent>
-          <TabsContent value="sugg"><SuggestionsTab /></TabsContent>
-          <TabsContent value="users"><UsersTab /></TabsContent>
-        </Tabs>
-      </div>
-    </MobileAppShell>
+    <div className="flex h-screen bg-[#FDF8F1] overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-border/40 flex flex-col shrink-0">
+        <div className="p-6 border-b border-border/40 flex items-center gap-3">
+          <div className="w-8 h-8 bg-[#1A1A1A] rounded-lg flex items-center justify-center text-white font-bold">H</div>
+          <span className="font-serif font-bold text-lg tracking-tight">Hemora Admin</span>
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                activeTab === item.id 
+                  ? "bg-[#1A1A1A] text-white shadow-md shadow-black/10" 
+                  : "text-muted-foreground hover:bg-black/5 hover:text-[#1A1A1A]"
+              )}
+            >
+              <item.icon className={cn("w-5 h-5", activeTab === item.id ? "text-white" : "text-muted-foreground/70")} />
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-border/40 space-y-2">
+          <button 
+            onClick={() => setLocation("/dashboard")}
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-[#1A1A1A] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Exit to App
+          </button>
+          <div className="flex items-center gap-3 px-3 py-4 bg-[#F9F6F2] rounded-2xl border border-border/30">
+            <div className="w-10 h-10 rounded-full bg-stone-200 overflow-hidden flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold truncate">Admin User</p>
+              <p className="text-[10px] text-muted-foreground truncate uppercase tracking-widest">Master Access</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Header */}
+        <header className="h-16 bg-white border-b border-border/40 flex items-center justify-between px-8 shrink-0">
+          <h2 className="text-xl font-serif font-bold text-[#1A1A1A]">
+            {menuItems.find(m => m.id === activeTab)?.label}
+          </h2>
+          
+          <div className="flex items-center gap-4">
+            <div className="relative hidden md:block">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                className="pl-10 pr-4 py-1.5 bg-[#F9F6F2] border-none rounded-full text-sm w-64 focus:ring-1 focus:ring-black/10 transition-all"
+              />
+            </div>
+            <button className="p-2 text-muted-foreground hover:text-[#1A1A1A] relative transition-colors">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+            </button>
+            <button className="p-2 text-muted-foreground hover:text-[#1A1A1A] transition-colors">
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          <div className="max-w-6xl mx-auto">
+            {activeTab === "stats" && <StatsTab />}
+            {activeTab === "blog" && <BlogTab />}
+            {activeTab === "prov" && <ProvidersTab />}
+            {activeTab === "sugg" && <SuggestionsTab />}
+            {activeTab === "users" && <UsersTab />}
+          </div>
+        </div>
+      </main>
+    </div>
   );
-}
+}
