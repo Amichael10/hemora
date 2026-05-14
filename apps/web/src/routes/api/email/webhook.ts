@@ -138,12 +138,28 @@ export const Route = createFileRoute("/api/email/webhook")({
         }
 
         // Build template props from payload.data (Supabase Auth Hook structure)
+        // Construct the confirmation URL with token_hash and type
+        let confirmationUrl = emailData.url || emailData.redirect_to || `https://app.${ROOT_DOMAIN}/auth/callback`
+        if (!confirmationUrl.includes('token_hash=')) {
+          try {
+            const url = new URL(confirmationUrl)
+            const tokenHash = emailData.token_hash || emailData.token_hash_new
+            if (tokenHash) {
+              url.searchParams.set('token_hash', tokenHash)
+              url.searchParams.set('type', emailType || 'signup')
+              confirmationUrl = url.toString()
+            }
+          } catch (e) {
+            console.warn('Could not parse confirmation URL as object', { confirmationUrl, run_id })
+          }
+        }
+
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
           recipient: recipientEmail,
-          confirmationUrl: emailData.url || emailData.redirect_to,
-          otpCode: emailData.token || emailData.token_hash,
+          confirmationUrl,
+          otpCode: emailData.token || emailData.token_new || emailData.token_hash,
           email: recipientEmail,
           oldEmail: emailData.old_email,
           newEmail: emailData.new_email,
