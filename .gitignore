@@ -34,3 +34,4 @@ dist-ssr
 # Environments
 .env
 .env.*
+!.env.example

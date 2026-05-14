@@ -3,7 +3,7 @@ import * as path from "node:path";
 
 import type { ConfigContext, ExpoConfig } from "expo/config";
 
-/** Load repo root `.env` then `apps/app/.env` (later wins on duplicate keys). Same Supabase vars as Lovable/Vite (`VITE_SUPABASE_*`). */
+/** Load env files in order; later files override earlier keys (same as most dotenv CLIs). */
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
   const raw = fs.readFileSync(filePath, "utf8");
@@ -20,27 +20,38 @@ function loadEnvFile(filePath: string) {
     ) {
       val = val.slice(1, -1);
     }
-    if (process.env[key] === undefined) {
-      process.env[key] = val;
-    }
+    process.env[key] = val;
   }
 }
 
-const siblingAppEnv = path.resolve(__dirname, "../app/.env");
 const repoRootEnv = path.resolve(__dirname, "../../.env");
+const siblingAppEnv = path.resolve(__dirname, "../app/.env");
+const mobileEnv = path.resolve(__dirname, ".env");
 loadEnvFile(repoRootEnv);
 loadEnvFile(siblingAppEnv);
+loadEnvFile(mobileEnv);
 
 export default ({ config }: ConfigContext): ExpoConfig => {
+  const existingExtra = (config.extra ?? {}) as Record<string, unknown>;
+
   const supabaseUrl =
     process.env.EXPO_PUBLIC_SUPABASE_URL?.trim() ||
     process.env.VITE_SUPABASE_URL?.trim() ||
-    process.env.SUPABASE_URL?.trim();
+    process.env.SUPABASE_URL?.trim() ||
+    (typeof existingExtra.supabaseUrl === "string" ? existingExtra.supabaseUrl.trim() : "");
+
   const supabaseAnonKey =
     process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() ||
-    process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
-  const authRedirectUrl = process.env.EXPO_PUBLIC_AUTH_REDIRECT?.trim();
+    process.env.VITE_SUPABASE_ANON_KEY?.trim() ||
+    process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.SUPABASE_ANON_KEY?.trim() ||
+    (typeof existingExtra.supabaseAnonKey === "string" ? existingExtra.supabaseAnonKey.trim() : "");
+
+  const authRedirectUrl =
+    process.env.EXPO_PUBLIC_AUTH_REDIRECT?.trim() ||
+    (typeof existingExtra.authRedirectUrl === "string" ? existingExtra.authRedirectUrl.trim() : "");
 
   return {
     ...config,
@@ -66,9 +77,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
     },
     extra: {
-      ...config.extra,
-      supabaseUrl,
-      supabaseAnonKey,
+      ...existingExtra,
+      ...(supabaseUrl ? { supabaseUrl } : {}),
+      ...(supabaseAnonKey ? { supabaseAnonKey } : {}),
       ...(authRedirectUrl ? { authRedirectUrl } : {}),
     },
   };
