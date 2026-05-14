@@ -22,6 +22,14 @@ apps/app/ios/
 # Local scratch / worktrees (can be huge)
 .claude/
 
+# Local video / media projects (not used by Expo mobile; with root .easignore, .gitignore
+# is ignored — these untracked folders were bloating the archive to ~300MB+ and uploads fail with ECONNRESET.)
+hemora-launch-video/
+hemora-video-v2/
+
+# Root Android template (Capacitor / experiments). apps/mobile is managed Expo — avoids wrong native root.
+/android/
+
 # Common junk
 .DS_Store
 Thumbs.db
