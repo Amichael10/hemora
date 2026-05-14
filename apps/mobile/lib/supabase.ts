@@ -10,6 +10,17 @@ export function getSupabase() {
   const url = getSupabaseUrl();
   const key = getSupabaseAnonKey();
   if (!url || !key) {
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
+      const missing: string[] = [];
+      if (!url) missing.push("Supabase URL (extra or EXPO_PUBLIC_SUPABASE_URL / VITE_SUPABASE_URL / SUPABASE_URL)");
+      if (!key)
+        missing.push(
+          "anon/publishable key (extra or EXPO_PUBLIC_SUPABASE_ANON_KEY / EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY / …)",
+        );
+      console.warn(
+        `[Supabase] Not configured — missing: ${missing.join(" · ")}. Put vars in apps/mobile/.env, then stop Metro and run: pnpm run start:clean`,
+      );
+    }
     return null;
   }
   client = createClient(url, key, {

@@ -5,9 +5,11 @@ type Extra = {
   supabaseAnonKey?: string;
 };
 
+/** Merge legacy manifest `extra` with `expoConfig.extra` (Expo Go / web sometimes only populate one). */
 function getExtra(): Extra {
-  const extra = Constants.expoConfig?.extra as Extra | undefined;
-  return extra ?? {};
+  const fromManifest = (Constants.manifest as { extra?: Extra } | null)?.extra;
+  const fromExpoConfig = Constants.expoConfig?.extra as Extra | undefined;
+  return { ...(fromManifest ?? {}), ...(fromExpoConfig ?? {}) };
 }
 
 export function getSupabaseUrl(): string | undefined {
@@ -28,6 +30,7 @@ export function getSupabaseAnonKey(): string | undefined {
     process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.VITE_SUPABASE_ANON_KEY?.trim() ||
+    process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.SUPABASE_ANON_KEY?.trim()
   );
 }
