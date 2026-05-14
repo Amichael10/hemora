@@ -73,6 +73,13 @@ export default function Dashboard() {
   const toolsScrollerRef = useRef<HTMLDivElement | null>(null);
   const userInteractedToolsRef = useRef(false);
 
+  // 1. Force onboarding if no profile is found
+  useEffect(() => {
+    if (!profileId) {
+      setLocation("/onboarding");
+    }
+  }, [profileId, setLocation]);
+
   // Auto-advance the tools slider every 15s (pauses after user interaction)
   useEffect(() => {
     const id = setInterval(() => {
