@@ -74,21 +74,58 @@ const serverJs = path.join(funcDir, "server.js");
 const indexMjs = path.join(funcDir, "index.mjs");
 
 if (fs.existsSync(serverJs)) {
-  console.log("   🔄 Creating index.mjs wrapper for server.js ...");
+  console.log("   🔄 Creating index.mjs Node.js bridge for fetch handler ...");
   fs.writeFileSync(indexMjs, `
-import handler from "./server.js";
+// Bridge between Vercel Node.js runtime and TanStack Start's Web fetch handler
+import server from "./server.js";
 
-export default async function(req, res) {
-  // Never let SSR handle static asset paths — return 404 so Vercel serves them from static
-  const url = new URL(req.url, "http://localhost");
-  if (url.pathname.startsWith("/assets/")) {
+export default async function handler(req, res) {
+  // Let Vercel static filesystem serve assets — never hit SSR for these
+  const pathname = req.url.split("?")[0];
+  if (pathname.startsWith("/assets/")) {
     res.statusCode = 404;
-    res.end("Not found");
+    res.end();
     return;
   }
-  return handler(req, res);
+
+  // Build the full URL from the request
+  const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
+  const proto = req.headers["x-forwarded-proto"] || "https";
+  const url = new URL(req.url, proto + "://" + host);
+
+  // Convert Node.js headers → Web Headers
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (value == null) continue;
+    headers.set(key, Array.isArray(value) ? value.join(", ") : String(value));
+  }
+
+  // Read request body
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const body = Buffer.concat(chunks);
+
+  // Build Web Request
+  const webRequest = new Request(url.toString(), {
+    method: req.method || "GET",
+    headers,
+    body: body.length > 0 && req.method !== "GET" && req.method !== "HEAD" ? body : undefined,
+  });
+
+  // Call TanStack Start's fetch handler
+  const webResponse = await server.fetch(webRequest, process.env, {});
+
+  // Write status + headers to Node.js response
+  res.statusCode = webResponse.status;
+  webResponse.headers.forEach((value, key) => {
+    res.setHeader(key, value);
+  });
+
+  // Stream body
+  const responseBody = await webResponse.arrayBuffer();
+  res.end(Buffer.from(responseBody));
 }
-`.trim() + "\n");
+`.trim() + "\\n");
   console.log("   ✅ index.mjs created.");
 } else {
   console.error("   ❌ server.js not found in dist/server!");
