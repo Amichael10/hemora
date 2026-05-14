@@ -74,16 +74,27 @@ export const Route = createFileRoute("/api/email/webhook")({
         // 3. Check webhook-signature (Standard Webhooks / Svix style)
         const webhookSig = request.headers.get('webhook-signature')?.trim()
         
+        // 4. Check for the secret in ANY header (very permissive for debugging)
+        let foundInAnyHeader = false
+        for (const [name, value] of request.headers.entries()) {
+          if (value.includes(webhookSecret.trim())) {
+            foundInAnyHeader = true
+            break
+          }
+        }
+
         const isAuthorized = 
           (authHeader && authHeader === webhookSecret.trim()) ||
           (supabaseSig && supabaseSig === webhookSecret.trim()) ||
-          (webhookSig && webhookSig.includes(webhookSecret.trim()))
+          (webhookSig && webhookSig.includes(webhookSecret.trim())) ||
+          foundInAnyHeader
 
         if (!isAuthorized) {
           console.error('Unauthorized webhook attempt', { 
             has_auth: !!authHeader,
             has_supabase_sig: !!supabaseSig,
             has_webhook_sig: !!webhookSig,
+            found_anywhere: foundInAnyHeader,
             run_id 
           })
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
