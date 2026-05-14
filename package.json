@@ -3,10 +3,10 @@
   "private": true,
   "packageManager": "pnpm@10.33.4",
   "scripts": {
-    "dev": "pnpm --filter @hemora/app dev",
-    "build": "pnpm --filter @hemora/app build",
-    "mobile:apk": "pnpm --filter @hemora/mobile run build:apk",
-    "mobile:start": "pnpm --filter @hemora/mobile start"
+    "dev": "cd apps/app && bun run dev",
+    "build": "cd apps/app && bun run build",
+    "mobile:apk": "cd apps/mobile && bun run build:apk",
+    "mobile:start": "cd apps/mobile && bun run start"
   },
   "engines": {
     "node": ">=22.15.0"
