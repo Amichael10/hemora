@@ -4,13 +4,15 @@ const path = require("path");
 
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, "../..");
+/** Only watch `apps/` — watching the whole repo (videos, .pnpm, etc.) breaks Metro on Windows ("Failed to start watch mode"). */
+const appsRoot = path.resolve(projectRoot, "..");
 
 const config = getDefaultConfig(projectRoot);
 
 /** `@solar-icons/react-native` ships `.mjs` chunks; Metro must resolve them (see Bold.mjs → …/Tuning2.mjs). */
 config.resolver.sourceExts = [...new Set([...config.resolver.sourceExts, "mjs"])];
 
-config.watchFolders = [workspaceRoot];
+config.watchFolders = [appsRoot];
 config.resolver.disableHierarchicalLookup = true;
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
