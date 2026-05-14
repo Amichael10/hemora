@@ -69,20 +69,30 @@ fs.cpSync(distServer, funcDir, { recursive: true });
 console.log("   ✅ Server runtime copied.");
 
 // Create index.mjs → entry point Vercel calls
+// This wrapper returns 404 for /assets/ paths so Vercel's static handler serves them
 const serverJs = path.join(funcDir, "server.js");
 const indexMjs = path.join(funcDir, "index.mjs");
 
-if (!fs.existsSync(indexMjs)) {
-  if (fs.existsSync(serverJs)) {
-    console.log("   🔄 Creating index.mjs wrapper for server.js ...");
-    fs.writeFileSync(indexMjs, `import handler from "./server.js";\nexport default handler;\n`);
-    console.log("   ✅ index.mjs created.");
-  } else {
-    console.error("   ❌ server.js not found in dist/server!");
-    process.exit(1);
+if (fs.existsSync(serverJs)) {
+  console.log("   🔄 Creating index.mjs wrapper for server.js ...");
+  fs.writeFileSync(indexMjs, `
+import handler from "./server.js";
+
+export default async function(req, res) {
+  // Never let SSR handle static asset paths — return 404 so Vercel serves them from static
+  const url = new URL(req.url, "http://localhost");
+  if (url.pathname.startsWith("/assets/")) {
+    res.statusCode = 404;
+    res.end("Not found");
+    return;
   }
+  return handler(req, res);
+}
+`.trim() + "\n");
+  console.log("   ✅ index.mjs created.");
 } else {
-  console.log("   ✅ index.mjs already exists.");
+  console.error("   ❌ server.js not found in dist/server!");
+  process.exit(1);
 }
 
 // ── 3. Routing config ─────────────────────────────────────────────────────────
@@ -92,15 +102,15 @@ fs.writeFileSync(
   JSON.stringify({
     version: 3,
     routes: [
-      // Serve static assets directly (JS, CSS, images) — no SSR needed
+      // Static assets bypass SSR entirely
       {
-        src: "/assets/(.*)",
+        src: "/assets/(.+\\.(js|css|png|jpg|svg|ico|woff2|woff|ttf|json))",
         headers: { "cache-control": "public, max-age=31536000, immutable" },
         continue: true,
       },
-      // Let Vercel serve files from the static folder
+      // Vercel checks static folder first
       { handle: "filesystem" },
-      // Everything else → SSR function
+      // Everything else → SSR
       { src: "/(.*)", dest: "/index" },
     ],
   }, null, 2)
