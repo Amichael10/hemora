@@ -8,17 +8,6 @@
     "mobile:apk": "pnpm --filter @hemora/mobile run build:apk",
     "mobile:start": "pnpm --filter @hemora/mobile start"
   },
-  "pnpm": {
-    "overrides": {
-      "@tanstack/react-query": "5.100.9",
-      "@tanstack/query-core": "5.100.9",
-      "@tanstack/react-router": "1.166.8",
-      "@tanstack/react-start": "1.166.18",
-      "@tanstack/router-plugin": "1.166.14",
-      "@tanstack/router-generator": "1.166.13",
-      "@tanstack/start-plugin-core": "1.167.2"
-    }
-  },
   "engines": {
     "node": ">=22.15.0"
   },
@@ -39,5 +28,14 @@
   ],
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4"
+  },
+  "overrides": {
+    "@tanstack/react-query": "5.100.9",
+    "@tanstack/query-core": "5.100.9",
+    "@tanstack/react-router": "1.166.8",
+    "@tanstack/react-start": "1.166.18",
+    "@tanstack/router-plugin": "1.166.14",
+    "@tanstack/router-generator": "1.166.13",
+    "@tanstack/start-plugin-core": "1.167.2"
   }
 }
