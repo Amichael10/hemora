@@ -77,9 +77,11 @@ if (fs.existsSync(serverJs)) {
   console.log("   🔄 Creating index.mjs Node.js bridge for fetch handler ...");
   fs.writeFileSync(indexMjs, `
 // Bridge between Vercel Node.js runtime and TanStack Start's Web fetch handler
-import server from "./server.js";
+import * as serverModule from "./server.js";
 
 export default async function handler(req, res) {
+  const server = serverModule.default || serverModule;
+  
   // Let Vercel static filesystem serve assets — never hit SSR for these
   const pathname = req.url.split("?")[0];
   if (pathname.startsWith("/assets/")) {
@@ -88,42 +90,57 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Build the full URL from the request
-  const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const url = new URL(req.url, proto + "://" + host);
+  try {
+    // Build the full URL from the request
+    const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const url = new URL(req.url, proto + "://" + host);
 
-  // Convert Node.js headers → Web Headers
-  const headers = new Headers();
-  for (const [key, value] of Object.entries(req.headers)) {
-    if (value == null) continue;
-    headers.set(key, Array.isArray(value) ? value.join(", ") : String(value));
+    // Convert Node.js headers → Web Headers
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value == null) continue;
+      if (Array.isArray(value)) {
+        value.forEach(v => headers.append(key, v));
+      } else {
+        headers.set(key, String(value));
+      }
+    }
+
+    // Read request body
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    const body = Buffer.concat(chunks);
+
+    // Build Web Request
+    const webRequest = new Request(url.toString(), {
+      method: req.method || "GET",
+      headers,
+      body: body.length > 0 && req.method !== "GET" && req.method !== "HEAD" ? body : undefined,
+    });
+
+    if (typeof server.fetch !== "function") {
+      console.error("Critical: server.fetch is not a function!", typeof server.fetch, Object.keys(server));
+      throw new Error("Server fetch handler missing");
+    }
+
+    // Call TanStack Start's fetch handler
+    const webResponse = await server.fetch(webRequest, process.env, {});
+
+    // Write status + headers to Node.js response
+    res.statusCode = webResponse.status;
+    webResponse.headers.forEach((value, key) => {
+      res.setHeader(key, value);
+    });
+
+    // Stream body
+    const responseBody = await webResponse.arrayBuffer();
+    res.end(Buffer.from(responseBody));
+  } catch (err) {
+    console.error("SSR Bridge Error:", err);
+    res.statusCode = 500;
+    res.end("Internal Server Error: " + err.message);
   }
-
-  // Read request body
-  const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
-  const body = Buffer.concat(chunks);
-
-  // Build Web Request
-  const webRequest = new Request(url.toString(), {
-    method: req.method || "GET",
-    headers,
-    body: body.length > 0 && req.method !== "GET" && req.method !== "HEAD" ? body : undefined,
-  });
-
-  // Call TanStack Start's fetch handler
-  const webResponse = await server.fetch(webRequest, process.env, {});
-
-  // Write status + headers to Node.js response
-  res.statusCode = webResponse.status;
-  webResponse.headers.forEach((value, key) => {
-    res.setHeader(key, value);
-  });
-
-  // Stream body
-  const responseBody = await webResponse.arrayBuffer();
-  res.end(Buffer.from(responseBody));
 }
 `.trim() + "\\n");
   console.log("   ✅ index.mjs created.");
