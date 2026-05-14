@@ -107,16 +107,19 @@ export default async function handler(req, res) {
       }
     }
 
-    // Read request body
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
-    const body = Buffer.concat(chunks);
+    // Read request body ONLY if needed
+    let body = undefined;
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      body = Buffer.concat(chunks);
+    }
 
     // Build Web Request
     const webRequest = new Request(url.toString(), {
       method: req.method || "GET",
       headers,
-      body: body.length > 0 && req.method !== "GET" && req.method !== "HEAD" ? body : undefined,
+      body: body && body.length > 0 ? body : undefined,
     });
 
     if (typeof server.fetch !== "function") {
