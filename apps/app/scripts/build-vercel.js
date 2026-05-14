@@ -21,7 +21,7 @@ fs.mkdirSync(vercelOut, { recursive: true });
 console.log("📦 Copying static assets...");
 const staticDir = path.join(vercelOut, "static");
 if (fs.existsSync(distClient)) {
-  copyDir(distClient, staticDir);
+  fs.cpSync(distClient, staticDir, { recursive: true });
 }
 
 // 2. Create Node.js serverless function
@@ -43,7 +43,7 @@ fs.writeFileSync(
 // Copy EVERY file from the server output to the function directory
 if (fs.existsSync(distServer)) {
   console.log("   📂 Copying server files...");
-  copyDir(distServer, funcDir);
+  fs.cpSync(distServer, funcDir, { recursive: true });
 }
 
 // CRITICAL: Ensure index.mjs exists (Vercel's entry point)
@@ -55,11 +55,13 @@ if (!fs.existsSync(indexMjs)) {
     console.log("   🔄 Renaming server.mjs to index.mjs...");
     fs.renameSync(serverMjs, indexMjs);
   } else {
-    // If no entry found, create a shim that imports the nitro entry
-    console.log("   ⚠️ No direct entry found, looking for chunks...");
-    // Usually Nitro has it in a specific spot or renamed
+    console.log("   ❌ Error: No server entry point found!");
   }
 }
+
+// DIAGNOSTIC: List files in function directory
+console.log("📂 Function Directory Contents:");
+fs.readdirSync(funcDir).forEach(file => console.log(`   📄 ${file}`));
 
 // 3. Write config.json
 console.log("📝 Writing config.json...");
@@ -76,17 +78,3 @@ fs.writeFileSync(
 );
 
 console.log("\n✅ Build complete. Ready for Vercel.");
-
-function copyDir(src, dest) {
-  if (!fs.existsSync(src)) return;
-  fs.mkdirSync(dest, { recursive: true });
-  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
-}
