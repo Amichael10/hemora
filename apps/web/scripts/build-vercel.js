@@ -16,7 +16,6 @@ const root = path.resolve(__dirname, "..");
 const distClient = path.join(root, "dist", "client");
 const distServer = path.join(root, "dist", "server");
 const vercelOut = path.join(root, ".vercel", "output");
-const nodeModules = path.join(root, "node_modules");
 
 // Clean and recreate .vercel/output
 fs.rmSync(vercelOut, { recursive: true, force: true });
@@ -51,46 +50,41 @@ fs.writeFileSync(
 // Copy the server build into the function directory
 copyDir(distServer, funcDir);
 
-// Symlink node_modules into function directory so bare specifiers resolve
-const funcModules = path.join(funcDir, "node_modules");
-if (!fs.existsSync(funcModules)) {
-  try {
-    fs.symlinkSync(nodeModules, funcModules, "junction");
-    console.log("   node_modules symlinked.");
-  } catch {
-    console.log("   note: could not symlink node_modules (non-critical).");
-  }
-}
-
 // index.mjs — wraps the fetch-API handler for Vercel's Node.js runtime
 const entry = `
 import server from "./server.js";
 
 export default async function handler(req, res) {
-  const url = new URL(req.url, \`http://\${req.headers.host || "localhost"}\`);
-  const request = new Request(url.toString(), {
-    method: req.method,
-    headers: req.headers,
-    body: ["GET", "HEAD"].includes(req.method) ? undefined : req,
-    duplex: "half",
-  });
+  try {
+    const url = new URL(req.url, \`http://\${req.headers.host || "localhost"}\`);
+    const request = new Request(url.toString(), {
+      method: req.method,
+      headers: req.headers,
+      body: ["GET", "HEAD"].includes(req.method) ? undefined : req,
+      duplex: "half",
+    });
 
-  const response = await server.fetch(request);
+    const response = await server.fetch(request);
 
-  res.statusCode = response.status;
-  for (const [key, value] of response.headers.entries()) {
-    res.setHeader(key, value);
-  }
-
-  if (response.body) {
-    const reader = response.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
+    res.statusCode = response.status;
+    for (const [key, value] of response.headers.entries()) {
+      res.setHeader(key, value);
     }
+
+    if (response.body) {
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+    }
+    res.end();
+  } catch (error) {
+    console.error("SSR Execution Error:", error);
+    res.statusCode = 500;
+    res.end("Internal Server Error: " + error.message);
   }
-  res.end();
 }
 `.trimStart();
 
@@ -102,16 +96,13 @@ console.log("📝 Writing .vercel/output/config.json ...");
 const config = {
   version: 3,
   routes: [
-    // Cache immutable hashed assets forever (map /_build/assets to /assets)
     {
       src: "^/_build/assets/(.*)$",
       dest: "/assets/$1",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
       continue: true,
     },
-    // Filesystem check — serves static files from /static
     { handle: "filesystem" },
-    // Everything else → SSR Node.js function
     { src: "/(.*)", dest: "/index" },
   ],
 };
@@ -125,6 +116,7 @@ console.log("\n✅ .vercel/output built successfully.");
 
 // --- helpers ---
 function copyDir(src, dest) {
+  if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const srcPath = path.join(src, entry.name);

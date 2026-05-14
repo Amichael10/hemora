@@ -34,6 +34,6 @@ export default defineConfig({
     include: ["@tanstack/query-core"],
   },
   ssr: {
-    noExternal: ["entities", "@tanstack/query-core"],
+    noExternal: true,
   },
 });
