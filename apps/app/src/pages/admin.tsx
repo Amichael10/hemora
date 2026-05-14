@@ -10,12 +10,29 @@ import {
   Search,
   Bell,
   Settings,
-  Plus
+  Plus,
+  Bold,
+  Italic,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  List as ListIcon,
+  Eye,
+  Edit3,
+  CheckCircle2,
+  XCircle,
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { HemoraLoader } from "@/components/HemoraLoader";
@@ -43,6 +60,7 @@ function BlogTab() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [editing, setEditing] = useState<Partial<Post> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewMode, setPreviewMode] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -56,6 +74,28 @@ function BlogTab() {
   };
 
   useEffect(() => { load(); }, []);
+
+  const insertMarkdown = (prefix: string, suffix: string = "") => {
+    if (!editing) return;
+    const textarea = document.getElementById("blog-body") as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = editing.body_markdown || "";
+    const selected = text.substring(start, end);
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+
+    const newText = before + prefix + selected + suffix + after;
+    setEditing({ ...editing, body_markdown: newText });
+    
+    // Reset focus and selection
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+    }, 0);
+  };
 
   const save = async () => {
     if (!editing?.title) return toast({ title: "Title required" });
@@ -88,53 +128,113 @@ function BlogTab() {
 
   if (editing) {
     return (
-      <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden">
-        <div className="p-6 border-b border-border/40 bg-[#F9F6F2] flex items-center justify-between">
-          <h3 className="font-serif font-bold text-lg">{editing.id ? "Edit Article" : "New Publication"}</h3>
+      <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden shadow-2xl shadow-black/5">
+        <div className="p-6 border-b border-border/40 bg-[#FDF8F1] flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => setEditing(null)} className="rounded-full">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
+            <h3 className="font-serif font-bold text-lg">{editing.id ? "Edit Article" : "New Publication"}</h3>
+          </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setEditing(null)}>Discard</Button>
-            <Button size="sm" onClick={save}>Save Changes</Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setPreviewMode(!previewMode)}
+              className={cn("rounded-full px-4", previewMode && "bg-black text-white hover:bg-black/80")}
+            >
+              {previewMode ? <Edit3 className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+              {previewMode ? "Edit Mode" : "Live Preview"}
+            </Button>
+            <Button size="sm" onClick={save} className="rounded-full px-6 bg-[#1A1A1A]">Save & Publish</Button>
           </div>
         </div>
-        <div className="p-8 space-y-6 max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Title</label>
-                <Input placeholder="Enter a compelling title..." value={editing.title || ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="rounded-xl border-stone-200" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Slug</label>
-                <Input placeholder="article-url-slug" value={editing.slug || ""} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="rounded-xl border-stone-200" />
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Cover Image</label>
-                <Input placeholder="https://unsplash.com/..." value={editing.cover_url || ""} onChange={(e) => setEditing({ ...editing, cover_url: e.target.value })} className="rounded-xl border-stone-200" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Status</label>
-                <div className="flex gap-2">
-                  {(["draft", "published", "archived"] as const).map((s) => (
-                    <Button key={s} size="sm" variant={editing.status === s ? "default" : "outline"} onClick={() => setEditing({ ...editing, status: s })} className="rounded-full px-4 capitalize">
-                      {s}
-                    </Button>
-                  ))}
+        
+        <div className="p-8 max-w-5xl mx-auto space-y-8">
+          {!previewMode ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="md:col-span-2 space-y-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Article Title</label>
+                    <Input 
+                      placeholder="e.g. Living Well with SCD: A Daily Guide" 
+                      value={editing.title || ""} 
+                      onChange={(e) => setEditing({ ...editing, title: e.target.value })} 
+                      className="text-xl font-serif font-bold h-14 rounded-2xl border-stone-200 focus:ring-black/5" 
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Summary (Excerpt)</label>
+                    <Textarea 
+                      placeholder="Provide a brief summary for the feed..." 
+                      value={editing.excerpt || ""} 
+                      onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} 
+                      rows={2} 
+                      className="rounded-2xl border-stone-200 resize-none" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Publication Status</label>
+                    <div className="flex gap-2 p-1 bg-[#F9F6F2] rounded-2xl border border-border/40">
+                      {(["draft", "published"] as const).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setEditing({ ...editing, status: s })}
+                          className={cn(
+                            "flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all",
+                            editing.status === s ? "bg-white shadow-sm text-[#1A1A1A]" : "text-muted-foreground hover:text-[#1A1A1A]"
+                          )}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Cover Image URL</label>
+                    <Input 
+                      placeholder="https://images.unsplash.com/..." 
+                      value={editing.cover_url || ""} 
+                      onChange={(e) => setEditing({ ...editing, cover_url: e.target.value })} 
+                      className="rounded-xl border-stone-200" 
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Summary</label>
-            <Textarea placeholder="Brief summary for social sharing..." value={editing.excerpt || ""} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className="rounded-xl border-stone-200" />
-          </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Content (Markdown)</label>
-            <Textarea placeholder="Write your story..." value={editing.body_markdown || ""} onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })} rows={15} className="rounded-xl border-stone-200 font-mono text-sm leading-relaxed" />
-          </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Content Editor</label>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("**", "**")} className="h-8 px-2" title="Bold"><Bold className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("_", "_")} className="h-8 px-2" title="Italic"><Italic className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("[", "](url)")} className="h-8 px-2" title="Link"><LinkIcon className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("![alt](", ")")} className="h-8 px-2" title="Image"><ImageIcon className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("\n- ", "")} className="h-8 px-2" title="List"><ListIcon className="w-4 h-4" /></Button>
+                  </div>
+                </div>
+                <Textarea 
+                  id="blog-body"
+                  placeholder="Start writing your story in Markdown..." 
+                  value={editing.body_markdown || ""} 
+                  onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })} 
+                  rows={20} 
+                  className="rounded-2xl border-stone-200 font-mono text-sm leading-relaxed p-6 bg-stone-50/30" 
+                />
+              </div>
+            </>
+          ) : (
+            <article className="prose prose-stone lg:prose-xl max-w-none">
+              {editing.cover_url && <img src={editing.cover_url} className="w-full h-80 object-cover rounded-[2rem] mb-12 shadow-lg" />}
+              <h1 className="font-serif font-bold text-4xl mb-6">{editing.title || "Untitled Article"}</h1>
+              <div className="whitespace-pre-wrap font-sans text-stone-700">
+                {editing.body_markdown || "No content to preview yet."}
+              </div>
+            </article>
+          )}
         </div>
       </div>
     );
@@ -145,50 +245,49 @@ function BlogTab() {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">Blog Management</h3>
-          <p className="text-xs text-muted-foreground">Manage articles, health guides, and company news.</p>
+          <p className="text-xs text-muted-foreground">Publish guides, news, and resources for the community.</p>
         </div>
-        <Button onClick={() => setEditing({ status: "draft", body_markdown: "" })} className="rounded-full gap-2">
-          <Plus className="w-4 h-4" /> New Article
+        <Button onClick={() => setEditing({ status: "draft", body_markdown: "" })} className="rounded-full gap-2 bg-[#1A1A1A]">
+          <Plus className="w-4 h-4" /> New Publication
         </Button>
       </div>
 
       {loading ? (
         <p className="text-sm text-muted-foreground text-center py-12">Loading content library…</p>
       ) : posts.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-dashed border-border/60 p-12 text-center space-y-4">
+        <div className="bg-white rounded-[2rem] border border-dashed border-border/60 p-12 text-center space-y-4">
           <BookOpen className="w-12 h-12 text-stone-200 mx-auto" />
-          <p className="text-sm text-muted-foreground">No articles published yet. Start your first draft!</p>
+          <p className="text-sm text-muted-foreground">No articles published yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((p) => (
-            <div key={p.id} className="bg-white rounded-3xl border border-border/40 overflow-hidden flex flex-col group hover:shadow-xl hover:shadow-black/5 transition-all">
-              <div className="h-32 bg-stone-100 relative overflow-hidden shrink-0">
+            <div key={p.id} className="bg-white rounded-[2rem] border border-border/40 overflow-hidden flex flex-col group hover:shadow-2xl hover:shadow-black/5 transition-all duration-300">
+              <div className="h-40 bg-stone-100 relative overflow-hidden shrink-0">
                 {p.cover_url ? (
-                  <img src={p.cover_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={p.cover_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen className="w-8 h-8 text-stone-200" />
+                    <BookOpen className="w-10 h-10 text-stone-200" />
                   </div>
                 )}
-                <div className="absolute top-3 right-3">
+                <div className="absolute top-4 right-4">
                   <Badge className={cn(
-                    "capitalize",
-                    p.status === "published" ? "bg-green-500 hover:bg-green-600" : 
-                    p.status === "draft" ? "bg-stone-500 hover:bg-stone-600" : "bg-red-500 hover:bg-red-600"
+                    "capitalize px-3 py-1 rounded-full text-[10px] font-bold tracking-widest",
+                    p.status === "published" ? "bg-green-500 text-white" : "bg-stone-200 text-stone-600"
                   )}>
                     {p.status}
                   </Badge>
                 </div>
               </div>
-              <div className="p-5 flex-1 flex flex-col">
-                <h4 className="font-serif font-bold text-base text-[#1A1A1A] line-clamp-2 mb-2">{p.title}</h4>
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-4">{p.excerpt || "No summary provided."}</p>
-                <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/30">
+              <div className="p-6 flex-1 flex flex-col">
+                <h4 className="font-serif font-bold text-lg text-[#1A1A1A] line-clamp-2 mb-2 leading-snug">{p.title}</h4>
+                <p className="text-xs text-muted-foreground line-clamp-3 mb-6 flex-1">{p.excerpt || "No description provided."}</p>
+                <div className="flex items-center justify-between border-t border-border/30 pt-4">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Date(p.updated_at).toLocaleDateString()}</span>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => setEditing(p)}>Edit</Button>
-                    <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600" onClick={() => remove(p.id)}>Delete</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditing(p)} className="rounded-full">Edit</Button>
+                    <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600 rounded-full" onClick={() => remove(p.id)}>Delete</Button>
                   </div>
                 </div>
               </div>
@@ -199,6 +298,7 @@ function BlogTab() {
     </div>
   );
 }
+
 
 
 type Provider = {
@@ -219,11 +319,22 @@ function ProvidersTab() {
   const [editing, setEditing] = useState<Partial<Provider> | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const providerTypes = [
+    "Hospital",
+    "Clinic",
+    "Pharmacy",
+    "Diagnostic Center",
+    "Specialist",
+    "Doctor",
+    "Laboratory",
+    "Support Group"
+  ];
+
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("providers")
-      .select("id,name,type,city,state,country,phone,verified,user_id")
+      .select("id,name,type,city,state,country,phone,verified,user_id,address")
       .is("user_id", null)
       .order("name");
     if (error) toast({ title: "Failed", description: error.message, variant: "destructive" });
@@ -236,7 +347,8 @@ function ProvidersTab() {
     if (!editing?.name) return toast({ title: "Name required" });
     const payload = {
       name: editing.name,
-      type: editing.type || "hospital",
+      type: editing.type || "Hospital",
+      address: editing.address || null,
       city: editing.city || null,
       state: editing.state || null,
       country: editing.country || "Nigeria",
@@ -248,13 +360,13 @@ function ProvidersTab() {
       ? await supabase.from("providers").update(payload).eq("id", editing.id)
       : await supabase.from("providers").insert(payload);
     if (error) return toast({ title: "Save failed", description: error.message, variant: "destructive" });
-    toast({ title: "Saved" });
+    toast({ title: "Provider saved successfully" });
     setEditing(null);
     load();
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Delete provider?")) return;
+    if (!confirm("Delete this provider from directory?")) return;
     const { error } = await supabase.from("providers").delete().eq("id", id);
     if (error) return toast({ title: "Delete failed", description: error.message, variant: "destructive" });
     load();
@@ -262,34 +374,118 @@ function ProvidersTab() {
 
   if (editing) {
     return (
-      <div className="space-y-3">
-        <Input placeholder="Name" value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
-        <Input placeholder="Type (hospital, clinic, doctor…)" value={editing.type || ""} onChange={(e) => setEditing({ ...editing, type: e.target.value })} />
-        <Input placeholder="City" value={editing.city || ""} onChange={(e) => setEditing({ ...editing, city: e.target.value })} />
-        <Input placeholder="State" value={editing.state || ""} onChange={(e) => setEditing({ ...editing, state: e.target.value })} />
-        <Input placeholder="Country" value={editing.country || "Nigeria"} onChange={(e) => setEditing({ ...editing, country: e.target.value })} />
-        <Input placeholder="Phone" value={editing.phone || ""} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} />
-        <div className="flex gap-2 pt-2">
-          <Button onClick={save} className="flex-1">Save</Button>
-          <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+      <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden shadow-xl shadow-black/5">
+        <div className="p-6 border-b border-border/40 bg-[#F9F6F2] flex items-center justify-between">
+          <h3 className="font-serif font-bold text-lg">{editing.id ? "Edit Provider" : "Register New Provider"}</h3>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button size="sm" onClick={save} className="bg-[#1A1A1A]">Save Provider</Button>
+          </div>
+        </div>
+        <div className="p-8 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Entity Name</label>
+              <Input placeholder="e.g. St. Nicholas Hospital" value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="rounded-xl border-stone-200" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Provider Category</label>
+              <Select value={editing.type || ""} onValueChange={(v) => setEditing({ ...editing, type: v })}>
+                <SelectTrigger className="rounded-xl border-stone-200">
+                  <SelectValue placeholder="Select type..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {providerTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Contact Phone</label>
+              <Input placeholder="+234..." value={editing.phone || ""} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} className="rounded-xl border-stone-200" />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+             <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Physical Address</label>
+              <Input placeholder="123 Health Street, Victoria Island" value={editing.address || ""} onChange={(e) => setEditing({ ...editing, address: e.target.value })} className="rounded-xl border-stone-200" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">City</label>
+                <Input placeholder="Lagos" value={editing.city || ""} onChange={(e) => setEditing({ ...editing, city: e.target.value })} className="rounded-xl border-stone-200" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">State</label>
+                <Input placeholder="Lagos" value={editing.state || ""} onChange={(e) => setEditing({ ...editing, state: e.target.value })} className="rounded-xl border-stone-200" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Country</label>
+              <Input placeholder="Nigeria" value={editing.country || "Nigeria"} onChange={(e) => setEditing({ ...editing, country: e.target.value })} className="rounded-xl border-stone-200" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <Button onClick={() => setEditing({ verified: true, country: "Nigeria", type: "hospital" })} className="w-full">+ New provider</Button>
-      {loading ? <p className="text-sm text-muted-foreground text-center py-4">Loading…</p> : items.map((p) => (
-        <div key={p.id} className="bg-card rounded-xl border border-border/60 p-3">
-          <div className="font-medium text-sm">{p.name}</div>
-          <p className="text-xs text-muted-foreground">{[p.type, p.city, p.state].filter(Boolean).join(" · ")}</p>
-          <div className="flex gap-2 pt-2">
-            <Button size="sm" variant="outline" onClick={() => setEditing(p)}>Edit</Button>
-            <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(p.id)}>Delete</Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">Healthcare Directory</h3>
+          <p className="text-xs text-muted-foreground">Manage verified hospitals, clinics, and specialists.</p>
         </div>
-      ))}
+        <Button onClick={() => setEditing({ verified: true, country: "Nigeria", type: "Hospital" })} className="rounded-full gap-2 bg-[#1A1A1A]">
+          <Plus className="w-4 h-4" /> Add Provider
+        </Button>
+      </div>
+
+      <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden shadow-sm">
+        <div className="grid grid-cols-12 gap-4 px-8 py-4 bg-[#F9F6F2] border-b border-border/40 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <div className="col-span-4">Entity</div>
+          <div className="col-span-3">Category</div>
+          <div className="col-span-4">Location</div>
+          <div className="col-span-1 text-right">Actions</div>
+        </div>
+        <div className="divide-y divide-border/20">
+          {loading ? (
+             <p className="text-sm text-muted-foreground text-center py-12">Fetching directory...</p>
+          ) : items.map((p) => (
+            <div key={p.id} className="grid grid-cols-12 gap-4 px-8 py-5 items-center hover:bg-stone-50/50 transition-colors">
+              <div className="col-span-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+                  <Stethoscope className="w-6 h-6" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-[#1A1A1A] truncate">{p.name}</div>
+                  <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-green-500" /> Verified Partner
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-3">
+                <Badge variant="secondary" className="bg-stone-100 text-stone-600 border-none capitalize">{p.type}</Badge>
+              </div>
+              <div className="col-span-4">
+                <div className="text-xs text-stone-700 truncate">{p.address || "No address provided"}</div>
+                <div className="text-[10px] text-muted-foreground">{p.city}, {p.state}</div>
+              </div>
+              <div className="col-span-1 text-right">
+                <div className="flex justify-end gap-1">
+                  <Button size="sm" variant="ghost" onClick={() => setEditing(p)} className="h-9 w-9 p-0 rounded-full">
+                    <Edit3 className="w-4 h-4 text-stone-500" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-9 w-9 p-0 rounded-full text-red-400 hover:text-red-500" onClick={() => remove(p.id)}>
+                    <XCircle className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -298,6 +494,7 @@ function SuggestionsTab() {
   const { toast } = useToast();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewing, setReviewing] = useState<any | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -312,40 +509,146 @@ function SuggestionsTab() {
   useEffect(() => { load(); }, []);
 
   const approve = async (s: any) => {
+    // This is called from the Review/Edit form
     const { error: insErr } = await supabase.from("providers").insert({
-      name: s.name, type: s.type || "hospital", city: s.city, state: s.state,
-      country: s.country, phone: s.phone, email: s.email, website: s.website,
-      verified: true, user_id: null,
+      name: s.name, 
+      type: s.type || "Hospital", 
+      address: s.address || null,
+      city: s.city, 
+      state: s.state,
+      country: s.country, 
+      phone: s.phone, 
+      email: s.email, 
+      website: s.website,
+      verified: true, 
+      user_id: null,
     });
     if (insErr) return toast({ title: "Approve failed", description: insErr.message, variant: "destructive" });
     await supabase.from("provider_suggestions").update({ status: "approved" }).eq("id", s.id);
-    toast({ title: "Approved" });
-    load();
-  };
-  const reject = async (id: string) => {
-    await supabase.from("provider_suggestions").update({ status: "rejected" }).eq("id", id);
+    toast({ title: "Provider added to live directory" });
+    setReviewing(null);
     load();
   };
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center py-4">Loading…</p>;
-  if (!items.length) return <p className="text-sm text-muted-foreground text-center py-4">No pending suggestions.</p>;
-  return (
-    <div className="space-y-3">
-      {items.map((s) => (
-        <div key={s.id} className="bg-card rounded-xl border border-border/60 p-3">
-          <div className="font-medium text-sm">{s.name}</div>
-          <p className="text-xs text-muted-foreground">{[s.type, s.city, s.state, s.country].filter(Boolean).join(" · ")}</p>
-          {s.phone && <p className="text-xs text-muted-foreground">{s.phone}</p>}
-          {s.notes && <p className="text-xs text-muted-foreground mt-1">{s.notes}</p>}
-          <div className="flex gap-2 pt-2">
-            <Button size="sm" onClick={() => approve(s)}>Approve</Button>
-            <Button size="sm" variant="ghost" className="text-destructive" onClick={() => reject(s.id)}>Reject</Button>
+  const reject = async (id: string) => {
+    if (!confirm("Permanently reject this suggestion?")) return;
+    await supabase.from("provider_suggestions").update({ status: "rejected" }).eq("id", id);
+    toast({ title: "Suggestion rejected" });
+    load();
+  };
+
+  if (loading) return <p className="text-sm text-muted-foreground text-center py-20 font-serif italic">Reviewing pending requests...</p>;
+  
+  if (reviewing) {
+     // Reuse the provider structure for the review form
+     return (
+        <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden shadow-2xl">
+          <div className="p-6 border-b border-border/40 bg-amber-50 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white">
+                <Bell className="w-4 h-4" />
+              </div>
+              <h3 className="font-serif font-bold text-lg">Reviewing Suggestion</h3>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setReviewing(null)}>Cancel</Button>
+              <Button size="sm" onClick={() => approve(reviewing)} className="bg-[#1A1A1A]">Edit & Approve</Button>
+            </div>
+          </div>
+          <div className="p-8 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Name</label>
+                <Input value={reviewing.name || ""} onChange={(e) => setReviewing({ ...reviewing, name: e.target.value })} className="rounded-xl" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Suggested Category</label>
+                <Input value={reviewing.type || ""} onChange={(e) => setReviewing({ ...reviewing, type: e.target.value })} className="rounded-xl" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Phone</label>
+                <Input value={reviewing.phone || ""} onChange={(e) => setReviewing({ ...reviewing, phone: e.target.value })} className="rounded-xl" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Physical Address</label>
+                <Input placeholder="Enter verified address..." value={reviewing.address || ""} onChange={(e) => setReviewing({ ...reviewing, address: e.target.value })} className="rounded-xl" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">City</label>
+                  <Input value={reviewing.city || ""} onChange={(e) => setReviewing({ ...reviewing, city: e.target.value })} className="rounded-xl" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">State</label>
+                  <Input value={reviewing.state || ""} onChange={(e) => setReviewing({ ...reviewing, state: e.target.value })} className="rounded-xl" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="px-8 pb-8">
+            <div className="p-4 bg-stone-50 rounded-2xl border border-border/40">
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Original User Notes</h4>
+              <p className="text-sm text-stone-600 italic">"{reviewing.notes || "No additional notes provided."}"</p>
+            </div>
           </div>
         </div>
-      ))}
+     );
+  }
+
+  if (!items.length) return (
+    <div className="bg-white rounded-[2rem] border border-dashed border-border/60 p-20 text-center space-y-4">
+      <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mx-auto">
+        <CheckCircle2 className="w-8 h-8 text-green-200" />
+      </div>
+      <p className="text-sm text-muted-foreground font-serif">Inbox Zero! No pending provider suggestions.</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">Pending Suggestions</h3>
+        <p className="text-xs text-muted-foreground">Review and verify provider details submitted by users.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {items.map((s) => (
+          <div key={s.id} className="bg-white rounded-[2rem] border border-border/40 p-6 flex flex-col hover:shadow-lg transition-all">
+            <div className="flex items-start justify-between mb-4">
+              <div className="space-y-1">
+                <Badge variant="secondary" className="bg-amber-50 text-amber-600 border-none text-[10px] uppercase tracking-widest mb-1">Pending Review</Badge>
+                <h4 className="font-serif font-bold text-lg text-[#1A1A1A]">{s.name}</h4>
+              </div>
+              <div className="p-3 bg-stone-50 rounded-2xl">
+                <MessageSquare className="w-5 h-5 text-stone-400" />
+              </div>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-2 text-xs text-stone-600">
+                <MapPin className="w-4 h-4 text-stone-400" />
+                {[s.city, s.state, s.country].filter(Boolean).join(", ")}
+              </div>
+              {s.notes && (
+                <div className="text-xs text-muted-foreground bg-[#F9F6F2] p-3 rounded-xl italic line-clamp-2">
+                  "{s.notes}"
+                </div>
+              )}
+            </div>
+
+            <div className="mt-auto flex gap-2">
+              <Button className="flex-1 rounded-full bg-[#1A1A1A]" onClick={() => setReviewing(s)}>Review & Edit</Button>
+              <Button variant="ghost" className="rounded-full text-red-500 hover:text-red-600" onClick={() => reject(s.id)}>Reject</Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+
 
 function UsersTab() {
   const { toast } = useToast();
@@ -521,46 +824,54 @@ export default function AdminPage() {
     { id: "users", label: "User Directory", icon: Users },
   ];
 
+
   return (
     <div className="flex h-screen bg-[#FDF8F1] overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-border/40 flex flex-col shrink-0">
-        <div className="p-6 border-b border-border/40 flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#1A1A1A] rounded-lg flex items-center justify-center text-white font-bold">H</div>
-          <span className="font-serif font-bold text-lg tracking-tight">Hemora Admin</span>
+      <aside className="w-64 bg-[#1A1A1A] flex flex-col shrink-0">
+        <div className="p-8 border-b border-stone-800/50 flex items-center gap-4">
+          <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-[#1A1A1A] font-serif font-black text-xl shadow-lg shadow-black/20">H</div>
+          <div className="min-w-0">
+            <h1 className="font-serif font-black text-white text-lg tracking-tight uppercase">Hemora</h1>
+            <p className="text-[10px] text-stone-500 font-bold uppercase tracking-[0.2em] leading-none">Console</p>
+          </div>
         </div>
         
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-6 space-y-2 overflow-y-auto">
+          <p className="text-[10px] font-black text-stone-600 uppercase tracking-widest mb-4 ml-2">Administration</p>
           {menuItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => { setActiveTab(item.id); setReviewing(null); }}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                "w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300",
                 activeTab === item.id 
-                  ? "bg-[#1A1A1A] text-white shadow-md shadow-black/10" 
-                  : "text-muted-foreground hover:bg-black/5 hover:text-[#1A1A1A]"
+                  ? "bg-white text-[#1A1A1A] shadow-xl shadow-black/20" 
+                  : "text-stone-400 hover:text-white hover:bg-white/5"
               )}
             >
-              <item.icon className={cn("w-5 h-5", activeTab === item.id ? "text-white" : "text-muted-foreground/70")} />
+              <item.icon className={cn("w-5 h-5", activeTab === item.id ? "text-[#1A1A1A]" : "text-stone-500")} />
               {item.label}
             </button>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-border/40 space-y-2">
+        <div className="p-6 space-y-4">
           <button 
             onClick={() => setLocation("/dashboard")}
-            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-[#1A1A1A] transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-stone-400 hover:text-white transition-colors rounded-2xl hover:bg-white/5"
           >
             <ArrowLeft className="w-4 h-4" />
-            Exit to App
+            Exit to Platform
           </button>
-          <div className="flex items-center gap-3 px-3 py-4 bg-[#F9F6F2] rounded-2xl border border-border/30">
-            <div className="w-10 h-10 rounded-full bg-stone-200 overflow-hidden flex-shrink-0" />
+          <div className="flex items-center gap-3 px-4 py-4 bg-stone-900 rounded-3xl border border-stone-800">
+            <div className="w-10 h-10 rounded-full bg-stone-700 overflow-hidden flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">Admin User</p>
-              <p className="text-[10px] text-muted-foreground truncate uppercase tracking-widest">Master Access</p>
+              <p className="text-xs font-black text-white truncate">Administrator</p>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                <p className="text-[9px] text-stone-500 font-bold uppercase tracking-widest">Active Now</p>
+              </div>
             </div>
           </div>
         </div>
@@ -569,33 +880,37 @@ export default function AdminPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-border/40 flex items-center justify-between px-8 shrink-0">
-          <h2 className="text-xl font-serif font-bold text-[#1A1A1A]">
-            {menuItems.find(m => m.id === activeTab)?.label}
-          </h2>
-          
+        <header className="h-20 bg-white border-b border-border/40 flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="relative hidden md:block">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+             <div className="w-1 h-8 bg-[#1A1A1A] rounded-full hidden md:block" />
+             <h2 className="text-2xl font-serif font-black text-[#1A1A1A]">
+                {menuItems.find(m => m.id === activeTab)?.label}
+             </h2>
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <div className="relative hidden lg:block">
+              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
               <input 
                 type="text" 
-                placeholder="Search..." 
-                className="pl-10 pr-4 py-1.5 bg-[#F9F6F2] border-none rounded-full text-sm w-64 focus:ring-1 focus:ring-black/10 transition-all"
+                placeholder="Search resources..." 
+                className="pl-12 pr-6 py-2.5 bg-stone-50 border-none rounded-full text-xs w-72 focus:ring-2 focus:ring-black/5 transition-all font-medium"
               />
             </div>
-            <button className="p-2 text-muted-foreground hover:text-[#1A1A1A] relative transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-            </button>
-            <button className="p-2 text-muted-foreground hover:text-[#1A1A1A] transition-colors">
-              <Settings className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-[#1A1A1A] transition-colors rounded-full hover:bg-stone-50">
+                <Bell className="w-5 h-5" />
+              </button>
+              <button className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-[#1A1A1A] transition-colors rounded-full hover:bg-stone-50">
+                <Settings className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <div className="max-w-6xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+          <div className="max-w-7xl mx-auto">
             {activeTab === "stats" && <StatsTab />}
             {activeTab === "blog" && <BlogTab />}
             {activeTab === "prov" && <ProvidersTab />}
