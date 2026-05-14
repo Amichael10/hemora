@@ -9,6 +9,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: string | null }>;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
+  verifyOtp: (email: string, token: string, type: "signup" | "email") => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -57,13 +58,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null };
   }, []);
 
+  const verifyOtp = useCallback(async (email: string, token: string, type: "signup" | "email") => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type,
+    });
+    return { error: error?.message ?? null };
+  }, []);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user ?? null, loading, signInWithGoogle, signInWithPassword, signUpWithPassword, signOut }}
+      value={{ 
+        session, 
+        user: session?.user ?? null, 
+        loading, 
+        signInWithGoogle, 
+        signInWithPassword, 
+        signUpWithPassword, 
+        verifyOtp,
+        signOut 
+      }}
     >
       {children}
     </AuthContext.Provider>

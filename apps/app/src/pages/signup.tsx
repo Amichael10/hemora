@@ -12,7 +12,7 @@ import { LockBold as Lock } from "solar-icon-set";
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { signInWithGoogle, signUpWithPassword, user } = useAuth();
+  const { signInWithGoogle, signUpWithPassword, verifyOtp, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -51,12 +51,71 @@ export default function Signup() {
       <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col p-6 pt-16">
         {sentTo ? (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex-1 flex flex-col justify-center text-center">
-            <h1 className="font-serif text-[28px] text-primary font-semibold tracking-[-0.5px]">Check your inbox</h1>
-            <p className="mt-3 text-sm text-muted-foreground">
-              We've sent a verification link to <span className="font-medium text-foreground">{sentTo}</span>. Click it to confirm your email and finish setting up your account.
+            <div className="mx-auto w-16 h-16 bg-[#0f3d3e]/10 rounded-2xl flex items-center justify-center mb-6">
+              <Lock size={32} className="text-[#0f3d3e]" />
+            </div>
+            
+            <h1 className="font-serif text-[28px] text-[#7d1d2e] font-semibold tracking-[-0.5px]">Check your inbox</h1>
+            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+              We've sent a verification link and code to <br />
+              <span className="font-medium text-foreground">{sentTo}</span>
             </p>
-            <p className="mt-6 text-xs text-muted-foreground">Didn't get it? Check your spam folder, or try again in a moment.</p>
-            <Button variant="outline" size="xl" className="w-full mt-8" onClick={() => setSentTo(null)}>
+
+            <div className="mt-10 space-y-6">
+              <div className="space-y-3">
+                <Label className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Verification Code</Label>
+                <div className="flex justify-center gap-2">
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    placeholder="0 0 0 0 0 0"
+                    className="h-14 text-center text-2xl font-bold tracking-[0.5em] w-full max-w-[240px] focus-visible:ring-[#0f3d3e]"
+                    onChange={async (e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      if (val.length === 6) {
+                        setBusy(true);
+                        const { error } = await verifyOtp(sentTo, val, "signup");
+                        setBusy(false);
+                        if (error) {
+                          toast({ title: "Invalid code", description: error, variant: "destructive" });
+                        } else {
+                          setLocation("/dashboard");
+                        }
+                      }
+                    }}
+                  />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Enter the 6-digit code from your email to continue.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-4">
+                <p className="text-xs text-muted-foreground">
+                  Didn't get it? Check your spam folder or
+                </p>
+                <Button 
+                  variant="link" 
+                  className="text-[#7d1d2e] h-auto p-0 font-bold"
+                  onClick={async () => {
+                    setBusy(true);
+                    const { error } = await signUpWithPassword(email, password);
+                    setBusy(false);
+                    if (error) {
+                      toast({ title: "Couldn't resend", description: error, variant: "destructive" });
+                    } else {
+                      toast({ title: "Code resent", description: "Check your email again." });
+                    }
+                  }}
+                >
+                  Resend verification email
+                </Button>
+              </div>
+            </div>
+
+            <Button variant="outline" className="mt-12 w-full h-12 border-muted-foreground/20" onClick={() => setSentTo(null)}>
               Use a different email
             </Button>
           </motion.div>
