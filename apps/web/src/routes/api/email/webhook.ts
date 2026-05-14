@@ -58,18 +58,32 @@ export const Route = createFileRoute("/api/email/webhook")({
 
         const run_id = crypto.randomUUID()
 
+        // Log header names for debugging (helps identify what Supabase is sending)
+        const headerNames = Array.from(request.headers.keys())
+        console.log('Webhook request received', { 
+          headerNames,
+          method: request.method,
+          run_id 
+        })
+
         // Robust authorization check
+        // 1. Check Authorization header (standard HTTP hook)
         const authHeader = request.headers.get('Authorization')?.replace('Bearer ', '').trim()
-        const signature = request.headers.get('x-supabase-signature')?.trim()
+        // 2. Check x-supabase-signature (Supabase specific)
+        const supabaseSig = request.headers.get('x-supabase-signature')?.trim()
+        // 3. Check webhook-signature (Standard Webhooks / Svix style)
+        const webhookSig = request.headers.get('webhook-signature')?.trim()
         
         const isAuthorized = 
           (authHeader && authHeader === webhookSecret.trim()) ||
-          (signature && signature === webhookSecret.trim())
+          (supabaseSig && supabaseSig === webhookSecret.trim()) ||
+          (webhookSig && webhookSig.includes(webhookSecret.trim()))
 
         if (!isAuthorized) {
           console.error('Unauthorized webhook attempt', { 
-            auth_present: !!authHeader,
-            sig_present: !!signature,
+            has_auth: !!authHeader,
+            has_supabase_sig: !!supabaseSig,
+            has_webhook_sig: !!webhookSig,
             run_id 
           })
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
