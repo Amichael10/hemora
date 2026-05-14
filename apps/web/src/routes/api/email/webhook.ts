@@ -16,7 +16,6 @@ const EMAIL_SUBJECTS: Record<string, string> = {
   email_change: 'Confirm your new email',
   reauthentication: 'Your verification code',
   welcome: 'Welcome to Hemora',
-  magiclink: 'Your magic link',
 }
 
 // Template mapping
@@ -27,7 +26,6 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   email_change: EmailChangeEmail,
   reauthentication: ReauthenticationEmail,
   welcome: WelcomeEmail,
-  magiclink: SignupEmail,
 }
 
 // Configuration
