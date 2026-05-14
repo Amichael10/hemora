@@ -1,0 +1,7 @@
+# Fallback if EAS resolves ignores from apps/mobile (sibling paths)
+node_modules/
+../web/node_modules/**
+../app/dist/**
+../app/android/**
+../app/ios/**
+../../.claude/**
