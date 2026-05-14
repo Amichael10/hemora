@@ -44,12 +44,14 @@ if (fs.existsSync(distServer)) {
 
 // Rename Nitro's entry to index.mjs if needed, or wrap it
 const nitroEntry = path.join(funcDir, "index.mjs");
-if (!fs.existsSync(nitroEntry)) {
-  // If Nitro output 'server.mjs' instead
-  const altEntry = path.join(funcDir, "server.mjs");
-  if (fs.existsSync(altEntry)) {
-    fs.renameSync(altEntry, nitroEntry);
-  }
+const serverEntry = path.join(funcDir, "server.mjs");
+
+if (!fs.existsSync(nitroEntry) && fs.existsSync(serverEntry)) {
+  console.log("   🔄 Renaming server.mjs to index.mjs...");
+  fs.renameSync(serverEntry, nitroEntry);
+} else if (!fs.existsSync(nitroEntry)) {
+  // If neither exists, we might need to look deeper or create a shim
+  console.log("   ⚠️ Warning: No server entry found in .output/server");
 }
 
 // 3. Write config.json — routing
