@@ -26,6 +26,17 @@ console.log("📦 Copying client assets → .vercel/output/static/ ...");
 const staticDir = path.join(vercelOut, "static");
 copyDir(distClient, staticDir);
 
+// DIAGNOSTIC: Print file tree
+console.log("📂 Static File Tree:");
+function listFiles(dir, indent = "") {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    console.log(`${indent}${entry.isDirectory() ? "📁" : "📄"} ${entry.name}`);
+    if (entry.isDirectory()) listFiles(path.join(dir, entry.name), indent + "  ");
+  }
+}
+listFiles(staticDir);
+
 // Ensure 'assets' is at the root of static (some frameworks nest it)
 const buildAssets = path.join(staticDir, "_build", "assets");
 const rootAssets = path.join(staticDir, "assets");
@@ -107,6 +118,16 @@ const config = {
     {
       src: "^/assets/(.*)$",
       dest: "/assets/$1",
+      headers: { "cache-control": "public, max-age=31536000, immutable" },
+    },
+    {
+      src: "^/assets/(.*)$",
+      dest: "/_build/assets/$1",
+      headers: { "cache-control": "public, max-age=31536000, immutable" },
+    },
+    {
+      src: "^/_build/assets/(.*)$",
+      dest: "/_build/assets/$1",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
     },
     { handle: "filesystem" },
