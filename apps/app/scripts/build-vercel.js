@@ -101,8 +101,17 @@ const config = {
       dest: "/assets/$1",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
     },
+    {
+      src: "^/assets/(.*)$",
+      dest: "/static/assets/$1",
+      headers: { "cache-control": "public, max-age=31536000, immutable" },
+    },
     { handle: "filesystem" },
-    { src: "/(.*)", dest: "/index" },
+    { 
+      src: "/(.*)", 
+      dest: "/", 
+      check: true 
+    },
   ],
 };
 fs.writeFileSync(
