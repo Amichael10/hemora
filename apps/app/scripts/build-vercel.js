@@ -97,6 +97,11 @@ const config = {
   version: 3,
   routes: [
     {
+      src: "^/assets/(.*)$",
+      dest: "/assets/$1",
+      headers: { "cache-control": "public, max-age=31536000, immutable" },
+    },
+    {
       src: "^/_build/assets/(.*)$",
       dest: "/assets/$1",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
