@@ -8,6 +8,7 @@ import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 import { WelcomeEmail } from '@/lib/email-templates/welcome'
+import { Webhook } from 'standardwebhooks'
 
 const EMAIL_SUBJECTS: Record<string, string> = {
   signup: 'Confirm your email',
@@ -57,61 +58,55 @@ export const Route = createFileRoute("/api/email/webhook")({
         }
 
         const run_id = crypto.randomUUID()
+        const headers = Object.fromEntries(request.headers)
+        const bodyText = await request.text()
 
-        // Log header names for debugging (helps identify what Supabase is sending)
-        const headerNames = Array.from(request.headers.keys())
         console.log('Webhook request received', { 
-          headerNames,
+          headerNames: Object.keys(headers),
           method: request.method,
           run_id 
         })
 
-        // Robust authorization check
-        // 1. Check Authorization header (standard HTTP hook)
-        const authHeader = request.headers.get('Authorization')?.replace('Bearer ', '').trim()
-        // 2. Check x-supabase-signature (Supabase specific)
-        const supabaseSig = request.headers.get('x-supabase-signature')?.trim()
-        // 3. Check webhook-signature (Standard Webhooks / Svix style)
-        const webhookSig = request.headers.get('webhook-signature')?.trim()
-        
-        // 4. Check for the secret in ANY header (very permissive for debugging)
-        let foundInAnyHeader = false
-        for (const [name, value] of request.headers.entries()) {
-          if (value.includes(webhookSecret.trim())) {
-            foundInAnyHeader = true
-            break
+        let payload: any
+        let isAuthorized = false
+
+        // 1. Try Standard Webhook verification (Svix style)
+        if (webhookSecret.startsWith('v1,whsec_')) {
+          try {
+            const wh = new Webhook(webhookSecret.replace('v1,whsec_', ''))
+            // wh.verify returns the parsed object if successful
+            payload = wh.verify(bodyText, headers)
+            isAuthorized = true
+            console.log('Standard Webhook signature verified', { run_id })
+          } catch (err) {
+            console.error('Standard Webhook verification failed', { error: err instanceof Error ? err.message : String(err), run_id })
           }
         }
 
-        const isAuthorized = 
-          (authHeader && authHeader === webhookSecret.trim()) ||
-          (supabaseSig && supabaseSig === webhookSecret.trim()) ||
-          (webhookSig && webhookSig.includes(webhookSecret.trim())) ||
-          foundInAnyHeader
+        // 2. Fallback to simple Bearer/Static token if Standard verification failed or wasn't used
+        if (!isAuthorized) {
+          const authHeader = request.headers.get('Authorization')?.replace('Bearer ', '').trim()
+          const supabaseSig = request.headers.get('x-supabase-signature')?.trim()
+          
+          if ((authHeader && authHeader === webhookSecret.trim()) || (supabaseSig && supabaseSig === webhookSecret.trim())) {
+            isAuthorized = true
+            try {
+              payload = JSON.parse(bodyText)
+            } catch (err) {
+              console.error('Invalid JSON payload', { error: err, run_id })
+              return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+            }
+          }
+        }
 
         if (!isAuthorized) {
           console.error('Unauthorized webhook attempt', { 
-            has_auth: !!authHeader,
-            has_supabase_sig: !!supabaseSig,
-            has_webhook_sig: !!webhookSig,
-            found_anywhere: foundInAnyHeader,
             run_id 
           })
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        let payload: any
-        try {
-          payload = await request.json()
-        } catch (error) {
-          console.error('Invalid JSON payload', { error })
-          return Response.json(
-            { error: 'Invalid webhook payload' },
-            { status: 400 }
-          )
-        }
-
-        // Handle Supabase 'send_email' hook payload structure: { user: { email: ... }, email_data: { ... } }
+        // At this point, payload is already parsed
         const emailData = payload.email_data || payload.data || {}
         const userData = payload.user || {}
         
