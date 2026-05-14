@@ -31,7 +31,8 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environments
+# Environments (never commit real keys — keep secrets in local .env only)
 .env
 .env.*
+apps/mobile/.env
 !.env.example
