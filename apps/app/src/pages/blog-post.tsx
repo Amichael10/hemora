@@ -9,10 +9,18 @@ type Post = {
   body_markdown: string; cover_url: string | null; published_at: string | null;
 };
 
-// Tiny markdown -> HTML (headings, bold, italic, links, paragraphs, lists)
-function renderMarkdown(md: string): string {
+// Handle both legacy markdown and new TipTap HTML
+function renderMarkdown(content: string): string {
+  if (!content) return "";
+  
+  // If it starts with a tag (TipTap output), treat as HTML
+  if (content.trim().startsWith("<")) {
+    return content;
+  }
+
+  // Legacy markdown -> HTML (headings, bold, italic, links, paragraphs, lists)
   const escape = (s: string) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" } as any)[c]);
-  let html = escape(md);
+  let html = escape(content);
   html = html.replace(/^### (.*)$/gm, "<h3>$1</h3>");
   html = html.replace(/^## (.*)$/gm, "<h2>$1</h2>");
   html = html.replace(/^# (.*)$/gm, "<h1>$1</h1>");

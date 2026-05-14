@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { 
   LayoutDashboard, 
@@ -13,15 +13,32 @@ import {
   Plus,
   Bold,
   Italic,
+  Underline as UnderlineIcon,
   Link as LinkIcon,
   Image as ImageIcon,
   List as ListIcon,
+  ListOrdered,
   Eye,
   Edit3,
   CheckCircle2,
   XCircle,
-  MapPin
+  MapPin,
+  Trash2,
+  Save,
+  ChevronRight,
+  Globe,
+  Phone,
+  Mail,
+  Building2,
+  Upload
 } from "lucide-react";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import ImageExtension from '@tiptap/extension-image';
+import LinkExtension from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
+import Underline from '@tiptap/extension-underline';
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,11 +65,145 @@ type Post = {
   slug: string;
   title: string;
   excerpt: string | null;
-  body_markdown: string;
+  body_markdown: string; // We'll keep the name but store HTML
   cover_url: string | null;
   status: "draft" | "published" | "archived";
   published_at: string | null;
   updated_at: string;
+};
+
+const TiptapEditor = ({ content, onChange }: { content: string, onChange: (html: string) => void }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      ImageExtension.configure({
+        inline: true,
+        allowBase64: true,
+      }),
+      LinkExtension.configure({
+        openOnClick: false,
+      }),
+      Placeholder.configure({
+        placeholder: 'Write your story here...',
+      }),
+    ],
+    content: content,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-stone max-w-none focus:outline-none min-h-[400px] p-8',
+      },
+    },
+  });
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `blog-assets/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('care-record-files')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('care-record-files')
+        .getPublicUrl(filePath);
+
+      editor?.chain().focus().setImage({ src: publicUrl }).run();
+      toast({ title: "Image uploaded successfully" });
+    } catch (error: any) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+    }
+  };
+
+  if (!editor) return null;
+
+  return (
+    <div className="border border-stone-200 rounded-2xl overflow-hidden bg-white">
+      <div className="flex flex-wrap items-center gap-1 p-2 border-b border-stone-100 bg-stone-50/50">
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('bold') && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        >
+          <Bold className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('italic') && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        >
+          <Italic className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('underline') && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+        >
+          <UnderlineIcon className="w-4 h-4" />
+        </Button>
+        <div className="w-px h-4 bg-stone-200 mx-1" />
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('heading', { level: 2 }) && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        >
+          <span className="font-bold text-xs">H2</span>
+        </Button>
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('heading', { level: 3 }) && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        >
+          <span className="font-bold text-xs">H3</span>
+        </Button>
+        <div className="w-px h-4 bg-stone-200 mx-1" />
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('bulletList') && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        >
+          <ListIcon className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('orderedList') && "bg-stone-200")}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        >
+          <ListOrdered className="w-4 h-4" />
+        </Button>
+        <div className="w-px h-4 bg-stone-200 mx-1" />
+        <Button
+          variant="ghost" size="sm" className="h-8 w-8 p-0"
+          onClick={() => {
+            const url = window.prompt('Enter URL');
+            if (url) editor.chain().focus().setLink({ href: url }).run();
+          }}
+        >
+          <LinkIcon className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost" size="sm" className="h-8 w-8 p-0"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <ImageIcon className="w-4 h-4" />
+        </Button>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          className="hidden" 
+          accept="image/*" 
+          onChange={handleFileUpload} 
+        />
+      </div>
+      <EditorContent editor={editor} />
+    </div>
+  );
 };
 
 function BlogTab() {
@@ -206,33 +357,21 @@ function BlogTab() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Content Editor</label>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("**", "**")} className="h-8 px-2" title="Bold"><Bold className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("_", "_")} className="h-8 px-2" title="Italic"><Italic className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("[", "](url)")} className="h-8 px-2" title="Link"><LinkIcon className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("![alt](", ")")} className="h-8 px-2" title="Image"><ImageIcon className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => insertMarkdown("\n- ", "")} className="h-8 px-2" title="List"><ListIcon className="w-4 h-4" /></Button>
-                  </div>
-                </div>
-                <Textarea 
-                  id="blog-body"
-                  placeholder="Start writing your story in Markdown..." 
-                  value={editing.body_markdown || ""} 
-                  onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })} 
-                  rows={20} 
-                  className="rounded-2xl border-stone-200 font-mono text-sm leading-relaxed p-6 bg-stone-50/30" 
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Article Content</label>
+                <TiptapEditor 
+                  content={editing.body_markdown || ""} 
+                  onChange={(html) => setEditing({ ...editing, body_markdown: html })} 
                 />
               </div>
             </>
           ) : (
-            <article className="prose prose-stone lg:prose-xl max-w-none">
-              {editing.cover_url && <img src={editing.cover_url} className="w-full h-80 object-cover rounded-[2rem] mb-12 shadow-lg" />}
-              <h1 className="font-serif font-bold text-4xl mb-6">{editing.title || "Untitled Article"}</h1>
-              <div className="whitespace-pre-wrap font-sans text-stone-700">
-                {editing.body_markdown || "No content to preview yet."}
-              </div>
+            <article className="prose prose-stone lg:prose-xl max-w-none bg-white p-12 rounded-[2rem] border border-border/40">
+              {editing.cover_url && <img src={editing.cover_url} className="w-full h-96 object-cover rounded-[2rem] mb-12 shadow-xl" />}
+              <h1 className="font-serif font-bold text-5xl mb-8 text-[#1A1A1A] leading-tight">{editing.title || "Untitled Article"}</h1>
+              <div 
+                className="font-sans text-stone-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: editing.body_markdown || "<p className='italic text-muted-foreground'>No content to preview yet.</p>" }}
+              />
             </article>
           )}
         </div>
@@ -378,8 +517,8 @@ function ProvidersTab() {
         <div className="p-6 border-b border-border/40 bg-[#F9F6F2] flex items-center justify-between">
           <h3 className="font-serif font-bold text-lg">{editing.id ? "Edit Provider" : "Register New Provider"}</h3>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button size="sm" onClick={save} className="bg-[#1A1A1A]">Save Provider</Button>
+            <Button variant="outline" size="sm" onClick={() => setEditing(null)} className="rounded-full">Cancel</Button>
+            <Button size="sm" onClick={save} className="bg-[#A8324A] hover:bg-[#8e2a3e] rounded-full">Save Provider</Button>
           </div>
         </div>
         <div className="p-8 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -437,7 +576,7 @@ function ProvidersTab() {
           <h3 className="text-lg font-serif font-bold text-[#1A1A1A]">Healthcare Directory</h3>
           <p className="text-xs text-muted-foreground">Manage verified hospitals, clinics, and specialists.</p>
         </div>
-        <Button onClick={() => setEditing({ verified: true, country: "Nigeria", type: "Hospital" })} className="rounded-full gap-2 bg-[#1A1A1A]">
+        <Button onClick={() => setEditing({ verified: true, country: "Nigeria", type: "Hospital" })} className="rounded-full gap-2 bg-[#A8324A] hover:bg-[#8e2a3e]">
           <Plus className="w-4 h-4" /> Add Provider
         </Button>
       </div>
@@ -540,57 +679,81 @@ function SuggestionsTab() {
   if (loading) return <p className="text-sm text-muted-foreground text-center py-20 font-serif italic">Reviewing pending requests...</p>;
   
   if (reviewing) {
-     // Reuse the provider structure for the review form
      return (
         <div className="bg-white rounded-[2rem] border border-border/40 overflow-hidden shadow-2xl">
-          <div className="p-6 border-b border-border/40 bg-amber-50 flex items-center justify-between">
+          <div className="p-6 border-b border-border/40 bg-[#FDF8F1] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white">
-                <Bell className="w-4 h-4" />
+              <div className="w-10 h-10 bg-[#A8324A] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#A8324A]/20">
+                <Bell className="w-5 h-5" />
               </div>
-              <h3 className="font-serif font-bold text-lg">Reviewing Suggestion</h3>
+              <div>
+                <h3 className="font-serif font-bold text-lg text-[#1A1A1A]">Reviewing Suggestion</h3>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Action Required</p>
+              </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setReviewing(null)}>Cancel</Button>
-              <Button size="sm" onClick={() => approve(reviewing)} className="bg-[#1A1A1A]">Edit & Approve</Button>
+              <Button variant="outline" size="sm" onClick={() => setReviewing(null)} className="rounded-full">Cancel</Button>
+              <Button size="sm" onClick={() => approve(reviewing)} className="bg-[#A8324A] hover:bg-[#8B293D] rounded-full px-6">Approve & Publish</Button>
             </div>
           </div>
-          <div className="p-8 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Name</label>
-                <Input value={reviewing.name || ""} onChange={(e) => setReviewing({ ...reviewing, name: e.target.value })} className="rounded-xl" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Suggested Category</label>
-                <Input value={reviewing.type || ""} onChange={(e) => setReviewing({ ...reviewing, type: e.target.value })} className="rounded-xl" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Phone</label>
-                <Input value={reviewing.phone || ""} onChange={(e) => setReviewing({ ...reviewing, phone: e.target.value })} className="rounded-xl" />
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Physical Address</label>
-                <Input placeholder="Enter verified address..." value={reviewing.address || ""} onChange={(e) => setReviewing({ ...reviewing, address: e.target.value })} className="rounded-xl" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">City</label>
-                  <Input value={reviewing.city || ""} onChange={(e) => setReviewing({ ...reviewing, city: e.target.value })} className="rounded-xl" />
+          <div className="p-8 max-w-5xl mx-auto space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Entity Name</label>
+                  <Input value={reviewing.name || ""} onChange={(e) => setReviewing({ ...reviewing, name: e.target.value })} className="rounded-2xl border-stone-200 h-12" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">State</label>
-                  <Input value={reviewing.state || ""} onChange={(e) => setReviewing({ ...reviewing, state: e.target.value })} className="rounded-xl" />
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Provider Type</label>
+                  <Select value={reviewing.type || "Hospital"} onValueChange={(v) => setReviewing({ ...reviewing, type: v })}>
+                    <SelectTrigger className="rounded-2xl border-stone-200 h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["Hospital", "Clinic", "Pharmacy", "Diagnostic Center", "Specialist", "Doctor", "Laboratory", "Support Group"].map(t => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Contact Phone</label>
+                  <Input value={reviewing.phone || ""} onChange={(e) => setReviewing({ ...reviewing, phone: e.target.value })} className="rounded-2xl border-stone-200 h-12" />
+                </div>
+              </div>
+              <div className="space-y-6">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Physical Address</label>
+                  <Input placeholder="Verify and enter full address..." value={reviewing.address || ""} onChange={(e) => setReviewing({ ...reviewing, address: e.target.value })} className="rounded-2xl border-stone-200 h-12" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">City</label>
+                    <Input value={reviewing.city || ""} onChange={(e) => setReviewing({ ...reviewing, city: e.target.value })} className="rounded-2xl border-stone-200 h-12" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">State</label>
+                    <Input value={reviewing.state || ""} onChange={(e) => setReviewing({ ...reviewing, state: e.target.value })} className="rounded-2xl border-stone-200 h-12" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Website (Optional)</label>
+                  <Input value={reviewing.website || ""} onChange={(e) => setReviewing({ ...reviewing, website: e.target.value })} className="rounded-2xl border-stone-200 h-12" />
                 </div>
               </div>
             </div>
-          </div>
-          <div className="px-8 pb-8">
-            <div className="p-4 bg-stone-50 rounded-2xl border border-border/40">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Original User Notes</h4>
-              <p className="text-sm text-stone-600 italic">"{reviewing.notes || "No additional notes provided."}"</p>
+            
+            <div className="p-6 bg-[#F9F6F2] rounded-[2rem] border border-border/40">
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#A8324A] mb-3 flex items-center gap-2">
+                <MessageSquare className="w-3 h-3" /> User Provided Notes
+              </h4>
+              <p className="text-sm text-stone-600 italic leading-relaxed">"{reviewing.notes || "No additional context provided by the user."}"</p>
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4">
+              <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => reject(reviewing.id)}>
+                <Trash2 className="w-4 h-4 mr-2" /> Reject Suggestion
+              </Button>
             </div>
           </div>
         </div>
@@ -766,7 +929,7 @@ function StatsTab() {
         {items.map((s) => (
           <div key={s.label} className="bg-white rounded-3xl border border-border/40 p-6 hover:shadow-lg hover:shadow-black/5 transition-all group">
             <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-[#F9F6F2] rounded-2xl group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
+              <div className="p-3 bg-[#F9F6F2] rounded-2xl group-hover:bg-[#A8324A] group-hover:text-white transition-colors">
                 <s.icon className="w-6 h-6" />
               </div>
               <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-100">+0%</Badge>
@@ -778,15 +941,15 @@ function StatsTab() {
         ))}
       </div>
       
-      <div className="bg-[#1A1A1A] rounded-[2rem] p-8 text-white relative overflow-hidden">
+      <div className="bg-[#A8324A] rounded-[2rem] p-8 text-white relative overflow-hidden">
         <div className="relative z-10">
           <h3 className="text-2xl font-serif font-bold mb-2">System Health</h3>
-          <p className="text-stone-400 max-w-md text-sm">All systems are operational. Global traffic and detailed visitor analytics are managed via the external Hemora Analytics dashboard.</p>
-          <Button variant="outline" className="mt-6 border-stone-700 hover:bg-stone-800 text-white hover:text-white">
+          <p className="text-stone-100/80 max-w-md text-sm">All systems are operational. Global traffic and detailed visitor analytics are managed via the external Hemora Analytics dashboard.</p>
+          <Button variant="outline" className="mt-6 border-white/20 bg-white/10 hover:bg-white/20 text-white hover:text-white rounded-full">
             View Live Reports
           </Button>
         </div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-stone-800/50 rounded-full blur-3xl -mr-20 -mt-20" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
       </div>
     </div>
   );
@@ -807,7 +970,7 @@ export default function AdminPage() {
           <div className="bg-white p-8 rounded-3xl shadow-sm border border-border/50">
             <h1 className="text-2xl font-serif font-bold text-[#1A1A1A] mb-2">Restricted Access</h1>
             <p className="text-sm text-muted-foreground">You don't have permission to access the management tools.</p>
-            <Button className="mt-6 w-full bg-[#1A1A1A] hover:bg-[#333]" onClick={() => setLocation("/dashboard")}>
+            <Button className="mt-6 w-full bg-[#A8324A] hover:bg-[#8e2a3e] rounded-full" onClick={() => setLocation("/dashboard")}>
               Back to dashboard
             </Button>
           </div>
@@ -828,29 +991,29 @@ export default function AdminPage() {
   return (
     <div className="flex h-screen bg-[#FDF8F1] overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1A1A1A] flex flex-col shrink-0">
-        <div className="p-8 border-b border-stone-800/50 flex items-center gap-4">
-          <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-[#1A1A1A] font-serif font-black text-xl shadow-lg shadow-black/20">H</div>
+      <aside className="w-72 bg-[#A8324A] flex flex-col shrink-0">
+        <div className="p-10 border-b border-white/10 flex items-center gap-4">
+          <div className="w-12 h-12 bg-[#FDF8F1] rounded-2xl flex items-center justify-center text-[#A8324A] font-serif font-black text-2xl shadow-2xl shadow-black/20">H</div>
           <div className="min-w-0">
-            <h1 className="font-serif font-black text-white text-lg tracking-tight uppercase">Hemora</h1>
-            <p className="text-[10px] text-stone-500 font-bold uppercase tracking-[0.2em] leading-none">Console</p>
+            <h1 className="font-serif font-black text-[#FDF8F1] text-xl tracking-tight uppercase">Hemora</h1>
+            <p className="text-[10px] text-[#FDF8F1]/60 font-bold uppercase tracking-[0.2em] leading-none">Management</p>
           </div>
         </div>
         
-        <nav className="flex-1 p-6 space-y-2 overflow-y-auto">
-          <p className="text-[10px] font-black text-stone-600 uppercase tracking-widest mb-4 ml-2">Administration</p>
+        <nav className="flex-1 p-6 space-y-2 overflow-y-auto mt-4">
+          <p className="text-[10px] font-black text-[#FDF8F1]/40 uppercase tracking-widest mb-6 ml-4">Administration</p>
           {menuItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => { setActiveTab(item.id); setReviewing(null); }}
+              onClick={() => setActiveTab(item.id)}
               className={cn(
-                "w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300",
+                "w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] text-sm font-bold transition-all duration-500 group",
                 activeTab === item.id 
-                  ? "bg-white text-[#1A1A1A] shadow-xl shadow-black/20" 
-                  : "text-stone-400 hover:text-white hover:bg-white/5"
+                  ? "bg-[#FDF8F1] text-[#A8324A] shadow-2xl shadow-black/30 translate-x-2" 
+                  : "text-[#FDF8F1]/70 hover:text-[#FDF8F1] hover:bg-white/5"
               )}
             >
-              <item.icon className={cn("w-5 h-5", activeTab === item.id ? "text-[#1A1A1A]" : "text-stone-500")} />
+              <item.icon className={cn("w-5 h-5 transition-colors", activeTab === item.id ? "text-[#A8324A]" : "text-[#FDF8F1]/40 group-hover:text-[#FDF8F1]")} />
               {item.label}
             </button>
           ))}
@@ -859,18 +1022,20 @@ export default function AdminPage() {
         <div className="p-6 space-y-4">
           <button 
             onClick={() => setLocation("/dashboard")}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-stone-400 hover:text-white transition-colors rounded-2xl hover:bg-white/5"
+            className="w-full flex items-center gap-3 px-6 py-4 text-sm text-[#FDF8F1]/60 hover:text-[#FDF8F1] transition-colors rounded-[2rem] hover:bg-white/5 font-bold"
           >
             <ArrowLeft className="w-4 h-4" />
-            Exit to Platform
+            Exit Console
           </button>
-          <div className="flex items-center gap-3 px-4 py-4 bg-stone-900 rounded-3xl border border-stone-800">
-            <div className="w-10 h-10 rounded-full bg-stone-700 overflow-hidden flex-shrink-0" />
+          <div className="flex items-center gap-4 px-6 py-5 bg-white/5 rounded-[2.5rem] border border-white/10 backdrop-blur-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[#FDF8F1]/10 overflow-hidden flex-shrink-0 flex items-center justify-center text-[#FDF8F1] font-bold">
+              AD
+            </div>
             <div className="min-w-0">
-              <p className="text-xs font-black text-white truncate">Administrator</p>
+              <p className="text-xs font-black text-[#FDF8F1] truncate">Administrator</p>
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                <p className="text-[9px] text-stone-500 font-bold uppercase tracking-widest">Active Now</p>
+                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-sm shadow-green-400" />
+                <p className="text-[9px] text-[#FDF8F1]/40 font-bold uppercase tracking-widest">System Active</p>
               </div>
             </div>
           </div>
