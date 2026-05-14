@@ -27,19 +27,15 @@ export default function AuthCallback() {
         const profile = await getProfileByUser(user.id);
         if (cancelled) return;
         setProfileId(String(profile.id));
-
-        // If the profile is essentially empty (just created by the auth trigger),
-        // we redirect them to the onboarding flow to complete it.
-        if (!profile.dateOfBirth || !profile.gender || !profile.country) {
-          setLocation("/onboarding?step=1");
-        } else {
-          setLocation("/dashboard");
-        }
+        // Profile already exists → returning user. Always go straight to dashboard.
+        setLocation("/dashboard");
       } catch (err) {
         if (cancelled) return;
-        // Only 404 means "no linked profile yet" → continue onboarding.
+        // 404 = no linked profile yet → brand new user, begin onboarding.
         if (err instanceof ApiError && err.status === 404) {
-          setLocation("/onboarding?step=1");
+          // Pass the auth provider so onboarding can skip the name step for Google.
+          const provider = user.app_metadata?.provider ?? "email";
+          setLocation(`/onboarding?step=1&provider=${provider}`);
           return;
         }
         const msg =

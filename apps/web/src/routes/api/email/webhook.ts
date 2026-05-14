@@ -16,6 +16,7 @@ const EMAIL_SUBJECTS: Record<string, string> = {
   email_change: 'Confirm your new email',
   reauthentication: 'Your verification code',
   welcome: 'Welcome to Hemora',
+  magiclink: 'Your magic link',
 }
 
 // Template mapping
@@ -26,6 +27,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   email_change: EmailChangeEmail,
   reauthentication: ReauthenticationEmail,
   welcome: WelcomeEmail,
+  magiclink: SignupEmail,
 }
 
 // Configuration
@@ -64,6 +66,8 @@ export const Route = createFileRoute("/api/email/webhook")({
           (authHeader && (authHeader === `Bearer ${webhookSecret}` || authHeader === webhookSecret)) ||
           (signature && signature === webhookSecret)
 
+        const run_id = crypto.randomUUID()
+
         if (!isAuthorized) {
           console.error('Unauthorized webhook attempt', { 
             received_auth: authHeader ? 'present' : 'missing',
@@ -86,24 +90,29 @@ export const Route = createFileRoute("/api/email/webhook")({
           )
         }
 
-        const run_id = payload.run_id || crypto.randomUUID()
-        const emailType = payload.data?.action_type || payload.type
+        // Handle Supabase 'send_email' hook payload structure: { user: { email: ... }, email_data: { ... } }
+        const emailData = payload.email_data || payload.data || {}
+        const userData = payload.user || {}
+        
+        const emailType = emailData.email_action_type || emailData.action_type || payload.type
 
         if (!emailType) {
-          console.error('Webhook payload missing action_type', { run_id })
+          console.error('Webhook payload missing email_action_type', { run_id, payload_keys: Object.keys(payload) })
           return Response.json(
             { error: 'Invalid webhook payload: missing action_type' },
             { status: 400 }
           )
         }
 
+        const recipientEmail = userData.email || emailData.email || payload.email
+        
         console.log('Received auth event', {
           emailType,
-          email_redacted: redactEmail(payload.data?.email),
+          email_redacted: redactEmail(recipientEmail),
           run_id,
         })
 
-        const EmailTemplate = EMAIL_TEMPLATES[emailType]
+        const EmailTemplate = EMAIL_TEMPLATES[emailType] || EMAIL_TEMPLATES['signup'] // Fallback to signup if unknown
         if (!EmailTemplate) {
           console.error('Unknown email type', { emailType, run_id })
           return Response.json(
@@ -116,12 +125,12 @@ export const Route = createFileRoute("/api/email/webhook")({
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
-          recipient: payload.data.email,
-          confirmationUrl: payload.data.url,
-          otpCode: payload.data.token,
-          email: payload.data.email,
-          oldEmail: payload.data.old_email,
-          newEmail: payload.data.new_email,
+          recipient: recipientEmail,
+          confirmationUrl: emailData.url || emailData.redirect_to,
+          otpCode: emailData.token || emailData.token_hash,
+          email: recipientEmail,
+          oldEmail: emailData.old_email,
+          newEmail: emailData.new_email,
         }
 
         // Render React Email to HTML and plain text
@@ -148,7 +157,7 @@ export const Route = createFileRoute("/api/email/webhook")({
         await supabase.from('email_send_log').insert({
           message_id: messageId,
           template_name: emailType,
-          recipient_email: payload.data.email,
+          recipient_email: recipientEmail,
           status: 'pending',
         })
 
@@ -157,7 +166,7 @@ export const Route = createFileRoute("/api/email/webhook")({
           payload: {
             run_id,
             message_id: messageId,
-            to: payload.data.email,
+            to: recipientEmail,
             from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
             subject: EMAIL_SUBJECTS[emailType] || 'Notification',
@@ -174,7 +183,7 @@ export const Route = createFileRoute("/api/email/webhook")({
           await supabase.from('email_send_log').insert({
             message_id: messageId,
             template_name: emailType,
-            recipient_email: payload.data.email,
+            recipient_email: recipientEmail,
             status: 'failed',
             error_message: 'Failed to enqueue email',
           })
@@ -186,7 +195,7 @@ export const Route = createFileRoute("/api/email/webhook")({
 
         console.log('Auth email enqueued', {
           emailType,
-          email_redacted: redactEmail(payload.data.email),
+          email_redacted: redactEmail(recipientEmail),
           run_id,
         })
 
