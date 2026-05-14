@@ -31,6 +31,8 @@ import botanical from "@/assets/images/botanical-illustration.png";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/context/ProfileContext";
 import { useAuth } from "@/context/AuthContext";
+import { triggerWelcomeEmail } from "@/lib/email.functions";
+
 import { authRedirectUrl } from "@/lib/supabase";
 
 type SetupFor = CreateProfileBodySetupFor;
@@ -122,6 +124,9 @@ export default function Onboarding() {
       {
         onSuccess: (newProfile) => {
           setProfileId(newProfile.id);
+          if (user?.email) {
+            triggerWelcomeEmail({ data: { email: user.email } }).catch(console.error);
+          }
           setLocation("/dashboard");
         },
         onError: () => toast({ title: "Something went wrong", description: "Please try again in a moment.", variant: "destructive" }),

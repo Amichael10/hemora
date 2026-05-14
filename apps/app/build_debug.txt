@@ -1,0 +1,28 @@
+[2m[34mvinxi[39m[22m [2m[33mv0.5.3[39m[22m
+file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/@tanstack+start-config@1.12_be358c97c5a7fb754437a225e52c2189/node_modules/@tanstack/start-config/dist/esm/vinxi-file-router.js:2
+import { CONSTANTS as GENERATOR_CONSTANTS, startAPIRouteSegmentsFromTSRFilePath, } from '@tanstack/router-generator';
+         ^^^^^^^^^
+SyntaxError: The requested module '@tanstack/router-generator' does not provide an export named 'CONSTANTS'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+    at async loadFile (file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/vinxi@0.5.3_@types+node@22._57ec36ea5b1a7d133bd935b2d619262b/node_modules/vinxi/lib/load-app.js:83:25)
+    at async loadApp (file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/vinxi@0.5.3_@types+node@22._57ec36ea5b1a7d133bd935b2d619262b/node_modules/vinxi/lib/load-app.js:137:19)
+    at async Object.run (file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/vinxi@0.5.3_@types+node@22._57ec36ea5b1a7d133bd935b2d619262b/node_modules/vinxi/bin/cli.mjs:229:17)
+    at async runCommand (file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/citty@0.1.6/node_modules/citty/dist/index.mjs:316:16)
+    at async runCommand (file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/citty@0.1.6/node_modules/citty/dist/index.mjs:307:11)
+    at async runMain (file:///C:/Users/User/Monorepo/hemora/node_modules/.pnpm/citty@0.1.6/node_modules/citty/dist/index.mjs:445:7)
+
+[41m[30m ERROR [39m[49m Couldn't load app
+
+    [90mat [39mObject.run ([36m/C:/Users/User/Monorepo/hemora/node_modules/.pnpm/vinxi@0.5.3_@types+node@22._57ec36ea5b1a7d133bd935b2d619262b/node_modules/vinxi/bin/cli.mjs:231:12[39m)
+    [90mat [39mprocess.processTicksAndRejections ([36mnode:internal/process/task_queues:103:5[39m)
+    [90mat [39masync runCommand ([36m/C:/Users/User/Monorepo/hemora/node_modules/.pnpm/citty@0.1.6/node_modules/citty/dist/index.mjs:316:16[39m)
+    [90mat [39masync runCommand ([36m/C:/Users/User/Monorepo/hemora/node_modules/.pnpm/citty@0.1.6/node_modules/citty/dist/index.mjs:307:11[39m)
+    [90mat [39masync runMain ([36m/C:/Users/User/Monorepo/hemora/node_modules/.pnpm/citty@0.1.6/node_modules/citty/dist/index.mjs:445:7[39m) 
+
+
+
+[41m[30m ERROR [39m[49m Couldn't load app
+

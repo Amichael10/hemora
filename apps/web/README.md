@@ -2,9 +2,9 @@
 
 The marketing landing page for Hemora. Deploys to **Vercel** at `hemora.xyz`.
 
-The companion app (`apps/app`) deploys separately to Cloudflare Workers at
-`app.hemora.xyz`. The two apps share the monorepo but have independent
-deployments and independent domains.
+The companion app (`apps/app`) also deploys to **Vercel** at `app.hemora.xyz`.
+The two apps share the monorepo but have independent deployment configurations
+within the same Vercel team.
 
 ## Stack
 
@@ -55,8 +55,8 @@ After the first deploy succeeds:
    Vercel shows. Typically:
    - `@` → A record `76.76.21.21`
    - `www` → CNAME `cname.vercel-dns.com`
-3. Leave the existing `app` CNAME pointing at Cloudflare untouched —
-   `app.hemora.xyz` continues to serve `apps/app`.
+3. The `app` subdomain should also point to Vercel as a separate project
+   serving `apps/app`.
 
 Once `hemora.xyz` resolves to Vercel, remove the custom domain from the
 standalone "Hemora Landing Page" Lovable project (Project Settings → Domains)
@@ -65,10 +65,10 @@ single source of truth.
 
 ## Why two deployment targets?
 
-- `apps/app` uses Cloudflare Worker–specific server bits (`src/server.ts`,
-  `wrangler.jsonc`, auth-protected `createServerFn` middleware) and is
-  already live on `app.hemora.xyz`. Migrating it would be a real refactor
-  with no upside.
+- `apps/app` and `apps/web` are both deployed on Vercel to simplify
+  the monorepo infrastructure and provide consistent SSR performance.
+- Previously, `apps/app` was on Cloudflare Workers, but it was migrated
+  to Vercel to resolve routing issues (404s) and unify the build pipeline.
 - `apps/web` is the marketing surface. Vercel's preview deployments per PR
   and zero-config domain wiring are nicer for marketing iteration.
 
