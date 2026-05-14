@@ -56,22 +56,20 @@ export const Route = createFileRoute("/api/email/webhook")({
           )
         }
 
-        // Verify authorization
-        const authHeader = request.headers.get('Authorization')
-        const signature = request.headers.get('x-supabase-signature')
+        const run_id = crypto.randomUUID()
+
+        // Robust authorization check
+        const authHeader = request.headers.get('Authorization')?.replace('Bearer ', '').trim()
+        const signature = request.headers.get('x-supabase-signature')?.trim()
         
         const isAuthorized = 
-          (authHeader && (authHeader === `Bearer ${webhookSecret}` || authHeader === webhookSecret)) ||
-          (signature && signature === webhookSecret)
-
-        const run_id = crypto.randomUUID()
+          (authHeader && authHeader === webhookSecret.trim()) ||
+          (signature && signature === webhookSecret.trim())
 
         if (!isAuthorized) {
           console.error('Unauthorized webhook attempt', { 
-            received_auth: authHeader ? 'present' : 'missing',
-            received_signature: signature ? 'present' : 'missing',
-            expected_secret_configured: !!webhookSecret,
-            secret_start: webhookSecret ? webhookSecret.substring(0, 8) + '...' : 'none',
+            auth_present: !!authHeader,
+            sig_present: !!signature,
             run_id 
           })
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -141,9 +139,13 @@ export const Route = createFileRoute("/api/email/webhook")({
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
         if (!supabaseUrl || !supabaseServiceKey) {
-          console.error('Missing Supabase environment variables')
+          console.error('Missing Supabase environment variables', {
+            has_url: !!supabaseUrl,
+            has_key: !!supabaseServiceKey,
+            run_id
+          })
           return Response.json(
-            { error: 'Server configuration error' },
+            { error: 'Server configuration error: missing database credentials' },
             { status: 500 }
           )
         }
