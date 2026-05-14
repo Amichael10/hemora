@@ -5,7 +5,7 @@
   },
   "build": {
     "base": {
-      "node": "22.13.0",
+      "node": "22.15.0",
       "corepack": true,
       "pnpm": "10.33.4"
     },
