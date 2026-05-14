@@ -17,7 +17,14 @@ function createSupabaseClient() {
     console.error(`[Supabase Client] ${message}`);
     // Return a dummy client instead of crashing startup
     return {
-      auth: { onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }) },
+      auth: { 
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signInWithOAuth: async () => ({ error: new Error(message) }),
+        signInWithPassword: async () => ({ error: new Error(message) }),
+        signUp: async () => ({ error: new Error(message) }),
+        signOut: async () => ({ error: null }),
+      },
       from: () => { throw new Error(message); },
     } as any;
   }
