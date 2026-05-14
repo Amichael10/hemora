@@ -25,6 +25,14 @@ fs.mkdirSync(vercelOut, { recursive: true });
 console.log("📦 Copying client assets → .vercel/output/static/ ...");
 const staticDir = path.join(vercelOut, "static");
 copyDir(distClient, staticDir);
+
+// Ensure 'assets' is at the root of static (some frameworks nest it)
+const buildAssets = path.join(staticDir, "_build", "assets");
+const rootAssets = path.join(staticDir, "assets");
+if (fs.existsSync(buildAssets) && !fs.existsSync(rootAssets)) {
+  console.log("   🚚 Moving _build/assets to root assets...");
+  copyDir(buildAssets, rootAssets);
+}
 console.log("   done.");
 
 // 2. Create Node.js serverless function
@@ -99,16 +107,6 @@ const config = {
     {
       src: "^/assets/(.*)$",
       dest: "/assets/$1",
-      headers: { "cache-control": "public, max-age=31536000, immutable" },
-    },
-    {
-      src: "^/_build/assets/(.*)$",
-      dest: "/assets/$1",
-      headers: { "cache-control": "public, max-age=31536000, immutable" },
-    },
-    {
-      src: "^/assets/(.*)$",
-      dest: "/static/assets/$1",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
     },
     { handle: "filesystem" },
