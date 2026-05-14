@@ -10,7 +10,9 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
-    tanstackStart(),
+    tanstackStart({
+      server: { entry: "src/server.ts" },
+    }),
     tsconfigPaths(),
     tailwindcss(),
   ],

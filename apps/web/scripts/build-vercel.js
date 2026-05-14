@@ -4,18 +4,6 @@
  *
  * Transforms TanStack Start Vite output (dist/client + dist/server)
  * into .vercel/output format so Vercel serves it correctly.
- *
- * Structure created:
- *   .vercel/output/
- *     config.json              - routing rules
- *     static/                  - client assets (dist/client/**)
- *     functions/
- *       index.func/            - Node.js 22 serverless function
- *         .vc-config.json      - marks as nodejs22 function
- *         index.mjs            - entry: wraps SSR handler for Node.js HTTP
- *         server.js            - built SSR handler (fetch-API based)
- *         assets/              - server assets
- *         node_modules/        - symlinked or copied for bare specifiers
  */
 
 import fs from "node:fs";
@@ -70,17 +58,14 @@ if (!fs.existsSync(funcModules)) {
     fs.symlinkSync(nodeModules, funcModules, "junction");
     console.log("   node_modules symlinked.");
   } catch {
-    // fallback: skip — runtime node_modules should be available
     console.log("   note: could not symlink node_modules (non-critical).");
   }
 }
 
 // index.mjs — wraps the fetch-API handler for Vercel's Node.js runtime
-// Vercel's shouldAddHelpers injects __vc_bridge which we use here
 const entry = `
 import server from "./server.js";
 
-// Vercel Node.js runtime: export a default async function handler
 export default async function handler(req, res) {
   const url = new URL(req.url, \`http://\${req.headers.host || "localhost"}\`);
   const request = new Request(url.toString(), {
