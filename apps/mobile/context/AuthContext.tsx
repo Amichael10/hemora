@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { getGoogleOAuthRedirectUrl } from "@/lib/authRedirect";
+import { getSupabaseMissingEnvHint } from "@/lib/env";
 import { establishSessionFromUrl, hasAuthPayloadInUrl } from "@/lib/oauthRedirectHandler";
 import { getSupabase } from "@/lib/supabase";
 
@@ -81,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithPassword = useCallback(async (email: string, password: string) => {
     const supabase = getSupabase();
     if (!supabase) {
-      return { error: "Supabase is not configured in app config." };
+      return { error: getSupabaseMissingEnvHint() || "Supabase is not configured." };
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
@@ -90,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase) {
-      return { error: "Supabase is not configured in app config." };
+      return { error: getSupabaseMissingEnvHint() || "Supabase is not configured." };
     }
     const redirectTo = getGoogleOAuthRedirectUrl();
     const { data, error } = await supabase.auth.signInWithOAuth({
