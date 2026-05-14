@@ -27,7 +27,14 @@ export default function AuthCallback() {
         const profile = await getProfileByUser(user.id);
         if (cancelled) return;
         setProfileId(String(profile.id));
-        setLocation("/dashboard");
+
+        // If the profile is essentially empty (just created by the auth trigger),
+        // we redirect them to the onboarding flow to complete it.
+        if (!profile.dateOfBirth || !profile.gender || !profile.country) {
+          setLocation("/onboarding?step=1");
+        } else {
+          setLocation("/dashboard");
+        }
       } catch (err) {
         if (cancelled) return;
         // Only 404 means "no linked profile yet" → continue onboarding.

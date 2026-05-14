@@ -58,8 +58,20 @@ export const Route = createFileRoute("/api/email/webhook")({
 
         // Verify authorization
         const authHeader = request.headers.get('Authorization')
-        if (!authHeader || (authHeader !== `Bearer ${webhookSecret}` && authHeader !== webhookSecret)) {
-          console.error('Unauthorized webhook attempt')
+        const signature = request.headers.get('x-supabase-signature')
+        
+        const isAuthorized = 
+          (authHeader && (authHeader === `Bearer ${webhookSecret}` || authHeader === webhookSecret)) ||
+          (signature && signature === webhookSecret)
+
+        if (!isAuthorized) {
+          console.error('Unauthorized webhook attempt', { 
+            received_auth: authHeader ? 'present' : 'missing',
+            received_signature: signature ? 'present' : 'missing',
+            expected_secret_configured: !!webhookSecret,
+            secret_start: webhookSecret ? webhookSecret.substring(0, 8) + '...' : 'none',
+            run_id 
+          })
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
