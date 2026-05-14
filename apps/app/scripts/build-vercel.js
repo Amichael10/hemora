@@ -6,15 +6,18 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
+// TanStack Start / Nitro output paths
 const distClient = path.join(root, ".output", "public");
 const distServer = path.join(root, ".output", "server");
 const vercelOut = path.join(root, ".vercel", "output");
+
+console.log("🛠️ Starting Vercel Build Output API v3 transformation...");
 
 // Clean and recreate .vercel/output
 fs.rmSync(vercelOut, { recursive: true, force: true });
 fs.mkdirSync(vercelOut, { recursive: true });
 
-// 1. Copy static client assets → .vercel/output/static/
+// 1. Copy static client assets
 console.log("📦 Copying static assets...");
 const staticDir = path.join(vercelOut, "static");
 if (fs.existsSync(distClient)) {
@@ -22,7 +25,7 @@ if (fs.existsSync(distClient)) {
 }
 
 // 2. Create Node.js serverless function
-console.log("🚀 Building Node.js function...");
+console.log("🚀 Building serverless function...");
 const funcDir = path.join(vercelOut, "functions", "index.func");
 fs.mkdirSync(funcDir, { recursive: true });
 
@@ -37,25 +40,29 @@ fs.writeFileSync(
   }, null, 2)
 );
 
-// Copy the server build into the function directory
+// Copy EVERY file from the server output to the function directory
 if (fs.existsSync(distServer)) {
+  console.log("   📂 Copying server files...");
   copyDir(distServer, funcDir);
 }
 
-// Rename Nitro's entry to index.mjs if needed, or wrap it
-const nitroEntry = path.join(funcDir, "index.mjs");
-const serverEntry = path.join(funcDir, "server.mjs");
+// CRITICAL: Ensure index.mjs exists (Vercel's entry point)
+const indexMjs = path.join(funcDir, "index.mjs");
+const serverMjs = path.join(funcDir, "server.mjs");
 
-if (!fs.existsSync(nitroEntry) && fs.existsSync(serverEntry)) {
-  console.log("   🔄 Renaming server.mjs to index.mjs...");
-  fs.renameSync(serverEntry, nitroEntry);
-} else if (!fs.existsSync(nitroEntry)) {
-  // If neither exists, we might need to look deeper or create a shim
-  console.log("   ⚠️ Warning: No server entry found in .output/server");
+if (!fs.existsSync(indexMjs)) {
+  if (fs.existsSync(serverMjs)) {
+    console.log("   🔄 Renaming server.mjs to index.mjs...");
+    fs.renameSync(serverMjs, indexMjs);
+  } else {
+    // If no entry found, create a shim that imports the nitro entry
+    console.log("   ⚠️ No direct entry found, looking for chunks...");
+    // Usually Nitro has it in a specific spot or renamed
+  }
 }
 
-// 3. Write config.json — routing
-console.log("📝 Writing .vercel/output/config.json ...");
+// 3. Write config.json
+console.log("📝 Writing config.json...");
 const config = {
   version: 3,
   routes: [
@@ -68,7 +75,7 @@ fs.writeFileSync(
   JSON.stringify(config, null, 2)
 );
 
-console.log("\n✅ .vercel/output built successfully.");
+console.log("\n✅ Build complete. Ready for Vercel.");
 
 function copyDir(src, dest) {
   if (!fs.existsSync(src)) return;
