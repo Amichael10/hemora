@@ -7,6 +7,9 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { PostHogProvider } from "@/components/providers/PostHogProvider";
+import posthog from "posthog-js";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 
@@ -122,10 +125,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Track pageview on route change
+    posthog.capture("$pageview");
+  }, [router.state.location.pathname]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <PostHogProvider>
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    </PostHogProvider>
   );
 }

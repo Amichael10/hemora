@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import hemoraLogo from "@/assets/brand/Logo.png";
 import hemoraWordmark from "@/assets/brand/Wordmark.png";
 import heroFamily from "@/assets/hero/hero-asset.png";
+import posthog from "posthog-js";
 import dashboardEmoji from "@/assets/images/emoji-mild.png";
 import {
   HeartPulse2Bold as HeartPulse,
@@ -289,12 +290,24 @@ function Hero() {
             </p>
 
             <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-              <Button size="xl" variant="crisis" asChild className="rounded-full px-10 shadow-xl hover:scale-[1.02] transition-transform">
+              <Button 
+                size="xl" 
+                variant="crisis" 
+                asChild 
+                className="rounded-full px-10 shadow-xl hover:scale-[1.02] transition-transform"
+                onClick={() => posthog.capture('landing_log_crisis_clicked')}
+              >
                 <a href="https://app.hemora.xyz/crisis">
                   Log a crisis <HeartPulse size={20} className="ml-2" />
                 </a>
               </Button>
-              <Button size="xl" variant="outline" asChild className="rounded-full px-10 border-2 hover:bg-muted/50 transition-colors">
+              <Button 
+                size="xl" 
+                variant="outline" 
+                asChild 
+                className="rounded-full px-10 border-2 hover:bg-muted/50 transition-colors"
+                onClick={() => posthog.capture('landing_find_care_clicked')}
+              >
                 <a href="/directory">
                   Find care near you <Users size={20} className="ml-2" />
                 </a>

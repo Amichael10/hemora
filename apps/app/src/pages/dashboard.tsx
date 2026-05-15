@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
+import posthog from "posthog-js";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
 import genotype3d from "@/assets/tools/genotype-3d.png";
 import family3d from "@/assets/tools/family-3d.png";
@@ -125,6 +126,7 @@ export default function Dashboard() {
 
   const handleMarkTaken = (medId: number, medName: string) => {
     setMarkingTaken(medId);
+    posthog.capture('medication_marked_taken', { medication_id: medId, medication_name: medName });
     createLog.mutate(
       {
         data: {
@@ -283,21 +285,30 @@ export default function Dashboard() {
           {/* Quick actions row */}
           <div className="mt-5 grid grid-cols-3 gap-3">
             <button
-              onClick={() => setLocation("/crisis")}
+              onClick={() => {
+                posthog.capture('dashboard_quick_action_clicked', { action: 'log_crisis' });
+                setLocation("/crisis");
+              }}
               className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
             >
               <HeartPulse size={20} />
               <span className="text-[12px] font-semibold">Log crisis</span>
             </button>
             <button
-              onClick={() => setLocation("/meds")}
+              onClick={() => {
+                posthog.capture('dashboard_quick_action_clicked', { action: 'add_medication' });
+                setLocation("/meds");
+              }}
               className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
             >
               <Pill size={20} />
               <span className="text-[12px] font-semibold">Add medication</span>
             </button>
             <button
-              onClick={() => setLocation("/resources")}
+              onClick={() => {
+                posthog.capture('dashboard_quick_action_clicked', { action: 'resources' });
+                setLocation("/resources");
+              }}
               className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
             >
               <Book size={20} />
@@ -401,7 +412,10 @@ export default function Dashboard() {
                 return cards.map((c) => (
                   <button
                     key={c.href}
-                    onClick={() => setLocation(c.href)}
+                    onClick={() => {
+                      posthog.capture('dashboard_tool_clicked', { tool_title: c.title, tool_href: c.href });
+                      setLocation(c.href);
+                    }}
                     className="snap-start shrink-0 w-[78%] max-w-[340px] h-[120px] rounded-2xl pl-2 pr-4 text-left flex items-center gap-2 relative overflow-hidden shadow-[0_8px_22px_-16px_rgba(15,40,55,0.25)] active:scale-[0.98] transition-transform border border-black/5"
                     style={{ background: c.bg, color: c.text }}
                   >

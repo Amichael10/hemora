@@ -13,6 +13,9 @@ import appCss from "../styles.css?url";
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import meltingFace from "@/assets/lottie/1fae0.json";
+import { PostHogProvider } from "@/components/providers/PostHogProvider";
+import posthog from "posthog-js";
+import { useEffect } from "react";
 
 function NotFoundComponent() {
   return (
@@ -137,10 +140,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Track pageview on route change
+    posthog.capture("$pageview");
+  }, [router.state.location.pathname]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <PostHogProvider>
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    </PostHogProvider>
   );
 }

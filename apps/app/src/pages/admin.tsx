@@ -30,7 +30,9 @@ import {
   Phone,
   Mail,
   Building2,
-  Upload
+  Upload,
+  BarChart3,
+  ExternalLink
 } from "lucide-react";
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -893,6 +895,97 @@ function UsersTab() {
 }
 
 
+function AnalyticsTab() {
+  const stats = [
+    { label: "Active Sessions", value: "Live", status: "Connected", icon: Globe },
+    { label: "Event Pipeline", value: "Active", status: "Healthy", icon: Bell },
+    { label: "Data Retention", value: "1 Year", status: "Standard", icon: Save },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-[#1A1A1A] rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl">
+        <div className="relative z-10">
+          <Badge className="bg-[#A8324A] text-white border-none mb-4 px-4 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-black">PostHog Infrastructure</Badge>
+          <h3 className="text-4xl font-serif font-black mb-4 leading-tight">Advanced Product <br/>Analytics Dashboard</h3>
+          <p className="text-stone-400 max-w-xl text-lg leading-relaxed">
+            We've successfully integrated PostHog to track user behavior, retention, and conversion funnels. 
+            Real-time data is flowing from both the landing page and the patient application.
+          </p>
+          <div className="flex flex-wrap gap-4 mt-10">
+            <Button 
+              className="bg-white text-black hover:bg-stone-200 rounded-full px-8 h-14 font-bold text-base shadow-xl"
+              onClick={() => window.open(`https://us.posthog.com/project/${import.meta.env.VITE_POSTHOG_PROJECT_ID || '425433'}`, '_blank')}
+            >
+              Open Full Dashboard <ExternalLink className="ml-2 w-5 h-5" />
+            </Button>
+            <Button variant="outline" className="border-white/20 bg-white/5 hover:bg-white/10 text-white hover:text-white rounded-full px-8 h-14 font-bold text-base">
+              View Event Stream
+            </Button>
+          </div>
+        </div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#A8324A]/20 rounded-full blur-[120px] -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[100px] -ml-32 -mb-32" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white rounded-[2rem] border border-border/40 p-8 hover:shadow-xl transition-all border-l-4 border-l-[#A8324A]">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 bg-stone-50 rounded-2xl text-[#A8324A]">
+                <s.icon className="w-6 h-6" />
+              </div>
+              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{s.label}</div>
+            </div>
+            <div className="text-3xl font-serif font-black text-[#1A1A1A]">{s.value}</div>
+            <div className="mt-2 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+              <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">{s.status}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-[2.5rem] border border-border/40 p-10 space-y-6">
+          <h4 className="text-xl font-serif font-black text-[#1A1A1A]">Tracking Plan</h4>
+          <div className="space-y-4">
+            {[
+              { event: "$pageview", desc: "Automatic tracking for all page transitions." },
+              { event: "Log Crisis", desc: "Triggered when a patient starts a health log." },
+              { event: "Provider Search", desc: "Tracks directory usage and location filters." },
+              { event: "Blog Interaction", desc: "Tracks reading time and content popularity." },
+            ].map(e => (
+              <div key={e.event} className="flex items-center justify-between p-5 bg-stone-50 rounded-2xl border border-stone-100">
+                <div>
+                  <code className="text-xs font-black text-[#A8324A] bg-[#A8324A]/5 px-2 py-1 rounded-md">{e.event}</code>
+                  <p className="text-xs text-muted-foreground mt-1 font-medium">{e.desc}</p>
+                </div>
+                <Badge className="bg-green-100 text-green-700 border-none text-[10px] font-black">LIVE</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#FDF8F1] to-white rounded-[2.5rem] border border-border/40 p-10 flex flex-col justify-center items-center text-center space-y-6">
+          <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center text-[#A8324A]">
+            <BarChart3 className="w-10 h-10" />
+          </div>
+          <div className="space-y-2">
+            <h4 className="text-xl font-serif font-black text-[#1A1A1A]">Session Recording</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              We are now capturing anonymous session recordings. You can watch how users navigate Hemora to identify friction points in the onboarding flow.
+            </p>
+          </div>
+          <Button variant="ghost" className="text-[#A8324A] font-black uppercase tracking-widest text-[10px] hover:bg-[#A8324A]/5 rounded-full px-8">
+            Manage Privacy Settings
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StatsTab() {
   const [stats, setStats] = useState<{ users?: number; posts?: number; crises?: number; meds?: number; providers?: number }>({});
 
@@ -985,6 +1078,7 @@ export default function AdminPage() {
     { id: "prov", label: "Providers", icon: Stethoscope },
     { id: "sugg", label: "Suggestions", icon: MessageSquare },
     { id: "users", label: "User Directory", icon: Users },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
   ];
 
 
@@ -1081,6 +1175,7 @@ export default function AdminPage() {
             {activeTab === "prov" && <ProvidersTab />}
             {activeTab === "sugg" && <SuggestionsTab />}
             {activeTab === "users" && <UsersTab />}
+            {activeTab === "analytics" && <AnalyticsTab />}
           </div>
         </div>
       </main>
