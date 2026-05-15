@@ -128,12 +128,42 @@ export default function Records() {
             ))}
           </div>
         ) : filteredRecords?.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
-            <div className="text-primary/20 flex justify-center mb-4">
-              <HealthIcon outline={MedicalRecordsOutline} filled={MedicalRecordsFilled} width="48" height="48" />
+          <div className="mt-2">
+            <div className="surface-soft p-6 text-center rounded-[24px]">
+              <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                   style={{ background: "var(--gradient-warm)" }}>
+                <HealthIcon
+                  outline={MedicalRecordsOutline}
+                  filled={MedicalRecordsFilled}
+                  width="32"
+                  height="32"
+                  active
+                />
+              </div>
+              <h3 className="font-serif text-lg font-semibold text-foreground mb-1.5 tracking-tight">
+                No care records yet
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5 max-w-[280px] mx-auto">
+                Keep track of your health journey. Log your visits, labs, and imaging to have everything in one place.
+              </p>
+
+              <div className="grid grid-cols-3 gap-2 mb-5 text-left">
+                {[
+                  { n: "1", t: "Add a record" },
+                  { n: "2", t: "Note details" },
+                  { n: "3", t: "Track history" },
+                ].map((s) => (
+                  <div key={s.n} className="rounded-xl bg-card/70 border border-border/40 p-2.5">
+                    <div className="text-[10px] font-bold text-accent mb-0.5">STEP {s.n}</div>
+                    <div className="text-[11px] font-medium text-foreground leading-tight">{s.t}</div>
+                  </div>
+                ))}
+              </div>
+
+              <Button size="lg" className="w-full" onClick={() => setLocation("/records/new")}>
+                <Plus size={16} /> Add your first record
+              </Button>
             </div>
-            <p className="text-sm mb-4">No records found.</p>
-            <Button variant="soft" onClick={() => setLocation("/records/new")}>Add Record</Button>
           </div>
         ) : (
           <div>

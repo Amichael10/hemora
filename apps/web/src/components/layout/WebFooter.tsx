@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import hemoraLogo from "@/assets/brand/Logo.png";
+import { Linkedin } from "lucide-react";
 
 export function WebFooter() {
   const [, setLocation] = useLocation();
@@ -35,9 +36,20 @@ export function WebFooter() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between items-center gap-4">
           <span>© {new Date().getFullYear()} Hemora. All rights reserved.</span>
-          <span>Made with care.</span>
+          <div className="flex items-center gap-6">
+            <a 
+              href="https://linkedin.com/company/hemorax" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-accent transition-colors flex items-center gap-1.5"
+            >
+              <Linkedin size={14} />
+              <span>LinkedIn</span>
+            </a>
+            <span>Made with care.</span>
+          </div>
         </div>
       </div>
     </footer>
