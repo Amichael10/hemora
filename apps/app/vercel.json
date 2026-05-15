@@ -1,7 +1,0 @@
-{
-  "version": 2,
-  "framework": null,
-  "buildCommand": "vite build && node scripts/build-vercel.js",
-  "outputDirectory": ".vercel/output",
-  "installCommand": "pnpm install --frozen-lockfile"
-}
