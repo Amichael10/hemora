@@ -125,11 +125,21 @@ export default function Onboarding() {
         onSuccess: (newProfile) => {
           setProfileId(newProfile.id);
           if (user?.email) {
-            triggerWelcomeEmail({ data: { email: user.email } }).catch(console.error);
+            // Trigger email asynchronously - don't block navigation if it fails or if secret is missing
+            triggerWelcomeEmail({ email: user.email })
+              .then(() => console.log("[Onboarding] Welcome email triggered"))
+              .catch((err) => console.error("[Onboarding] Welcome email trigger failed:", err));
           }
           setLocation("/dashboard");
         },
-        onError: () => toast({ title: "Something went wrong", description: "Please try again in a moment.", variant: "destructive" }),
+        onError: (err) => {
+          console.error("[Onboarding] Profile creation failed:", err);
+          toast({ 
+            title: "Something went wrong", 
+            description: "We couldn't save your profile. Please try again.", 
+            variant: "destructive" 
+          });
+        },
       }
     );
   };
