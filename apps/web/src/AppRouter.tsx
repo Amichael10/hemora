@@ -120,8 +120,8 @@ function Routes() {
         <Route path="/records/new" component={protect(RecordForm)} />
         <Route path="/records/:id/edit" component={protect(RecordForm)} />
         <Route path="/records/:id" component={protect(RecordDetail)} />
-        <Route path="/directory" component={protect(Directory)} />
-        <Route path="/directory/:id" component={protect(DirectoryDetail)} />
+        <Route path="/directory" component={Directory} />
+        <Route path="/directory/:id" component={DirectoryDetail} />
         <Route path="/emergency" component={protect(Emergency)} />
         <Route path="/profile" component={protect(Profile)} />
         <Route path="/profile/edit" component={protect(ProfileEdit)} />
@@ -137,7 +137,6 @@ function Routes() {
         <Route path="/admin" component={protect(Admin)} />
         <Route path="/blog" component={BlogIndex} />
         <Route path="/blog/:slug" component={BlogPost} />
-        <Route path="/blog" component={Blog} />
         <Route path="/help" component={Help} />
         <Route path="/about" component={About} />
         <Route path="/privacy" component={Privacy} />

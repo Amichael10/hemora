@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        crisis: "bg-[hsl(var(--brand-oxblood))] text-white shadow-md hover:opacity-95",
+        crisis: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
         glass: "text-white border border-white/30 bg-white/20 backdrop-blur-sm hover:bg-white/25",
         soft: "bg-primary/10 text-primary hover:bg-primary/15",
         outline:

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
-import { SubPageHeader } from "@/components/layout/SubPageHeader";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen, Calendar, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { WebNav } from "@/components/layout/WebNav";
 import { WebFooter } from "@/components/layout/WebFooter";

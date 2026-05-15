@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
@@ -247,8 +248,83 @@ function DesktopMockup() {
 }
 
 function Hero() {
-  // injected below
-  return _Hero();
+  const [, setLocation] = useLocation();
+  return (
+    <Section className="overflow-hidden" topRule={false}>
+      {/* Full-bleed hero image (desktop only) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden lg:block">
+        <img
+          src={heroFamily}
+          alt=""
+          width={1600}
+          height={900}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          className="w-full h-full object-cover object-right"
+        />
+        {/* Left-side fade so text stays legible */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.92) 35%, hsl(var(--background) / 0.55) 55%, transparent 75%)",
+          }}
+        />
+      </div>
+      <div className="relative z-10 px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
+          <div className="text-center lg:text-left">
+            <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              For families touched by sickle cell
+            </div>
+            <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
+              <span className="inline-block">Care that stays with you,</span>{" "}
+              <span className="inline-block italic text-primary">between appointments.</span>
+            </h1>
+            <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Hemora helps you log crises, stay on top of meds, keep records in one place,
+              and find sickle-cell-aware care — on your phone, anywhere.
+            </p>
+
+            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
+              <Button size="xl" variant="crisis" asChild className="rounded-full px-10 shadow-xl hover:scale-[1.02] transition-transform">
+                <a href="https://app.hemora.xyz/crisis">
+                  Log a crisis <HeartPulse size={20} className="ml-2" />
+                </a>
+              </Button>
+              <Button size="xl" variant="outline" asChild className="rounded-full px-10 border-2 hover:bg-muted/50 transition-colors">
+                <a href="/directory">
+                  Find care near you <Users size={20} className="ml-2" />
+                </a>
+              </Button>
+            </div>
+
+            <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
+              <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
+              <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
+            </div>
+
+            {/* Mobile/tablet: image below text */}
+            <div className="mt-10 lg:hidden">
+              <img
+                src={heroFamily}
+                alt="Family"
+                loading="eager"
+                decoding="async"
+                className="w-full h-auto rounded-2xl object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Right column intentionally empty — image is full-bleed background */}
+          <div aria-hidden />
+        </div>
+      </div>
+    </Section>
+  );
 }
 
 function MobileMockup() {
@@ -326,81 +402,7 @@ function MobileMockup() {
   );
 }
 
-function _Hero() {
-  const [, setLocation] = useLocation();
-  return (
-    <Section className="overflow-hidden" topRule={false}>
-      {/* Full-bleed hero image (desktop only) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden lg:block">
-        <img
-          src={heroFamily}
-          alt=""
-          width={1600}
-          height={900}
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          className="w-full h-full object-cover object-right"
-        />
-        {/* Left-side fade so text stays legible */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.92) 35%, hsl(var(--background) / 0.55) 55%, transparent 75%)",
-          }}
-        />
-      </div>
-      <div className="relative z-10 px-6 sm:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
-          <div className="text-center lg:text-left">
-            <div data-anim="hero-badge" className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs text-muted-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              For families touched by sickle cell
-            </div>
-            <h1 data-anim="hero-title" className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-secondary">
-              <span className="inline-block">Care that stays with you,</span>{" "}
-              <span className="inline-block italic text-primary">between appointments.</span>
-            </h1>
-            <p data-anim="hero-sub" className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Hemora helps you log crises, stay on top of meds, keep records in one place,
-              and find sickle-cell-aware care — on your phone, anywhere.
-            </p>
 
-            <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
-              <Button size="lg" asChild className="rounded-full px-8 shadow-lg shadow-primary/20">
-                <a href="https://app.hemora.xyz/crisis">Log a crisis <HeartPulse size={18} className="ml-2" /></a>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="rounded-full px-8">
-                <a href="/directory">Find care near you <Users size={18} className="ml-2" /></a>
-              </Button>
-            </div>
-
-            <div data-anim="hero-trust" className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-5 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5"><Shield size={14} color="hsl(var(--accent))" /> Private by default</div>
-              <div className="flex items-center gap-1.5"><Check size={14} color="hsl(var(--accent))" /> Works offline</div>
-              <div className="flex items-center gap-1.5"><Star size={14} color="hsl(var(--accent))" /> Family-friendly</div>
-            </div>
-
-            {/* Mobile/tablet: image below text */}
-            <div className="mt-10 lg:hidden">
-              <img
-                src={heroFamily}
-                alt="Family"
-                loading="eager"
-                decoding="async"
-                className="w-full h-auto rounded-2xl object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Right column intentionally empty — image is full-bleed background */}
-          <div aria-hidden />
-        </div>
-      </div>
-    </Section>
-  );
-}
 
 function ProductPreview() {
   return (
@@ -783,11 +785,20 @@ function FAQ() {
 }
 
 function BlogPreview() {
-  const items = [
-    { tag: "Story", title: "Coming soon", meta: "Article · — min" },
-    { tag: "Care", title: "Coming soon", meta: "Guide · — min" },
-    { tag: "Family", title: "Coming soon", meta: "Story · — min" },
-  ];
+  const [posts, setPosts] = useState<any[]>([]);
+  
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("id, slug, title, category, published_at")
+        .eq("status", "published")
+        .limit(3)
+        .order("published_at", { ascending: false });
+      setPosts(data || []);
+    })();
+  }, []);
+
   return (
     <Section id="blog">
       <div className="px-6 sm:px-10 py-20 lg:py-28">
@@ -807,20 +818,31 @@ function BlogPreview() {
           </div>
         </div>
         <div data-stagger className="mt-10 grid sm:grid-cols-3 gap-3">
-          {items.map((it, i) => (
-            <div
-              key={i}
+          {posts.length > 0 ? posts.map((it, i) => (
+            <a
+              key={it.id}
+              href={`/blog/${it.slug}`}
               data-stagger-item
               className="group rounded-2xl bg-card border border-border p-5 hover:shadow-md transition-shadow"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
                 <BookFilled size={18} />
               </div>
-              <div className="mt-4 text-[10px] uppercase tracking-wider text-accent font-semibold">{it.tag}</div>
+              <div className="mt-4 text-[10px] uppercase tracking-wider text-accent font-semibold">{it.category || 'Article'}</div>
               <h3 className="mt-1 font-serif text-lg text-secondary leading-snug">{it.title}</h3>
-              <p className="mt-2 text-xs text-muted-foreground">{it.meta}</p>
-            </div>
-          ))}
+              <p className="mt-2 text-xs text-muted-foreground">
+                {it.published_at ? new Date(it.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Recent'}
+              </p>
+            </a>
+          )) : (
+            [1, 2, 3].map((i) => (
+              <div key={i} className="group rounded-2xl bg-card border border-border p-5 opacity-50">
+                <div className="w-10 h-10 rounded-xl bg-muted grid place-items-center animate-pulse" />
+                <div className="mt-4 h-3 w-12 bg-muted rounded animate-pulse" />
+                <div className="mt-2 h-4 w-3/4 bg-muted rounded animate-pulse" />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </Section>
@@ -841,7 +863,6 @@ export default function Landing() {
         .from("[data-anim='hero-badge']", { y: 14, opacity: 0, duration: 0.6 })
         .from("[data-anim='hero-title'] > *", { y: 28, opacity: 0, duration: 0.9, stagger: 0.08 }, "-=0.3")
         .from("[data-anim='hero-sub']", { y: 18, opacity: 0, duration: 0.7 }, "-=0.5")
-        .from("[data-anim='hero-cta'] > *", { y: 14, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.4")
         .from("[data-anim='hero-trust'] > *", { y: 10, opacity: 0, duration: 0.5, stagger: 0.06 }, "-=0.35")
         .from("[data-anim='hero-mockup']", { y: 60, opacity: 0, scale: 0.96, duration: 1.1, ease: "power4.out" }, "-=0.4");
 
@@ -923,10 +944,7 @@ export default function Landing() {
         <Stories />
         <Download />
         <FAQ />
-        {/* Hidden until blog has content */}
-        <div className="hidden" aria-hidden="true">
-          <BlogPreview />
-        </div>
+        <BlogPreview />
       </main>
       <WebFooter />
     </div>
