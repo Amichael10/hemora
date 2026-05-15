@@ -64,10 +64,13 @@ const INDIA_STATES = [
   "Uttarakhand", "West Bengal",
 ];
 
+const UGANDA_REGIONS = ["Central", "Eastern", "Northern", "Western", "Kampala"];
+
 export const COUNTRIES: Country[] = [
   { code: "NG", name: "Nigeria", states: NIGERIA_STATES },
   { code: "GH", name: "Ghana", states: GHANA_REGIONS },
   { code: "KE", name: "Kenya", states: KENYA_COUNTIES },
+  { code: "UG", name: "Uganda", states: UGANDA_REGIONS },
   { code: "GB", name: "United Kingdom", states: UK_REGIONS },
   { code: "US", name: "United States", states: US_STATES },
   { code: "IN", name: "India", states: INDIA_STATES },

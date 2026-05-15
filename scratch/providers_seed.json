@@ -1,0 +1,524 @@
+[
+  {
+    "name": "Komfo Anokye Teaching Hospital \u2013 Haematology",
+    "country": "Ghana",
+    "state": "Ashanti",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Haematology and sickle cell management",
+    "hospital": "Komfo Anokye Teaching Hospital",
+    "address": "Bantama High Street, Kumasi, Ashanti, Ghana",
+    "phone": "+233-322-022301",
+    "website": "https://kathhsp.org",
+    "services": [
+      "sickle cell clinic",
+      "haematology"
+    ]
+  },
+  {
+    "name": "Korle-Bu Teaching Hospital \u2013 Sickle Cell Clinic",
+    "country": "Ghana",
+    "state": "Greater Accra",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Adult & paediatric sickle cell clinic",
+    "hospital": "Korle-Bu Teaching Hospital",
+    "address": "Guggisberg Avenue, Accra, Greater Accra, Ghana",
+    "phone": "+233-302-739500",
+    "website": "https://kbth.gov.gh",
+    "services": [
+      "sickle cell clinic",
+      "transfusion"
+    ]
+  },
+  {
+    "name": "Sickle Cell Foundation of Ghana",
+    "country": "Ghana",
+    "state": "Greater Accra",
+    "verified": true,
+    "type": "counselling",
+    "specialty": "Counselling, screening, advocacy",
+    "hospital": "Sickle Cell Foundation of Ghana",
+    "address": "Korle-Bu Teaching Hospital, Accra, Greater Accra, Ghana",
+    "phone": "+233-302-665401",
+    "email": "info@sicklecellghana.org",
+    "website": "https://sicklecellghana.org",
+    "services": [
+      "counselling",
+      "screening",
+      "education"
+    ]
+  },
+  {
+    "name": "Sickle Cell Institute Chhattisgarh",
+    "country": "India",
+    "state": "Chhattisgarh",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Dedicated state sickle cell institute",
+    "hospital": "Sickle Cell Institute Chhattisgarh",
+    "address": "Pt. JNM Medical College Campus, Raipur, Chhattisgarh, India",
+    "phone": "+91-771-2890061",
+    "website": "https://scic.cg.gov.in",
+    "services": [
+      "sickle cell clinic",
+      "screening",
+      "research"
+    ]
+  },
+  {
+    "name": "AIIMS Delhi \u2013 Department of Haematology",
+    "country": "India",
+    "state": "Delhi",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Tertiary haematology and sickle cell care",
+    "hospital": "All India Institute of Medical Sciences",
+    "address": "Sri Aurobindo Marg, Ansari Nagar, New Delhi, Delhi, India",
+    "phone": "+91-11-26588500",
+    "website": "https://aiims.edu",
+    "services": [
+      "haematology",
+      "sickle cell clinic",
+      "transplant"
+    ]
+  },
+  {
+    "name": "Metropolis Healthcare \u2013 Mumbai",
+    "country": "India",
+    "state": "Maharashtra",
+    "verified": true,
+    "type": "lab",
+    "specialty": "Haemoglobin electrophoresis, HPLC, genetic testing",
+    "hospital": "Metropolis Healthcare",
+    "address": "250 D, Udyog Bhavan, Worli, Mumbai, Maharashtra, India",
+    "phone": "+91-22-3399-3939",
+    "email": "customercare@metropolisindia.com",
+    "website": "https://metropolisindia.com",
+    "services": [
+      "electrophoresis",
+      "HPLC",
+      "genetic testing"
+    ]
+  },
+  {
+    "name": "CMC Vellore \u2013 Department of Haematology",
+    "country": "India",
+    "state": "Tamil Nadu",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Comprehensive haemoglobinopathy services",
+    "hospital": "Christian Medical College Vellore",
+    "address": "Ida Scudder Road, Vellore, Tamil Nadu, India",
+    "phone": "+91-416-2281000",
+    "website": "https://cmch-vellore.edu",
+    "services": [
+      "haematology",
+      "sickle cell clinic",
+      "transplant"
+    ]
+  },
+  {
+    "name": "Jaramogi Oginga Odinga Teaching & Referral Hospital",
+    "country": "Kenya",
+    "state": "Kisumu",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Western Kenya sickle cell programme",
+    "hospital": "JOOTRH",
+    "address": "Ang'awa Avenue, Kisumu, Kisumu, Kenya",
+    "phone": "+254-57-2020803",
+    "website": "https://jootrh.go.ke",
+    "services": [
+      "sickle cell clinic",
+      "newborn screening"
+    ]
+  },
+  {
+    "name": "Kenyatta National Hospital \u2013 Haematology",
+    "country": "Kenya",
+    "state": "Nairobi",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Sickle cell management, transfusion",
+    "hospital": "Kenyatta National Hospital",
+    "address": "Hospital Road, Nairobi, Nairobi, Kenya",
+    "phone": "+254-20-2726300",
+    "website": "https://knh.or.ke",
+    "services": [
+      "sickle cell clinic",
+      "transfusion"
+    ]
+  },
+  {
+    "name": "Lancet Kenya \u2013 Nairobi",
+    "country": "Kenya",
+    "state": "Nairobi",
+    "verified": true,
+    "type": "lab",
+    "specialty": "Haemoglobin electrophoresis, HbS screening",
+    "hospital": "Lancet Kenya",
+    "address": "Fifth Avenue Office Suites, Ngong Road, Nairobi, Nairobi, Kenya",
+    "phone": "+254-703-064000",
+    "email": "info.kenya@lancet.co.ke",
+    "website": "https://lancet.co.ke",
+    "services": [
+      "electrophoresis",
+      "CBC"
+    ]
+  },
+  {
+    "name": "Sickle Cell Federation of Kenya",
+    "country": "Kenya",
+    "state": "Nairobi",
+    "verified": true,
+    "type": "support",
+    "specialty": "Patient support and advocacy",
+    "hospital": "Sickle Cell Federation of Kenya",
+    "address": "Nairobi, Nairobi, Nairobi, Kenya",
+    "phone": "+254-722-509389",
+    "email": "info@sicklecellkenya.org",
+    "website": "https://sicklecellkenya.org",
+    "services": [
+      "support group",
+      "advocacy"
+    ]
+  },
+  {
+    "name": "National Hospital Abuja \u2013 Haematology Department",
+    "country": "Nigeria",
+    "state": "Federal Capital Territory",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Haematology, sickle cell management",
+    "hospital": "National Hospital Abuja",
+    "address": "Plot 132 Central District, Abuja, Federal Capital Territory, Nigeria",
+    "phone": "+234-9-2900100",
+    "website": "https://nationalhospital.gov.ng",
+    "services": [
+      "sickle cell clinic",
+      "transfusion"
+    ]
+  },
+  {
+    "name": "Aminu Kano Teaching Hospital \u2013 Sickle Cell Centre",
+    "country": "Nigeria",
+    "state": "Kano",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Sickle cell care and research",
+    "hospital": "Aminu Kano Teaching Hospital",
+    "address": "Zaria Road, Kano, Kano, Nigeria",
+    "phone": "+234-64-665374",
+    "website": "https://akth.org.ng",
+    "services": [
+      "sickle cell clinic",
+      "newborn screening"
+    ]
+  },
+  {
+    "name": "Clina-Lancet Laboratories \u2013 Lagos",
+    "country": "Nigeria",
+    "state": "Lagos",
+    "verified": true,
+    "type": "lab",
+    "specialty": "Haemoglobin electrophoresis, sickle cell screening",
+    "hospital": "Clina-Lancet Laboratories",
+    "address": "5 Oduduwa Way, Ikeja GRA, Lagos, Lagos, Nigeria",
+    "phone": "+234-1-2718500",
+    "email": "info@clinalancet.com",
+    "website": "https://clinalancet.com",
+    "services": [
+      "genotype",
+      "electrophoresis"
+    ]
+  },
+  {
+    "name": "Lagos University Teaching Hospital (LUTH) \u2013 Haematology",
+    "country": "Nigeria",
+    "state": "Lagos",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Haematology / sickle cell clinic",
+    "hospital": "Lagos University Teaching Hospital",
+    "address": "Ishaga Road, Idi-Araba, Lagos, Lagos, Nigeria",
+    "phone": "+234-1-5851400",
+    "website": "https://luth.gov.ng",
+    "services": [
+      "sickle cell clinic",
+      "transfusion",
+      "emergency care"
+    ]
+  },
+  {
+    "name": "Sickle Cell Foundation Nigeria",
+    "country": "Nigeria",
+    "state": "Lagos",
+    "verified": true,
+    "type": "counselling",
+    "specialty": "Sickle cell counselling, genotype testing & advocacy",
+    "hospital": "Sickle Cell Foundation Nigeria",
+    "address": "54 Forsythe Street, Idi-Araba, Lagos, Lagos, Nigeria",
+    "phone": "+234-1-7744664",
+    "email": "info@sicklecellfoundation.com",
+    "website": "https://sicklecellfoundation.com",
+    "services": [
+      "counselling",
+      "genotype testing",
+      "education"
+    ]
+  },
+  {
+    "name": "Synlab Nigeria \u2013 Lagos",
+    "country": "Nigeria",
+    "state": "Lagos",
+    "verified": true,
+    "type": "lab",
+    "specialty": "Genotype, haemoglobin electrophoresis, full blood count",
+    "hospital": "Synlab",
+    "address": "7 Akin Leigh Close, Lekki, Lagos, Lagos, Nigeria",
+    "phone": "+234-700-7965225",
+    "email": "info.ng@synlab.com",
+    "website": "https://synlab.ng",
+    "services": [
+      "genotype",
+      "electrophoresis",
+      "CBC"
+    ]
+  },
+  {
+    "name": "University College Hospital Ibadan \u2013 SCD Clinic",
+    "country": "Nigeria",
+    "state": "Oyo",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Sickle cell clinic, haematology",
+    "hospital": "University College Hospital",
+    "address": "Queen Elizabeth Road, Ibadan, Oyo, Nigeria",
+    "phone": "+234-2-2410088",
+    "website": "https://uch-ibadan.org.ng",
+    "services": [
+      "sickle cell clinic",
+      "haematology"
+    ]
+  },
+  {
+    "name": "Guy's and St Thomas' \u2013 Red Cell & Sickle Cell Centre",
+    "country": "United Kingdom",
+    "state": "England - London",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Specialist haemoglobinopathy centre",
+    "hospital": "Guy's and St Thomas' NHS Foundation Trust",
+    "address": "Westminster Bridge Road, London, England - London, United Kingdom",
+    "phone": "+44-20-7188-7188",
+    "website": "https://guysandstthomas.nhs.uk",
+    "services": [
+      "specialist sickle cell centre",
+      "transfusion",
+      "stem cell transplant"
+    ]
+  },
+  {
+    "name": "King's College Hospital \u2013 Haematology",
+    "country": "United Kingdom",
+    "state": "England - London",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Adult sickle cell service",
+    "hospital": "King's College Hospital NHS Foundation Trust",
+    "address": "Denmark Hill, London, England - London, United Kingdom",
+    "phone": "+44-20-3299-9000",
+    "website": "https://kch.nhs.uk",
+    "services": [
+      "sickle cell clinic",
+      "day unit"
+    ]
+  },
+  {
+    "name": "Sickle Cell Society (UK)",
+    "country": "United Kingdom",
+    "state": "England - London",
+    "verified": true,
+    "type": "support",
+    "specialty": "National charity \u2013 information, advocacy, support",
+    "hospital": "Sickle Cell Society",
+    "address": "54 Station Road, Harlesden, London, England - London, United Kingdom",
+    "phone": "+44-20-8961-7795",
+    "email": "info@sicklecellsociety.org",
+    "website": "https://sicklecellsociety.org",
+    "services": [
+      "support group",
+      "counselling",
+      "education"
+    ]
+  },
+  {
+    "name": "Manchester Royal Infirmary \u2013 Sickle Cell & Thalassaemia",
+    "country": "United Kingdom",
+    "state": "England - North West",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "North-west England specialist centre",
+    "hospital": "Manchester University NHS Foundation Trust",
+    "address": "Oxford Road, Manchester, England - North West, United Kingdom",
+    "phone": "+44-161-276-1234",
+    "website": "https://mft.nhs.uk",
+    "services": [
+      "sickle cell clinic"
+    ]
+  },
+  {
+    "name": "UCSF Benioff Children's Hospital Oakland \u2013 Sickle Cell Center",
+    "country": "United States",
+    "state": "California",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Comprehensive sickle cell care, west coast",
+    "hospital": "UCSF Benioff Children's Hospital Oakland",
+    "address": "747 52nd Street, Oakland, California, United States",
+    "phone": "+1-510-428-3885",
+    "website": "https://childrenshospitaloakland.org",
+    "services": [
+      "paediatric sickle cell",
+      "adult sickle cell",
+      "transplant"
+    ]
+  },
+  {
+    "name": "Children's National \u2013 Sickle Cell Disease Program",
+    "country": "United States",
+    "state": "District of Columbia",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Paediatric sickle cell program",
+    "hospital": "Children's National Hospital",
+    "address": "111 Michigan Avenue NW, Washington, District of Columbia, United States",
+    "phone": "+1-202-476-5000",
+    "website": "https://childrensnational.org",
+    "services": [
+      "paediatric sickle cell",
+      "newborn screening"
+    ]
+  },
+  {
+    "name": "Johns Hopkins Sickle Cell Center for Adults",
+    "country": "United States",
+    "state": "Maryland",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Adult sickle cell comprehensive care",
+    "hospital": "Johns Hopkins Hospital",
+    "address": "1800 Orleans Street, Baltimore, Maryland, United States",
+    "phone": "+1-410-955-5000",
+    "website": "https://hopkinsmedicine.org/sickle_cell_center",
+    "services": [
+      "adult sickle cell",
+      "day hospital",
+      "gene therapy"
+    ]
+  },
+  {
+    "name": "Sickle Cell Disease Association of America (SCDAA)",
+    "country": "United States",
+    "state": "Maryland",
+    "verified": true,
+    "type": "support",
+    "specialty": "National advocacy, education, support",
+    "hospital": "SCDAA",
+    "address": "3700 Koppers Street, Suite 570, Baltimore, Maryland, United States",
+    "phone": "+1-410-528-1555",
+    "email": "scdaa@sicklecelldisease.org",
+    "website": "https://sicklecelldisease.org",
+    "services": [
+      "advocacy",
+      "support group",
+      "education"
+    ]
+  },
+  {
+    "name": "Quest Diagnostics \u2013 Hemoglobinopathy Evaluation",
+    "country": "United States",
+    "state": "New Jersey",
+    "verified": true,
+    "type": "lab",
+    "specialty": "Hemoglobin electrophoresis, HPLC, sickle cell screening",
+    "hospital": "Quest Diagnostics",
+    "address": "Nationwide patient service centers, Secaucus, New Jersey, United States",
+    "phone": "+1-866-697-8378",
+    "website": "https://questdiagnostics.com",
+    "services": [
+      "electrophoresis",
+      "HPLC",
+      "newborn screening"
+    ]
+  },
+  {
+    "name": "St. Jude Children's Research Hospital \u2013 Sickle Cell Program",
+    "country": "United States",
+    "state": "Tennessee",
+    "verified": true,
+    "type": "hospital",
+    "specialty": "Paediatric sickle cell care and research",
+    "hospital": "St. Jude Children's Research Hospital",
+    "address": "262 Danny Thomas Place, Memphis, Tennessee, United States",
+    "phone": "+1-866-278-5833",
+    "website": "https://stjude.org",
+    "services": [
+      "paediatric sickle cell",
+      "research",
+      "transplant"
+    ]
+  },
+  {
+    "name": "Garki Hospital Sickle Cell Clinic",
+    "type": "hospital",
+    "phone": "+234-809-300-0011",
+    "address": "Tafawa Balewa Way, Area 8, Garki, Abuja",
+    "state": "Federal Capital Territory",
+    "country": "Nigeria",
+    "verified": true,
+    "services": [
+      "sickle cell clinic"
+    ]
+  },
+  {
+    "name": "SAMI (Sickle Cell Aid Foundation)",
+    "type": "support",
+    "phone": "+234-802-311-6666",
+    "address": "13A, Suleiman Crescent, Off Anthony Enahoro St, Utako, Abuja",
+    "state": "Federal Capital Territory",
+    "country": "Nigeria",
+    "verified": true,
+    "services": [
+      "support group",
+      "advocacy"
+    ]
+  },
+  {
+    "name": "Mulago National Referral Hospital",
+    "type": "hospital",
+    "phone": "+256-414-554001",
+    "address": "Mulago Hill, Kampala",
+    "state": "Kampala",
+    "country": "Uganda",
+    "verified": true,
+    "services": [
+      "sickle cell clinic",
+      "haematology"
+    ]
+  },
+  {
+    "name": "Uganda Sickle Cell Rescue Foundation",
+    "type": "support",
+    "phone": "+256-772-400000",
+    "address": "Plot 25, Gaba Rd, Kampala",
+    "state": "Kampala",
+    "country": "Uganda",
+    "verified": true,
+    "services": [
+      "support group",
+      "advocacy"
+    ]
+  }
+]
