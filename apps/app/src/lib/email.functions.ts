@@ -5,7 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
  * This is called from the onboarding flow after profile creation.
  */
 export const triggerWelcomeEmail = createServerFn({ method: "POST" })
-  .validator((d: { email: string }) => d)
+  .inputValidator((d: { email: string }) => d)
   .handler(async ({ data }) => {
     const { email } = data;
     const secret = process.env.EMAIL_WEBHOOK_SECRET;
