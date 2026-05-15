@@ -2,6 +2,107 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { localDayKey } from "@/lib/datetime";
 
+export type CrisisLogRow = {
+  id: string;
+  occurredAt: string;
+  painLevel: string;
+  painLocations: string[];
+  triggers: string[];
+  whatHelped: string[];
+  hospitalVisit: boolean;
+};
+
+function asStringArray(v: unknown): string[] {
+  if (!v) return [];
+  if (Array.isArray(v)) return v.filter((x): x is string => typeof x === "string");
+  return [];
+}
+
+function mapCrisisRow(r: Record<string, unknown>): CrisisLogRow {
+  return {
+    id: String(r.id),
+    occurredAt: String(r.occurred_at),
+    painLevel: String(r.pain_level ?? "").trim() || "unspecified",
+    painLocations: asStringArray(r.pain_locations),
+    triggers: asStringArray(r.triggers),
+    whatHelped: asStringArray(r.what_helped),
+    hospitalVisit: r.hospital_visit === true,
+  };
+}
+
+/** For body illustration (Male vs Female paths); ignores errors / RLS. */
+export async function fetchProfileGender(supabase: SupabaseClient, userId: string): Promise<string | null> {
+  const { data, error } = await supabase.from("profiles").select("gender").eq("user_id", userId).maybeSingle();
+  if (error) return null;
+  const g = (data as { gender?: string | null } | null)?.gender;
+  return typeof g === "string" && g.trim() ? g.trim() : null;
+}
+
+export async function fetchRecentCrisisLogs(
+  supabase: SupabaseClient,
+  userId: string,
+  limit = 50
+): Promise<CrisisLogRow[]> {
+  const { data, error } = await supabase
+    .from("crisis_logs")
+    .select("id,occurred_at,pain_level,pain_locations,triggers,what_helped,hospital_visit")
+    .eq("user_id", userId)
+    .order("occurred_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((r) => mapCrisisRow(r as Record<string, unknown>));
+}
+
+export async function fetchCrisisLogById(
+  supabase: SupabaseClient,
+  userId: string,
+  id: string
+): Promise<CrisisLogRow | null> {
+  const { data, error } = await supabase
+    .from("crisis_logs")
+    .select("id,occurred_at,pain_level,pain_locations,triggers,what_helped,hospital_visit")
+    .eq("user_id", userId)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+  return mapCrisisRow(data as Record<string, unknown>);
+}
+
+export type CreateCrisisLogInput = {
+  painLevel: string;
+  painLocations: string[];
+  triggers: string[];
+  whatHelped: string[];
+  hospitalVisit: boolean;
+  occurredAt?: string;
+};
+
+export async function insertCrisisLog(
+  supabase: SupabaseClient,
+  userId: string,
+  input: CreateCrisisLogInput
+): Promise<CrisisLogRow> {
+  const { data, error } = await supabase
+    .from("crisis_logs")
+    .insert({
+      user_id: userId,
+      pain_level: input.painLevel,
+      pain_locations: input.painLocations,
+      triggers: input.triggers,
+      what_helped: input.whatHelped,
+      hospital_visit: input.hospitalVisit,
+      occurred_at: input.occurredAt ?? new Date().toISOString(),
+    })
+    .select("id,occurred_at,pain_level,pain_locations,triggers,what_helped,hospital_visit")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return mapCrisisRow(data as Record<string, unknown>);
+}
+
 export type CrisisTriggerRow = { label: string; count: number };
 
 export type PainSlice = { label: string; count: number; pct: number };
@@ -14,12 +115,6 @@ export type CrisisInsightsPayload = {
   painSlices: PainSlice[];
   triggers: CrisisTriggerRow[];
 };
-
-function asStringArray(v: unknown): string[] {
-  if (!v) return [];
-  if (Array.isArray(v)) return v.filter((x): x is string => typeof x === "string");
-  return [];
-}
 
 export async function fetchCrisisInsights(
   supabase: SupabaseClient,

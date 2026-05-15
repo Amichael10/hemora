@@ -1,4 +1,33 @@
-import { ScrollViewStyleReset } from 'expo-router/html';
+import { ScrollViewStyleReset } from "expo-router/html";
+
+/**
+ * Ensures the RN root fills the viewport (avoids an empty-looking page on web when
+ * the flex chain does not stretch to 100% height).
+ */
+const rootLayoutCss = `
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+#root {
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+`;
+
+const responsiveBackground = `
+body {
+  background-color: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #000;
+  }
+}`;
 
 // This file is web-only and used to configure the root HTML for every
 // web page during static rendering.
@@ -19,20 +48,10 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <ScrollViewStyleReset />
 
         {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
-        <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
+        <style dangerouslySetInnerHTML={{ __html: rootLayoutCss + responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
       <body>{children}</body>
     </html>
   );
 }
-
-const responsiveBackground = `
-body {
-  background-color: #fff;
-}
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000;
-  }
-}`;

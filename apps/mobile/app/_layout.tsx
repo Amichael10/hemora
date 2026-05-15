@@ -82,6 +82,8 @@ function RootLayoutNav() {
           <Stack.Screen name="add-medication" options={{ headerShown: false }} />
           <Stack.Screen name="add-record" options={{ headerShown: false }} />
           <Stack.Screen name="medication-detail" options={{ headerShown: false }} />
+          <Stack.Screen name="emergency" options={{ headerShown: false }} />
+          <Stack.Screen name="crisis-detail" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ title: "Settings" }} />
           <Stack.Screen name="modal" options={{ presentation: "modal", title: "About Hemora" }} />
         </Stack>
