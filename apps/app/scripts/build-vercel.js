@@ -53,16 +53,13 @@ console.log("🚀 Building serverless function ...");
 const funcDir = path.join(vercelOut, "functions", "index.func");
 fs.mkdirSync(funcDir, { recursive: true });
 
-// Runtime config
-fs.writeFileSync(
-  path.join(funcDir, ".vc-config.json"),
-  JSON.stringify({
-    runtime: "nodejs22.x",
-    handler: "index.mjs",
-    launcherType: "Nodejs",
-    shouldAddHelpers: true,
-  }, null, 2)
-);
+const vcConfig = path.join(funcDir, ".vc-config.json");
+fs.writeFileSync(vcConfig, JSON.stringify({
+  runtime: "nodejs20.x",
+  handler: "index.mjs",
+  launcherType: "Nodejs",
+  shouldAddHelpers: true
+}, null, 2));
 
 // Copy entire dist/server/ into the function directory
 fs.cpSync(distServer, funcDir, { recursive: true });
@@ -80,23 +77,25 @@ if (fs.existsSync(serverJs)) {
 import * as serverModule from "./server.js";
 
 export default async function handler(req, res) {
-  const server = serverModule.default || serverModule;
-  
-  // Let Vercel static filesystem serve assets — never hit SSR for these
-  const pathname = req.url.split("?")[0];
-  if (pathname.startsWith("/assets/")) {
-    res.statusCode = 404;
-    res.end();
-    return;
-  }
-
+  console.log("SSR: Request received", req.method, req.url);
   try {
+    const server = serverModule.default || serverModule;
+    
+    // Let Vercel static filesystem serve assets — never hit SSR for these
+    const pathname = req.url.split("?")[0];
+    if (pathname.startsWith("/assets/")) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+
     // Build the full URL from the request
     const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
     const proto = req.headers["x-forwarded-proto"] || "https";
     const url = new URL(req.url, proto + "://" + host);
 
     // Convert Node.js headers → Web Headers
+    // Use the global Headers constructor (available in Node 20+)
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value == null) continue;
@@ -122,17 +121,17 @@ export default async function handler(req, res) {
       body: body && body.length > 0 ? body : undefined,
     });
 
-    if (typeof server.fetch !== "function") {
-      console.error("Critical: server.fetch is not a function!", typeof server.fetch, Object.keys(server));
+    if (!server || typeof server.fetch !== "function") {
+      console.error("Critical: server.fetch is not a function!", typeof server?.fetch, server ? Object.keys(server) : "null");
       throw new Error("Server fetch handler missing");
     }
 
-    console.log(`SSR: Handling ${req.method} ${url.pathname} ...`);
+    console.log("SSR: Calling server.fetch...");
 
     // Call TanStack Start's fetch handler
     const webResponse = await server.fetch(webRequest, process.env, {});
     
-    console.log(`SSR: Response received with status ${webResponse.status}`);
+    console.log("SSR: Response status", webResponse.status);
 
     // Write status + headers to Node.js response
     res.statusCode = webResponse.status;
@@ -144,12 +143,13 @@ export default async function handler(req, res) {
     const responseBody = await webResponse.arrayBuffer();
     res.end(Buffer.from(responseBody));
   } catch (err) {
-    console.error("SSR Bridge Error:", err);
+    console.error("SSR Bridge Fatal Error:", err);
     res.statusCode = 500;
-    res.end("Internal Server Error: " + err.message);
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Internal Server Error\n\n" + err.stack);
   }
 }
-`.trim() + "\\n");
+`.trim() + "\n");
   console.log("   ✅ index.mjs created.");
 } else {
   console.error("   ❌ server.js not found in dist/server!");
