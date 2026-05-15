@@ -11,12 +11,19 @@ const distClient = path.join(__dirname, "..", "dist", "client");
 
 console.log("🛠️  Starting Vercel Build Output API v3 transformation...");
 
+// Clean up old output
+if (fs.existsSync(vercelOut)) {
+  fs.rmSync(vercelOut, { recursive: true, force: true });
+}
+
 // ── 1. Static Assets ─────────────────────────────────────────────────────────
 console.log("📦 Copying static assets (dist/client → static) ...");
 const staticDir = path.join(vercelOut, "static");
 fs.mkdirSync(staticDir, { recursive: true });
-fs.cpSync(distClient, staticDir, { recursive: true });
-console.log("   ✅ Static assets copied.");
+if (fs.existsSync(distClient)) {
+  fs.cpSync(distClient, staticDir, { recursive: true });
+  console.log("   ✅ Static assets copied.");
+}
 
 // ── 2. Serverless function ────────────────────────────────────────────────────
 console.log("🚀 Building serverless function ...");
@@ -34,8 +41,17 @@ fs.writeFileSync(
   }, null, 2)
 );
 
+// package.json for the function (ensure ESM)
+fs.writeFileSync(
+  path.join(funcDir, "package.json"),
+  JSON.stringify({ type: "module" }, null, 2)
+);
+
 // Copy server bundle
-fs.cpSync(distServer, funcDir, { recursive: true });
+if (fs.existsSync(distServer)) {
+  fs.cpSync(distServer, funcDir, { recursive: true });
+  console.log("   ✅ Server bundle copied.");
+}
 
 // Create bridge
 const indexMjs = path.join(funcDir, "index.mjs");
@@ -43,19 +59,42 @@ fs.writeFileSync(indexMjs, `
 import * as serverModule from "./server.js";
 
 export default async function handler(req, res) {
+  console.log("SSR: Request", req.method, req.url);
   try {
     const server = serverModule.default || serverModule;
     
-    // Build URL
     const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
     const proto = req.headers["x-forwarded-proto"] || "https";
     const url = new URL(req.url, proto + "://" + host);
 
-    // Simple GET/HEAD handling (no body reading to prevent hangs)
+    // Convert Node headers to Headers object
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) {
+        if (Array.isArray(value)) value.forEach(v => headers.append(key, v));
+        else headers.set(key, value);
+      }
+    }
+
+    // Read body if not GET/HEAD
+    let body = undefined;
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      body = Buffer.concat(chunks);
+    }
+
     const webRequest = new Request(url.toString(), {
       method: req.method,
-      headers: req.headers
+      headers,
+      body: body && body.length > 0 ? body : undefined,
+      // Duplex is required for some Node fetch implementations when body is present
+      duplex: body ? "half" : undefined
     });
+
+    if (!server || typeof server.fetch !== "function") {
+      throw new Error("Server fetch handler not found in bundle");
+    }
 
     const webResponse = await server.fetch(webRequest, process.env, {});
     
@@ -67,8 +106,10 @@ export default async function handler(req, res) {
     const responseBody = await webResponse.arrayBuffer();
     res.end(Buffer.from(responseBody));
   } catch (err) {
+    console.error("SSR Error:", err);
     res.statusCode = 500;
-    res.end("Bridge Error: " + err.message);
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Internal Server Error\\n\\n" + err.stack);
   }
 }
 `.trim() + "\n");
