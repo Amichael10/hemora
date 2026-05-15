@@ -791,7 +791,7 @@ function BlogPreview() {
     (async () => {
       const { data } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, category, published_at")
+        .select("id, slug, title, category, published_at, cover_url")
         .eq("status", "published")
         .limit(3)
         .order("published_at", { ascending: false });
@@ -817,29 +817,52 @@ function BlogPreview() {
             </Button>
           </div>
         </div>
-        <div data-stagger className="mt-10 grid sm:grid-cols-3 gap-3">
+        <div data-stagger className="mt-10 grid sm:grid-cols-3 gap-6">
           {posts.length > 0 ? posts.map((it, i) => (
             <a
               key={it.id}
               href={`/blog/${it.slug}`}
               data-stagger-item
-              className="group rounded-2xl bg-card border border-border p-5 hover:shadow-md transition-shadow"
+              className="group flex flex-col rounded-2xl bg-card border border-border overflow-hidden hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
             >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
-                <BookFilled size={18} />
+              <div className="aspect-[16/10] overflow-hidden relative bg-muted/20">
+                {it.cover_url ? (
+                  <img 
+                    src={it.cover_url} 
+                    alt={it.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BookFilled size={24} className="text-primary/20" />
+                  </div>
+                )}
+                <div className="absolute top-4 left-4">
+                  <div className="bg-background/90 backdrop-blur px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-sm shadow-sm border border-border/40">
+                    {it.category || 'Article'}
+                  </div>
+                </div>
               </div>
-              <div className="mt-4 text-[10px] uppercase tracking-wider text-accent font-semibold">{it.category || 'Article'}</div>
-              <h3 className="mt-1 font-serif text-lg text-secondary leading-snug">{it.title}</h3>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {it.published_at ? new Date(it.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Recent'}
-              </p>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="font-serif text-xl text-secondary leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                  {it.title}
+                </h3>
+                <div className="mt-auto pt-4 flex items-center justify-between text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">
+                  <span>{it.published_at ? new Date(it.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Recent'}</span>
+                  <div className="flex items-center gap-1.5 group-hover:text-primary transition-colors">
+                    Read more <ArrowRight size={10} />
+                  </div>
+                </div>
+              </div>
             </a>
           )) : (
             [1, 2, 3].map((i) => (
-              <div key={i} className="group rounded-2xl bg-card border border-border p-5 opacity-50">
-                <div className="w-10 h-10 rounded-xl bg-muted grid place-items-center animate-pulse" />
-                <div className="mt-4 h-3 w-12 bg-muted rounded animate-pulse" />
-                <div className="mt-2 h-4 w-3/4 bg-muted rounded animate-pulse" />
+              <div key={i} className="rounded-2xl bg-card border border-border overflow-hidden opacity-50">
+                <div className="aspect-[16/10] bg-muted animate-pulse" />
+                <div className="p-6 space-y-3">
+                  <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+                </div>
               </div>
             ))
           )}
