@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import hemoraLogo from "@/assets/brand/Logo.png";
 import { DownloadMinimalisticLinear as DownloadIcon } from "solar-icon-set";
+import { WebFooter } from "@/components/layout/WebFooter";
 
 type FileLink = { label: string; href: string };
 type LogoVariant = {
@@ -116,21 +117,6 @@ function Nav() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="bg-secondary text-secondary-foreground mt-20">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 py-10 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
-        <span>© {new Date().getFullYear()} Hemora. All rights reserved.</span>
-        <div className="flex gap-4">
-          <a href="/about" className="hover:text-accent">About</a>
-          <a href="/privacy" className="hover:text-accent">Privacy</a>
-          <a href="/terms" className="hover:text-accent">Terms</a>
-          <a href="/brand" className="hover:text-accent">Brand</a>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 function LogoCard({ variant }: { variant: LogoVariant }) {
   return (
@@ -399,7 +385,7 @@ export default function Brand() {
         </div>
       </section>
 
-      <Footer />
+      <WebFooter />
     </div>
   );
 }

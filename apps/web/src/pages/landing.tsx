@@ -21,6 +21,7 @@ import {
   BookBold as BookFilled,
 } from "solar-icon-set";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
+import { WebFooter } from "@/components/layout/WebFooter";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -367,11 +368,11 @@ function _Hero() {
             </p>
 
             <div data-anim="hero-cta" className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
-              <Button size="lg" asChild>
-                <a href="https://app.hemora.xyz">Open the app <ArrowRight size={16} /></a>
+              <Button size="lg" asChild className="rounded-full px-8 shadow-lg shadow-primary/20">
+                <a href="https://app.hemora.xyz/crisis">Log a crisis <HeartPulse size={18} className="ml-2" /></a>
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <a href="#download">Download for mobile</a>
+              <Button size="lg" variant="outline" asChild className="rounded-full px-8">
+                <a href="/directory">Find care near you <Users size={18} className="ml-2" /></a>
               </Button>
             </div>
 
@@ -826,47 +827,6 @@ function BlogPreview() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="bg-secondary text-secondary-foreground">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10 py-14 grid md:grid-cols-4 gap-8 text-sm border-x border-white/10">
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-2">
-            <img src={hemoraLogo} alt="Hemora" className="w-9 h-9" />
-            <span className="font-serif text-2xl">Hemora</span>
-          </div>
-          <p className="mt-3 text-secondary-foreground/70 max-w-sm leading-relaxed">
-            Care that stays with you. For every family touched by sickle cell.
-          </p>
-        </div>
-        <div>
-          <div className="text-xs uppercase tracking-wider text-accent mb-3">Product</div>
-          <ul className="space-y-2 text-secondary-foreground/80">
-            <li><a href="#features" className="hover:text-accent">Features</a></li>
-            <li><a href="#how" className="hover:text-accent">How it works</a></li>
-            <li><a href="#download" className="hover:text-accent">Download</a></li>
-          </ul>
-        </div>
-        <div>
-          <div className="text-xs uppercase tracking-wider text-accent mb-3">Company</div>
-          <ul className="space-y-2 text-secondary-foreground/80">
-            <li><a href="/about" className="hover:text-accent">About</a></li>
-            <li><a href="/blog" className="hover:text-accent">Blog</a></li>
-            <li><a href="/privacy" className="hover:text-accent">Privacy</a></li>
-            <li><a href="/terms" className="hover:text-accent">Terms</a></li>
-          <li><a href="/brand" className="hover:text-accent">Brand</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6 sm:px-10 py-5 text-xs text-secondary-foreground/60 flex flex-wrap justify-between gap-2">
-          <span>© {new Date().getFullYear()} Hemora. All rights reserved.</span>
-          <span>Made with care.</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 export default function Landing() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -968,7 +928,7 @@ export default function Landing() {
           <BlogPreview />
         </div>
       </main>
-      <Footer />
+      <WebFooter />
     </div>
   );
 }

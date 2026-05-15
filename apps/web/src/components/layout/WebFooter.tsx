@@ -19,9 +19,9 @@ export function WebFooter() {
         <div>
           <div className="text-xs uppercase tracking-wider text-accent mb-3">Product</div>
           <ul className="space-y-2 text-secondary-foreground/80">
-            <li><button onClick={() => setLocation("/")} className="hover:text-accent">Features</button></li>
-            <li><button onClick={() => setLocation("/")} className="hover:text-accent">How it works</button></li>
-            <li><a href="https://app.hemora.xyz/download" className="hover:text-accent">Download</a></li>
+            <li><a href="/#features" className="hover:text-accent">Features</a></li>
+            <li><a href="/#how" className="hover:text-accent">How it works</a></li>
+            <li><a href="/#download" className="hover:text-accent">Download</a></li>
           </ul>
         </div>
         <div>
@@ -47,6 +47,14 @@ export function WebFooter() {
             >
               <Linkedin size={14} />
               <span>LinkedIn</span>
+            </a>
+            <a 
+              href="https://twitter.com/HemoraApp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-accent transition-colors"
+            >
+              Twitter
             </a>
             <span>Made with care.</span>
           </div>

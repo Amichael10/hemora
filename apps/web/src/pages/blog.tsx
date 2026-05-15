@@ -160,33 +160,6 @@ export default function BlogIndex() {
           )}
         </main>
 
-        {/* Branded Footer */}
-        <footer className="bg-secondary text-secondary-foreground py-32 mt-40">
-          <div className="max-w-5xl mx-auto px-6 text-center space-y-16">
-            <div className="flex flex-col items-center gap-8">
-              <h2 className="text-[11px] font-bold uppercase tracking-[0.5em] opacity-50">The Ethos</h2>
-              <p className="text-4xl md:text-6xl tracking-tighter leading-[1.1] italic font-serif max-w-4xl">
-                Knowledge is the bridge between vulnerability and invincibility.
-              </p>
-            </div>
-            <div className="pt-16 flex flex-col items-center gap-12 border-t border-white/5">
-              <div className="flex flex-wrap justify-center gap-x-16 gap-y-6 text-[11px] font-bold uppercase tracking-[0.3em]">
-                <Link href="/" className="hover:text-accent transition-colors">Foundation</Link>
-                <Link href="/about" className="hover:text-accent transition-colors">Mission</Link>
-                <Link href="/directory" className="hover:text-accent transition-colors">Resources</Link>
-                <Link href="/contact" className="hover:text-accent transition-colors">Connect</Link>
-              </div>
-              <div className="space-y-4">
-                <p className="text-[10px] opacity-30 uppercase tracking-[0.4em]">© 2024 Hemora. All Rights Reserved.</p>
-                <div className="flex justify-center gap-4 opacity-20">
-                  <div className="w-1 h-1 rounded-full bg-white" />
-                  <div className="w-1 h-1 rounded-full bg-white" />
-                  <div className="w-1 h-1 rounded-full bg-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
       <WebFooter />
     </div>
