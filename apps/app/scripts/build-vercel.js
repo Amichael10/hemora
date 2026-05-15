@@ -67,6 +67,7 @@ export default async function handler(req, res) {
     const proto = req.headers["x-forwarded-proto"] || "https";
     const url = new URL(req.url, proto + "://" + host);
 
+    console.log("SSR: Converting headers...");
     // Convert Node headers to Headers object
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
@@ -79,9 +80,11 @@ export default async function handler(req, res) {
     // Read body if not GET/HEAD
     let body = undefined;
     if (req.method !== "GET" && req.method !== "HEAD") {
+      console.log("SSR: Reading request body...");
       const chunks = [];
       for await (const chunk of req) chunks.push(chunk);
       body = Buffer.concat(chunks);
+      console.log("SSR: Body read, length:", body.length);
     }
 
     const webRequest = new Request(url.toString(), {
@@ -96,15 +99,20 @@ export default async function handler(req, res) {
       throw new Error("Server fetch handler not found in bundle");
     }
 
+    console.log("SSR: Calling server.fetch...");
     const webResponse = await server.fetch(webRequest, process.env, {});
+    console.log("SSR: server.fetch returned status:", webResponse.status);
     
     res.statusCode = webResponse.status;
     webResponse.headers.forEach((value, key) => {
       res.setHeader(key, value);
     });
 
+    console.log("SSR: Reading response body as arrayBuffer...");
     const responseBody = await webResponse.arrayBuffer();
+    console.log("SSR: Response body read, length:", responseBody.byteLength);
     res.end(Buffer.from(responseBody));
+    console.log("SSR: Response sent.");
   } catch (err) {
     console.error("SSR Error:", err);
     res.statusCode = 500;
