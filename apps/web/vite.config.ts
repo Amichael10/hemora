@@ -32,13 +32,6 @@ export default defineConfig({
     include: ["@tanstack/query-core"],
   },
   ssr: {
-    noExternal: [
-      "@tanstack/react-start",
-      "@tanstack/react-router",
-      "lucide-react",
-      "recharts",
-      "gsap",
-      "framer-motion",
-    ],
+    noExternal: [/.*/],
   },
 });
