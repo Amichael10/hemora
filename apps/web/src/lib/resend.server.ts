@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || process.env.HEMORA_API_KEY);
 
 export { resend };
 
@@ -8,7 +8,7 @@ export async function sendEmail({
   to,
   subject,
   html,
-  from = "Hemora <hello@hemora.xyz>",
+  from = "Hemora <hello@notify.hemora.xyz>",
   text,
 }: {
   to: string | string[];

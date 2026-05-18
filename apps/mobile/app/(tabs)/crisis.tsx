@@ -7,12 +7,14 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
   Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import HemoraLottie from "@/components/HemoraLottie";
@@ -26,6 +28,7 @@ import {
   ChartSquareLinear,
   CheckCircleBold,
   ClockCircleBold,
+  DangerTriangleBold,
   HeartPulse2Bold,
   HeartPulse2Linear,
   HospitalBold,
@@ -116,8 +119,66 @@ const RELIEFS = [
 const DEFAULT_FLOW_BG = "#3D6B6B";
 
 type Phase = "hub" | "insights" | "flow";
-type FlowStep = "pain" | "location" | "triggers" | "relief" | "hospital";
+type FlowStep = "type" | "pain" | "location" | "triggers" | "relief" | "hospital";
 type InsightTab = "overview" | "trends";
+
+const CRISIS_TYPES = [
+  {
+    key: "pain",
+    label: "Pain (VOC)",
+    caption: "Vaso-occlusive pain crisis",
+    color: "#C92A3A",
+    source: LOTTIE_SEVERE,
+  },
+  {
+    key: "acs",
+    label: "Chest / Breathing",
+    caption: "Acute Chest Syndrome signs",
+    color: "#8C2A3A",
+    source: LOTTIE_SEVERE,
+    emergency: true,
+  },
+  {
+    key: "stroke",
+    label: "Stroke Signs",
+    caption: "Weakness, speech issues, etc.",
+    color: "#8C2A3A",
+    source: LOTTIE_SEVERE,
+    emergency: true,
+  },
+  {
+    key: "splenic",
+    label: "Spleen / Abdomen",
+    caption: "Splenic sequestration signs",
+    color: "#C97A4A",
+    source: LOTTIE_SEVERE,
+    emergency: true,
+  },
+  {
+    key: "fever",
+    label: "Fever",
+    caption: "Temperature above 38°C",
+    color: "#C9A24A",
+    source: LOTTIE_INFECTION,
+    emergency: true,
+  },
+  {
+    key: "priapism",
+    label: "Priapism",
+    caption: "Persistent painful erection",
+    color: "#C97A4A",
+    source: LOTTIE_SEVERE,
+    emergency: true,
+  },
+  {
+    key: "aplastic",
+    label: "Extreme Fatigue",
+    caption: "Aplastic crisis signs",
+    color: "#5C7A9B",
+    source: LOTTIE_SHRUG,
+    emergency: true,
+  },
+] as const;
 
 function toggleItem(list: string[], item: string): string[] {
   return list.includes(item) ? list.filter((x) => x !== item) : [...list, item];
@@ -176,7 +237,8 @@ export default function CrisisScreen() {
   const { user } = useAuth();
 
   const [phase, setPhase] = useState<Phase>("hub");
-  const [flowStep, setFlowStep] = useState<FlowStep>("pain");
+  const [flowStep, setFlowStep] = useState<FlowStep>("type");
+  const [crisisType, setCrisisType] = useState<string>("pain");
   const [painLevel, setPainLevel] = useState<(typeof PAIN)[number]["level"] | null>(null);
   const [locations, setLocations] = useState<string[]>([]);
   const [otherLocationText, setOtherLocationText] = useState("");
@@ -185,6 +247,7 @@ export default function CrisisScreen() {
   const [whatHelped, setWhatHelped] = useState<string[]>([]);
   const [hospitalVisit, setHospitalVisit] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [profileGender, setProfileGender] = useState<string | null>(null);
 
   const [logs, setLogs] = useState<CrisisLogRow[]>([]);
@@ -245,7 +308,8 @@ export default function CrisisScreen() {
   }, [user?.id]);
 
   const resetFlow = useCallback(() => {
-    setFlowStep("pain");
+    setFlowStep("type");
+    setCrisisType("pain");
     setPainLevel(null);
     setLocations([]);
     setOtherLocationText("");
@@ -291,7 +355,7 @@ export default function CrisisScreen() {
   }, [triggers, otherTriggerText]);
 
   const saveLog = useCallback(async () => {
-    if (!user?.id || !painLevel) return;
+    if (!user?.id) return;
     const supabase = getSupabase();
     if (!supabase) {
       Alert.alert("Not configured", "Add Supabase keys to save a crisis log.");
@@ -300,7 +364,8 @@ export default function CrisisScreen() {
     setSaving(true);
     try {
       await insertCrisisLog(supabase, user.id, {
-        painLevel,
+        crisisType,
+        painLevel: painLevel ?? "mild",
         painLocations: finalLocations,
         triggers: finalTriggers,
         whatHelped,
@@ -326,18 +391,135 @@ export default function CrisisScreen() {
   const donutPct = topPain && total > 0 ? topPain.pct : total > 0 ? 100 : 0;
 
   const flowStepIndex =
-    flowStep === "pain" ? 1 : flowStep === "location" ? 2 : flowStep === "triggers" ? 3 : flowStep === "relief" ? 4 : 5;
+    flowStep === "type"
+      ? 1
+      : flowStep === "pain"
+      ? 2
+      : flowStep === "location"
+      ? 3
+      : flowStep === "triggers"
+      ? 4
+      : flowStep === "relief"
+      ? 5
+      : 6;
+
+  const totalSteps = 6;
 
   if (phase === "flow") {
     return (
       <View style={[styles.flowRoot, { backgroundColor: t.background }]}>
-        {flowStep === "pain" && (
-          <View style={[styles.flowFill, { backgroundColor: painBg }]}>
+        {flowStep === "type" && (
+          <View style={[styles.flowFill, { backgroundColor: CRISIS_TYPES.find((c) => c.key === crisisType)?.color ?? DEFAULT_FLOW_BG }]}>
             <SafeAreaView style={styles.flowSafe} edges={["top"]}>
               <Pressable style={styles.flowBack} onPress={closeFlowToHub} accessibilityLabel="Back">
                 <AltArrowLeftLinear color="#fff" size={20} />
               </Pressable>
-              <StepDots current={flowStepIndex} total={5} light />
+              <StepDots current={flowStepIndex} total={totalSteps} light />
+              <Text style={styles.flowH1}>What kind of crisis{"\n"}is this?</Text>
+              <Text style={styles.flowSub}>Different crises need different care.</Text>
+              
+              <ScrollView 
+                style={styles.typeScroll}
+                contentContainerStyle={styles.typeScrollContent}
+                showsVerticalScrollIndicator={false}
+              >
+                {CRISIS_TYPES.map((type) => {
+                  const on = crisisType === type.key;
+                  return (
+                    <TouchableOpacity
+                      key={type.key}
+                      onPress={() => setCrisisType(type.key)}
+                      activeOpacity={0.7}
+                      style={[styles.typeCard, on && styles.typeCardOn]}
+                    >
+                      <View style={styles.typeCardLeft}>
+                        <View style={[styles.typeIconBox, { backgroundColor: type.color }]}>
+                           <HemoraLottie source={type.source} autoPlay loop style={styles.typeLottie} />
+                        </View>
+                        <View style={styles.typeCardMeta}>
+                          <Text style={[styles.typeLabel, on && styles.typeLabelOn]}>{type.label}</Text>
+                          <Text style={[styles.typeCaption, on && styles.typeCaptionOn]}>{type.caption}</Text>
+                        </View>
+                      </View>
+                      {on && <CheckCircleBold color="#fff" size={20} />}
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+
+              <Pressable
+                style={styles.flowPrimaryBtn}
+                onPress={() => {
+                  const typeCfg = CRISIS_TYPES.find((c) => c.key === crisisType);
+                  if ((typeCfg as any)?.emergency) {
+                    setShowEmergencyModal(true);
+                  } else if (crisisType === "pain") {
+                    setFlowStep("pain");
+                  } else {
+                    setPainLevel("severe");
+                    setFlowStep("location");
+                  }
+                }}
+              >
+                <Text style={styles.flowPrimaryTxt}>Continue</Text>
+                <CheckCircleBold color={Brand.ink} size={18} />
+              </Pressable>
+
+              <Modal
+                visible={showEmergencyModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowEmergencyModal(false)}
+              >
+                <View style={styles.modalOverlay}>
+                  <View style={[styles.modalContent, { backgroundColor: t.surface }]}>
+                    <View style={styles.modalHeader}>
+                      <View style={styles.alertIcon}>
+                        <DangerTriangleBold color="#fff" size={24} />
+                      </View>
+                      <Text style={[styles.modalTitle, { color: t.text }]}>Urgent Medical Attention Needed</Text>
+                    </View>
+                    <Text style={[styles.modalBody, { color: t.textMuted }]}>
+                      The signs you've selected are serious and require immediate professional care. 
+                      Please don't delay.
+                    </Text>
+                    
+                    <View style={styles.modalActions}>
+                      <TouchableOpacity 
+                        style={styles.emergencyBtn}
+                        onPress={() => {
+                          setShowEmergencyModal(false);
+                          router.push("/emergency");
+                        }}
+                      >
+                        <Text style={styles.emergencyBtnTxt}>View Emergency Plan</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={[styles.modalSecondaryBtn, { borderColor: t.tabBorder }]}
+                        onPress={() => {
+                          setShowEmergencyModal(false);
+                          setPainLevel("severe");
+                          setFlowStep("location");
+                        }}
+                      >
+                        <Text style={[styles.modalSecondaryBtnTxt, { color: t.text }]}>Continue Logging Anyway</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+            </SafeAreaView>
+          </View>
+        )}
+
+        {flowStep === "pain" && (
+          <View style={[styles.flowFill, { backgroundColor: painBg }]}>
+            <SafeAreaView style={styles.flowSafe} edges={["top"]}>
+              <Pressable style={styles.flowBack} onPress={() => setFlowStep("type")} accessibilityLabel="Back">
+                <AltArrowLeftLinear color="#fff" size={20} />
+              </Pressable>
+              <StepDots current={flowStepIndex} total={totalSteps} light />
               <Text style={styles.flowH1}>How severe is{"\n"}the pain right now?</Text>
               <Text style={styles.flowSub}>Take a breath. Choose the face that fits.</Text>
               <View style={styles.flowCenter}>
@@ -393,10 +575,10 @@ export default function CrisisScreen() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.locationScroll}
             >
-              <Pressable style={styles.flowBackLight} onPress={() => setFlowStep("pain")} accessibilityLabel="Back">
+              <Pressable style={styles.flowBackLight} onPress={() => setFlowStep(crisisType === "pain" ? "pain" : "type")} accessibilityLabel="Back">
                 <AltArrowLeftLinear color={t.teal} size={20} />
               </Pressable>
-              <StepDots current={flowStepIndex} total={5} />
+              <StepDots current={flowStepIndex} total={totalSteps} />
               <Text style={[styles.hPage, { color: t.text }]}>Where does it hurt?</Text>
               <Text style={[styles.bodyMd, { color: t.textMuted }]}>
                 Tap the body or the chips — same illustration as the web app.
@@ -424,7 +606,7 @@ export default function CrisisScreen() {
               <Pressable style={styles.flowBack} onPress={() => setFlowStep("location")} accessibilityLabel="Back">
                 <AltArrowLeftLinear color="#fff" size={20} />
               </Pressable>
-              <StepDots current={flowStepIndex} total={5} light />
+              <StepDots current={flowStepIndex} total={totalSteps} light />
               <Text style={styles.flowH1}>Any known triggers?</Text>
               <Text style={styles.flowSub}>Tap all that apply</Text>
               <View style={styles.flowCenter}>
@@ -472,7 +654,7 @@ export default function CrisisScreen() {
               <Pressable style={styles.flowBack} onPress={() => setFlowStep("triggers")} accessibilityLabel="Back">
                 <AltArrowLeftLinear color="#fff" size={20} />
               </Pressable>
-              <StepDots current={flowStepIndex} total={5} light />
+              <StepDots current={flowStepIndex} total={totalSteps} light />
               <Text style={styles.flowH1}>What has helped so far?</Text>
               <Text style={styles.flowSub}>Tap all that apply</Text>
               <View style={styles.flowCenter}>
@@ -510,7 +692,7 @@ export default function CrisisScreen() {
             <Pressable style={styles.flowBackLight} onPress={() => setFlowStep("relief")} accessibilityLabel="Back">
               <AltArrowLeftLinear color={t.teal} size={20} />
             </Pressable>
-            <StepDots current={flowStepIndex} total={5} />
+            <StepDots current={flowStepIndex} total={totalSteps} />
             <Text style={[styles.hPage, { color: t.text }]}>Did this require a hospital visit?</Text>
             <Pressable
               style={[styles.hospChoice, { borderColor: t.tabBorder, backgroundColor: hospitalVisit === true ? `${Brand.red}18` : t.surface }]}
@@ -786,9 +968,51 @@ export default function CrisisScreen() {
             <ActivityIndicator color={Brand.red} />
             <Text style={[styles.hint, { color: t.textMuted }]}>Loading…</Text>
           </View>
-        ) : logs.length > 0 ? (
+        ) : logs.length === 0 ? (
+          <View style={[styles.emptyCard, { borderColor: t.tabBorder, backgroundColor: t.surface }]}>
+            <LinearGradient
+              colors={[`${Brand.red}18`, `${Brand.red}05`]}
+              style={styles.emptyIconGrad}
+            >
+              <ActivityIndicator color={Brand.red} size="small" />
+            </LinearGradient>
+            <Text style={[styles.emptyH, { color: t.text, fontFamily: Fonts.serifSemi }]}>No health events logged</Text>
+            <Text style={[styles.emptyBody, { color: t.textMuted, fontFamily: Fonts.sans }]}>
+              Tracking your crises helps you and your doctor identify triggers and build a better care plan.
+            </Text>
+            
+            <View style={styles.stepGrid}>
+              <View style={[styles.stepCell, { borderColor: t.tabBorder, backgroundColor: t.background }]}>
+                <Text style={[styles.stepNum, { color: Brand.red, fontFamily: Fonts.sansBold }]}>01</Text>
+                <Text style={[styles.stepTxt, { color: t.text, fontFamily: Fonts.sansBold }]}>Rate Intensity</Text>
+              </View>
+              <View style={[styles.stepCell, { borderColor: t.tabBorder, backgroundColor: t.background }]}>
+                <Text style={[styles.stepNum, { color: Brand.red, fontFamily: Fonts.sansBold }]}>02</Text>
+                <Text style={[styles.stepTxt, { color: t.text, fontFamily: Fonts.sansBold }]}>Map the Pain</Text>
+              </View>
+              <View style={[styles.stepCell, { borderColor: t.tabBorder, backgroundColor: t.background }]}>
+                <Text style={[styles.stepNum, { color: Brand.red, fontFamily: Fonts.sansBold }]}>03</Text>
+                <Text style={[styles.stepTxt, { color: t.text, fontFamily: Fonts.sansBold }]}>Track Triggers</Text>
+              </View>
+            </View>
+
+            <Pressable style={styles.ctaRed} onPress={openFlow}>
+              <Text style={styles.ctaRedTxt}>Log health event</Text>
+              <View style={{ marginLeft: 8 }}><AddCircleBold color="#fff" size={20} /></View>
+            </Pressable>
+            
+            <Pressable onPress={() => router.push("/emergency")}>
+              <Text style={[styles.urgentLink, { color: Brand.red, fontFamily: Fonts.sansBold }]}>Need urgent help? View plan</Text>
+            </Pressable>
+          </View>
+        ) : (
           <>
-            <Text style={[styles.recentH, { color: t.text }]}>Recent Crisis Logs</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <Text style={[styles.recentH, { color: t.text, marginBottom: 0 }]}>Recent Crisis Logs</Text>
+              <Pressable style={[styles.ctaRed, { paddingVertical: 8, paddingHorizontal: 16, width: 'auto' }]} onPress={openFlow}>
+                <Text style={[styles.ctaRedTxt, { fontSize: 13 }]}>New Log</Text>
+              </Pressable>
+            </View>
             {logs.map((log, idx) => {
               const d = new Date(log.occurredAt);
               const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
@@ -808,11 +1032,13 @@ export default function CrisisScreen() {
                       <View style={{ flex: 1 }}>
                         <View style={styles.logTitleRow}>
                           <Text style={[styles.logPain, { color: t.text, fontFamily: Fonts.serifSemi }]}>
-                            {log.painLevel} pain
+                            {log.crisisType === "pain"
+                              ? `${log.painLevel} pain`
+                              : CRISIS_TYPES.find((c) => c.key === log.crisisType)?.label ?? log.crisisType}
                           </Text>
-                          <View style={[styles.badge, { backgroundColor: `${Brand.red}14` }]}>
-                            <Text style={[styles.badgeTxt, { color: Brand.red, fontFamily: Fonts.sansBold }]}>
-                              {log.painLevel}
+                          <View style={[styles.badge, { backgroundColor: log.crisisType === "pain" ? `${Brand.red}14` : `${Brand.teal}14` }]}>
+                            <Text style={[styles.badgeTxt, { color: log.crisisType === "pain" ? Brand.red : Brand.teal, fontFamily: Fonts.sansBold }]}>
+                              {log.crisisType}
                             </Text>
                           </View>
                         </View>
@@ -855,39 +1081,6 @@ export default function CrisisScreen() {
               );
             })}
           </>
-        ) : (
-          <View style={[styles.emptyCard, { borderColor: t.tabBorder, backgroundColor: t.surface }]}>
-            <LinearGradient colors={["#c9a35a", "#e8dcc4"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.emptyIconGrad}>
-              <HeartPulse2Linear color={Brand.red} size={30} />
-            </LinearGradient>
-            <Text style={[styles.emptyH, { color: t.text, fontFamily: Fonts.serifSemi }]}>
-              No crises logged — that&apos;s a good thing.
-            </Text>
-            <Text style={[styles.emptyBody, { color: t.textMuted, fontFamily: Fonts.sans }]}>
-              When pain shows up, log it here. Over time you&apos;ll see patterns — triggers, what helped, when to call your team.
-            </Text>
-            <View style={styles.stepGrid}>
-              {[
-                { n: "1", tt: "Tap Start log" },
-                { n: "2", tt: "Rate the pain" },
-                { n: "3", tt: "Note what helped" },
-              ].map((s) => (
-                <View key={s.n} style={[styles.stepCell, { borderColor: t.tabBorder, backgroundColor: `${t.surface}ee` }]}>
-                  <Text style={[styles.stepNum, { color: Brand.gold, fontFamily: Fonts.sansBold }]}>STEP {s.n}</Text>
-                  <Text style={[styles.stepTxt, { color: t.text, fontFamily: Fonts.sansBold }]}>{s.tt}</Text>
-                </View>
-              ))}
-            </View>
-            <Pressable style={styles.ctaRed} onPress={openFlow}>
-              <AddCircleBold color="#fff" size={18} />
-              <Text style={[styles.ctaRedTxt, { marginLeft: 8 }]}>Log your first crisis</Text>
-            </Pressable>
-            <Pressable onPress={() => router.push("/emergency")}>
-              <Text style={[styles.urgentLink, { color: Brand.gold, fontFamily: Fonts.sansBold }]}>
-                In a crisis right now? Get urgent care →
-              </Text>
-            </Pressable>
-          </View>
         )}
 
         {logs.length > 0 ? (
@@ -1257,5 +1450,126 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     borderStyle: "dashed",
+  },
+  typeScroll: {
+    flex: 1,
+    marginVertical: 12,
+  },
+  typeScrollContent: {
+    gap: 12,
+    paddingBottom: 20,
+  },
+  typeCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.12)",
+  },
+  typeCardOn: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderColor: "rgba(255,255,255,0.35)",
+  },
+  typeCardLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    flex: 1,
+  },
+  typeIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  typeLottie: {
+    width: 28,
+    height: 28,
+  },
+  typeCardMeta: {
+    flex: 1,
+  },
+  typeLabel: {
+    fontSize: 15,
+    fontFamily: Fonts.sansBold,
+    color: "rgba(255,255,255,0.85)",
+  },
+  typeLabelOn: {
+    color: "#fff",
+  },
+  typeCaption: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.6)",
+    marginTop: 2,
+  },
+  typeCaptionOn: {
+    color: "rgba(255,255,255,0.8)",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  modalContent: {
+    width: "100%",
+    borderRadius: 28,
+    padding: 24,
+  },
+  modalHeader: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  alertIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 20,
+    backgroundColor: Brand.red,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: Fonts.serifSemi,
+    textAlign: "center",
+  },
+  modalBody: {
+    fontSize: 15,
+    fontFamily: Fonts.sans,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  modalActions: {
+    gap: 12,
+  },
+  emergencyBtn: {
+    backgroundColor: Brand.red,
+    height: 56,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emergencyBtnTxt: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: Fonts.sansBold,
+  },
+  modalSecondaryBtn: {
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSecondaryBtnTxt: {
+    fontSize: 15,
+    fontFamily: Fonts.sansMedium,
   },
 });

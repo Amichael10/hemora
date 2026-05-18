@@ -10,8 +10,16 @@ import { useProfile } from "@/context/ProfileContext";
 import {
   useListCareRecords,
   useCreateCareRecord,
-  getListCareRecordsQueryKey
+  useListVitalsLogs,
+  useListTransfusionLogs,
+  useListAppointments,
+  useGetProfile,
+  getListCareRecordsQueryKey,
+  getListVitalsLogsQueryKey,
+  getListTransfusionLogsQueryKey,
+  getListAppointmentsQueryKey
 } from "@workspace/api-client-react";
+import { exportHealthSummaryToPdf } from "@/lib/careRecordPdf";
 import { CreateCareRecordBodyType, CreateCareRecordBodyStatus } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
@@ -45,6 +53,13 @@ export default function Records() {
     { profileId },
     { query: { queryKey: getListCareRecordsQueryKey({ profileId }), enabled: !!profileId } }
   );
+
+  const { data: profile } = useGetProfile(profileId || "", { query: { queryKey: ["profile", profileId], enabled: !!profileId } });
+  const { data: vitals } = useListVitalsLogs({ profileId }, { query: { queryKey: getListVitalsLogsQueryKey({ profileId }), enabled: !!profileId } });
+  const { data: transfusions } = useListTransfusionLogs({ profileId }, { query: { queryKey: getListTransfusionLogsQueryKey({ profileId }), enabled: !!profileId } });
+  const { data: appointments } = useListAppointments({ profileId }, { query: { queryKey: getListAppointmentsQueryKey({ profileId }), enabled: !!profileId } });
+
+  const [isExporting, setIsExporting] = useState(false);
 
   const createRecord = useCreateCareRecord();
   const [title, setTitle] = useState("");
@@ -105,8 +120,30 @@ export default function Records() {
         </Tabs>
 
         <div className="flex gap-2 mb-6 flex-wrap">
-          <Button variant="soft" size="sm" className="whitespace-nowrap">
-            <FileUp size={14} /> Export Summary
+          <Button 
+            variant="soft" 
+            size="sm" 
+            className="whitespace-nowrap"
+            disabled={isExporting}
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                await exportHealthSummaryToPdf({
+                  profile,
+                  careRecords: records,
+                  vitals,
+                  transfusions,
+                  appointments
+                });
+                toast({ title: "Summary exported", description: "Your health record summary is ready." });
+              } catch (e) {
+                toast({ title: "Export failed", variant: "destructive" });
+              } finally {
+                setIsExporting(false);
+              }
+            }}
+          >
+            <FileUp size={14} /> {isExporting ? "Exporting..." : "Export Summary"}
           </Button>
           <Button variant="soft" size="sm" className="whitespace-nowrap">
             Filter by Date
@@ -129,39 +166,42 @@ export default function Records() {
           </div>
         ) : filteredRecords?.length === 0 ? (
           <div className="mt-2">
-            <div className="surface-soft p-6 text-center rounded-[24px]">
-              <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+            <div className="surface-soft p-8 text-center rounded-[32px] border border-border/50 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+              <div className="mx-auto w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-primary/10 relative z-10"
                    style={{ background: "var(--gradient-warm)" }}>
                 <HealthIcon
                   outline={MedicalRecordsOutline}
                   filled={MedicalRecordsFilled}
-                  width="32"
-                  height="32"
+                  width="36"
+                  height="36"
                   active
+                  className="text-white"
                 />
               </div>
-              <h3 className="font-serif text-lg font-semibold text-foreground mb-1.5 tracking-tight">
-                No care records yet
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-5 max-w-[280px] mx-auto">
-                Keep track of your health journey. Log your visits, labs, and imaging to have everything in one place.
+              <h3 className="h-card mb-2">No care records yet</h3>
+              <p className="p-muted mb-8 max-w-[260px] mx-auto">
+                Keep track of your health journey. Log your visits, labs, and imaging to have everything in one secure place.
               </p>
 
-              <div className="grid grid-cols-3 gap-2 mb-5 text-left">
+              <div className="grid grid-cols-2 gap-3 mb-8 text-left relative z-10">
                 {[
-                  { n: "1", t: "Add a record" },
-                  { n: "2", t: "Note details" },
-                  { n: "3", t: "Track history" },
-                ].map((s) => (
-                  <div key={s.n} className="rounded-xl bg-card/70 border border-border/40 p-2.5">
-                    <div className="text-[10px] font-bold text-accent mb-0.5">STEP {s.n}</div>
-                    <div className="text-[11px] font-medium text-foreground leading-tight">{s.t}</div>
+                  { icon: <StethoscopeOutline size={14} />, label: "Hospital Visits" },
+                  { icon: <TestTubesOutline size={14} />, label: "Lab Results" },
+                  { icon: <UiFolderOutline size={14} />, label: "Medical Docs" },
+                  { icon: <Calendar size={14} />, label: "History" },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 p-3 rounded-2xl bg-white/50 border border-white/20">
+                    <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                      {item.icon}
+                    </div>
+                    <span className="text-[11px] font-medium text-foreground/80">{item.label}</span>
                   </div>
                 ))}
               </div>
 
-              <Button size="lg" className="w-full" onClick={() => setLocation("/records/new")}>
-                <Plus size={16} /> Add your first record
+              <Button size="lg" className="w-full shadow-md" onClick={() => setLocation("/records/new")}>
+                <Plus size={18} className="mr-2" /> Add your first record
               </Button>
             </div>
           </div>

@@ -25,7 +25,7 @@ export default function RecordForm() {
   const [, editParams] = useRoute("/records/:id/edit");
   const id = editParams?.id;
   const isEdit = !!id;
-  const { profileId } = useProfile();
+  const { profileId, activeProfileId } = useProfile();
   const { toast } = useToast();
 
   const { data: rec, isLoading } = useGetCareRecord(id);
@@ -73,6 +73,7 @@ export default function RecordForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!activeProfileId) return;
     let savedFileUrl = fileUrl;
     try {
       savedFileUrl = await uploadFile();
@@ -81,7 +82,11 @@ export default function RecordForm() {
       return;
     }
     const data = {
-      profileId, documentTitle: title, hospitalClinic: hospital, type,
+      profileId, 
+      familyMemberId: activeProfileId,
+      documentTitle: title, 
+      hospitalClinic: hospital, 
+      type,
       status: CreateCareRecordBodyStatus.saved,
       dateOfRecord: new Date(date).toISOString(),
       labName: type === "lab" ? labName || null : null,

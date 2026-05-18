@@ -1,222 +1,293 @@
-import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { useLocation } from "wouter";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
-import { SubPageHeader } from "@/components/layout/SubPageHeader";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import {
-  getNotificationPrefs,
-  updateNotificationPrefs,
-  subscribeToPush,
-  unsubscribeFromPush,
-  sendTestNotification,
-} from "@/lib/push.functions";
-import {
-  isPushSupported,
-  subscribeBrowser,
-  unsubscribeBrowser,
-  getCurrentEndpoint,
-  isIosSafari,
-  isStandalonePwa,
-} from "@/lib/push-client";
-import { PwaInstallButton } from "@/components/PwaInstallButton";
+  Bell as BellOutline,
+  HeartPulse,
+  Pill as Pills,
+  Droplet as Cup,
+  CheckCircle as Check,
+  Settings as SettingsIcon,
+  BellOff,
+  ArrowLeft,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-type Prefs = {
-  notify_med_reminders: boolean;
-  notify_daily_summary: boolean;
-  notify_crisis_followups: boolean;
-  notify_product_updates: boolean;
-};
+type NotifCategory = "all" | "crisis" | "meds" | "hydration" | "system";
 
-const DEFAULT_PREFS: Prefs = {
-  notify_med_reminders: true,
-  notify_daily_summary: false,
-  notify_crisis_followups: true,
-  notify_product_updates: false,
-};
+interface Notification {
+  id: string;
+  type: "crisis" | "meds" | "hydration" | "system";
+  title: string;
+  body: string;
+  time: string; // human-readable
+  ts: number;   // unix ms for sorting
+  read: boolean;
+}
 
-const ITEMS: { key: keyof Prefs; label: string; desc: string }[] = [
-  { key: "notify_med_reminders", label: "Medication reminders", desc: "Get notified when it's time to take a dose." },
-  { key: "notify_daily_summary", label: "Daily adherence summary", desc: "A short recap each evening." },
-  { key: "notify_crisis_followups", label: "Crisis follow-ups", desc: "Check-ins after a logged crisis." },
-  { key: "notify_product_updates", label: "Product updates", desc: "New features and announcements." },
+const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: "n1",
+    type: "meds",
+    title: "Medication Due",
+    body: "Time to take Hydroxyurea 500 mg. Tap to confirm.",
+    time: "Just now",
+    ts: Date.now() - 2 * 60 * 1000,
+    read: false,
+  },
+  {
+    id: "n2",
+    type: "hydration",
+    title: "Hydration Reminder",
+    body: "You're at 4 / 8 glasses today. Keep it up!",
+    time: "2 h ago",
+    ts: Date.now() - 2 * 60 * 60 * 1000,
+    read: false,
+  },
+  {
+    id: "n3",
+    type: "crisis",
+    title: "Crisis Follow-up",
+    body: "How are you feeling after yesterday's pain episode?",
+    time: "Yesterday",
+    ts: Date.now() - 24 * 60 * 60 * 1000,
+    read: true,
+  },
+  {
+    id: "n4",
+    type: "meds",
+    title: "Dose Confirmed",
+    body: "Folic Acid logged at 8:00 AM. Great job staying on track.",
+    time: "Yesterday",
+    ts: Date.now() - 26 * 60 * 60 * 1000,
+    read: true,
+  },
+  {
+    id: "n5",
+    type: "hydration",
+    title: "Daily Goal Achieved!",
+    body: "You reached your hydration target of 8 glasses. 🎉",
+    time: "2 days ago",
+    ts: Date.now() - 48 * 60 * 60 * 1000,
+    read: true,
+  },
+  {
+    id: "n6",
+    type: "system",
+    title: "Hemora Update",
+    body: "New: Transfusion & Iron Log is now live. Track ferritin directly in the app.",
+    time: "3 days ago",
+    ts: Date.now() - 72 * 60 * 60 * 1000,
+    read: true,
+  },
+  {
+    id: "n7",
+    type: "crisis",
+    title: "Crisis Episode Logged",
+    body: "Your May 14 vaso-occlusive episode was saved. Sharing with your care team.",
+    time: "4 days ago",
+    ts: Date.now() - 4 * 24 * 60 * 60 * 1000,
+    read: true,
+  },
 ];
 
-export default function Notifications() {
-  const { toast } = useToast();
-  const fetchPrefs = useServerFn(getNotificationPrefs);
-  const savePrefs = useServerFn(updateNotificationPrefs);
-  const subscribe = useServerFn(subscribeToPush);
-  const unsubscribe = useServerFn(unsubscribeFromPush);
-  const sendTest = useServerFn(sendTestNotification);
+const TABS: { key: NotifCategory; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "crisis", label: "Crisis" },
+  { key: "meds", label: "Meds" },
+  { key: "hydration", label: "Hydration" },
+  { key: "system", label: "System" },
+];
 
-  const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
-  const [loaded, setLoaded] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission | "unsupported">("default");
-  const [showIosHint, setShowIosHint] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const p = (await fetchPrefs()) as Prefs;
-        setPrefs({ ...DEFAULT_PREFS, ...p });
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoaded(true);
-      }
-      if (!isPushSupported()) {
-        setPermission("unsupported");
-      } else {
-        setPermission(Notification.permission);
-        const ep = await getCurrentEndpoint();
-        setSubscribed(!!ep);
-      }
-      if (isIosSafari() && !isStandalonePwa()) setShowIosHint(true);
-    })();
-  }, [fetchPrefs]);
-
-  async function ensureSubscription(): Promise<boolean> {
-    if (subscribed) return true;
-    if (!isPushSupported()) {
-      toast({ title: "Notifications aren't supported on this device", variant: "destructive" });
-      return false;
-    }
-    if (isIosSafari() && !isStandalonePwa()) {
-      setShowIosHint(true);
-      toast({
-        title: "Add Hemora to your Home Screen first",
-        description: "iOS only allows notifications from installed web apps. Tap Share → Add to Home Screen.",
-      });
-      return false;
-    }
-    const sub = await subscribeBrowser();
-    if (!sub) {
-      toast({ title: "Notification permission denied", variant: "destructive" });
-      setPermission(Notification.permission);
-      return false;
-    }
-    await subscribe({ data: sub });
-    setSubscribed(true);
-    setPermission(Notification.permission);
-    return true;
+function typeIcon(type: Notification["type"]) {
+  switch (type) {
+    case "crisis": return <HeartPulse size={18} />;
+    case "meds": return <Pills size={18} />;
+    case "hydration": return <Cup size={18} />;
+    case "system": return <Check size={18} />;
   }
+}
 
-  async function togglePref(key: keyof Prefs, value: boolean) {
-    const prev = prefs;
-    const next = { ...prefs, [key]: value };
-    setPrefs(next);
-    setBusy(true);
-    try {
-      if (value) {
-        const ok = await ensureSubscription();
-        if (!ok) {
-          setPrefs(prev);
-          return;
-        }
-      }
-      await savePrefs({ data: { [key]: value } });
-    } catch (e) {
-      console.error(e);
-      setPrefs(prev);
-      toast({ title: "Couldn't save preference", variant: "destructive" });
-    } finally {
-      setBusy(false);
-    }
+function typeBg(type: Notification["type"]) {
+  switch (type) {
+    case "crisis": return "bg-primary/10 text-primary";
+    case "meds": return "bg-secondary/15 text-secondary";
+    case "hydration": return "bg-accent/15 text-accent";
+    case "system": return "bg-accent/15 text-accent";
   }
+}
 
-  async function handleTest() {
-    setBusy(true);
-    try {
-      const ok = await ensureSubscription();
-      if (!ok) return;
-      const res = (await sendTest()) as { sent: number; removed: number };
-      if (res.sent > 0) {
-        toast({ title: "Test notification sent", description: "It should arrive in a few seconds." });
-      } else {
-        toast({ title: "No active subscription found", variant: "destructive" });
-      }
-    } catch (e) {
-      console.error(e);
-      toast({ title: "Couldn't send test", variant: "destructive" });
-    } finally {
-      setBusy(false);
+function groupByDay(notifs: Notification[]): Array<{ label: string; items: Notification[] }> {
+  const groups: Record<string, Notification[]> = {};
+  const now = Date.now();
+  notifs.forEach((n) => {
+    const delta = now - n.ts;
+    let label: string;
+    if (delta < 24 * 60 * 60 * 1000) {
+      label = "Today";
+    } else if (delta < 48 * 60 * 60 * 1000) {
+      label = "Yesterday";
+    } else {
+      const d = new Date(n.ts);
+      label = d.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" });
     }
-  }
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(n);
+  });
+  return Object.entries(groups).map(([label, items]) => ({ label, items }));
+}
 
-  async function handleDisable() {
-    setBusy(true);
-    try {
-      const endpoint = await unsubscribeBrowser();
-      if (endpoint) await unsubscribe({ data: { endpoint } });
-      setSubscribed(false);
-      toast({ title: "Notifications disabled on this device" });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setBusy(false);
-    }
-  }
+export default function NotificationsInbox() {
+  const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState<NotifCategory>("all");
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+
+  const filtered = activeTab === "all" ? notifications : notifications.filter((n) => n.type === activeTab);
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const groups = groupByDay(filtered);
+
+  const markAllRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const markRead = (id: string) =>
+    setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
 
   return (
     <MobileAppShell>
-      <SubPageHeader title="Notifications" back="/settings" />
-      <div className="px-5 pb-10 space-y-4">
-        <PwaInstallButton className="w-full" size="lg" />
-        {showIosHint && (
-          <div className="bg-accent/15 border border-accent/30 rounded-2xl px-4 py-3 text-xs text-foreground">
-            <strong className="block mb-1">iPhone users:</strong>
-            To receive push notifications, add Hemora to your Home Screen first. In Safari, tap the Share button →
-            <em> Add to Home Screen</em>, then open Hemora from the Home Screen.
-          </div>
-        )}
-
-        {permission === "denied" && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-2xl px-4 py-3 text-xs text-foreground">
-            Notifications are blocked in your browser settings. Enable them for this site to receive reminders.
-          </div>
-        )}
-
-        <div className="bg-card rounded-2xl border border-border/60 overflow-hidden">
-          {ITEMS.map((it, i) => (
-            <div
-              key={it.key}
-              className="flex items-start justify-between gap-4 px-4 py-4 border-b border-border/60 last:border-0"
-            >
-              <div className="flex-1 min-w-0">
-                <Label htmlFor={it.key} className="text-sm font-medium">{it.label}</Label>
-                <p className="text-xs text-muted-foreground mt-0.5">{it.desc}</p>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-background border-b border-border px-5 pt-6 pb-4">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setLocation("/dashboard")}
+                className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
+              >
+                <ArrowLeft size={17} className="text-foreground" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-serif text-foreground leading-tight">
+                  Notifications
+                </h1>
+                {unreadCount > 0 && (
+                  <p className="text-xs text-muted-foreground font-sans">
+                    {unreadCount} unread
+                  </p>
+                )}
               </div>
-              <Switch
-                id={it.key}
-                checked={prefs[it.key]}
-                disabled={!loaded || busy}
-                onCheckedChange={(v) => togglePref(it.key, v)}
-              />
             </div>
-          ))}
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="text-[10px] font-bold text-primary hover:underline"
+                >
+                  Mark all read
+                </button>
+              )}
+              <button
+                onClick={() => setLocation("/settings/notifications")}
+                className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center shadow-sm hover:bg-muted transition-colors"
+                title="Notification settings"
+              >
+                <SettingsIcon size={16} className="text-foreground" />
+              </button>
+            </div>
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 mt-3 scrollbar-none">
+            {TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "flex-shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-bold transition-all",
+                  activeTab === tab.key
+                    ? "bg-primary text-white shadow-sm animate-pulse"
+                    : "bg-card text-foreground/75 border border-border hover:bg-muted"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" onClick={handleTest} disabled={busy || permission === "unsupported"}>
-            Send test notification
-          </Button>
-          {subscribed && (
-            <Button size="sm" variant="ghost" onClick={handleDisable} disabled={busy}>
-              Disable on this device
-            </Button>
+        {/* Notification List */}
+        <div className="px-5 py-4 pb-24 space-y-6">
+          {groups.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-16 h-16 rounded-full bg-card border border-border flex items-center justify-center mb-4 shadow-sm">
+                <BellOff size={28} className="text-muted-foreground/40" />
+              </div>
+              <p className="text-sm font-serif text-muted-foreground">No notifications here</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">
+                {activeTab === "all" ? "You're all caught up." : `No ${activeTab} alerts yet.`}
+              </p>
+            </div>
+          ) : (
+            groups.map(({ label, items }) => (
+              <div key={label}>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground pl-1 mb-3">
+                  {label}
+                </div>
+                <div className="space-y-2">
+                  {items.map((notif) => (
+                    <button
+                      key={notif.id}
+                      onClick={() => markRead(notif.id)}
+                      className={cn(
+                        "w-full text-left rounded-[20px] p-4 border transition-all",
+                        notif.read
+                          ? "bg-card border-border hover:border-primary/20"
+                          : "bg-card border-primary/20 shadow-sm"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          "w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 mt-0.5",
+                          typeBg(notif.type)
+                        )}>
+                          {typeIcon(notif.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-0.5">
+                            <span className={cn(
+                              "text-sm font-bold text-foreground leading-snug",
+                              !notif.read && "font-extrabold"
+                            )}>
+                              {notif.title}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground shrink-0 font-medium">
+                              {notif.time}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-normal line-clamp-2">
+                            {notif.body}
+                          </p>
+                        </div>
+                        {!notif.read && (
+                          <span className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))
           )}
         </div>
 
-        <p className="text-[11px] text-muted-foreground/70 px-2">
-          {subscribed
-            ? "Push is active on this device."
-            : "Toggle a notification on (or send a test) to enable push on this device."}
-        </p>
+        {/* Settings Link Banner */}
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-40px)] max-w-[390px]">
+          <button
+            onClick={() => setLocation("/settings/notifications")}
+            className="w-full flex items-center justify-center gap-2 bg-primary text-white text-xs font-bold py-3.5 rounded-2xl shadow-lg hover:bg-primary/90 transition-colors"
+          >
+            <SettingsIcon size={16} />
+            Manage Notification Settings
+          </button>
+        </div>
       </div>
     </MobileAppShell>
   );

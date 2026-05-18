@@ -33,7 +33,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 const SITE_NAME = "Hemora"
 const SENDER_DOMAIN = "notify.hemora.xyz"
 const ROOT_DOMAIN = "hemora.xyz"
-const FROM_DOMAIN = "hemora.xyz"
+const FROM_DOMAIN = "notify.hemora.xyz"
 
 function redactEmail(email: string | null | undefined): string {
   if (!email) return '***'
@@ -190,16 +190,17 @@ export const Route = createFileRoute("/api/email/webhook")({
         const messageId = crypto.randomUUID()
 
         // Log pending BEFORE enqueue so we have a record even if enqueue crashes
-        await supabase.from('email_send_log').insert({
+        const { data: logData, error: logError } = await supabase.from('email_send_log').insert({
           message_id: messageId,
           template_name: emailType,
           recipient_email: recipientEmail,
           status: 'pending',
-        })
+        }).select('id').single()
 
         const { error: enqueueError } = await supabase.rpc('enqueue_email', {
           queue_name: 'auth_emails',
           payload: {
+            logId: logData?.id,
             run_id,
             message_id: messageId,
             to: recipientEmail,

@@ -15,6 +15,7 @@ import { getGoogleOAuthRedirectUrl } from "@/lib/authRedirect";
 import { getSupabaseMissingEnvHint } from "@/lib/env";
 import { establishSessionFromUrl, hasAuthPayloadInUrl } from "@/lib/oauthRedirectHandler";
 import { getSupabase } from "@/lib/supabase";
+import { registerForPushNotificationsAsync } from "@/lib/notifications";
 
 type AuthState = {
   user: User | null;
@@ -127,6 +128,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = getSupabase();
     if (supabase) await supabase.auth.signOut();
   }, []);
+
+  const user = session?.user ?? null;
+
+  useEffect(() => {
+    if (user) {
+      void registerForPushNotificationsAsync();
+    }
+  }, [user]);
 
   const value = useMemo<AuthState>(
     () => ({

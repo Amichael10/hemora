@@ -64,7 +64,7 @@ export const Route = createFileRoute("/api/email/process")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.RESEND_API_KEY
+        const apiKey = process.env.RESEND_API_KEY || process.env.HEMORA_API_KEY
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -223,7 +223,7 @@ export const Route = createFileRoute("/api/email/process")({
             try {
               await sendEmail({
                 to: payload.to,
-                from: payload.from || "Hemora <hello@hemora.xyz>",
+                from: payload.from || "Hemora <hello@notify.hemora.xyz>",
                 subject: payload.subject,
                 html: payload.html,
                 text: payload.text,

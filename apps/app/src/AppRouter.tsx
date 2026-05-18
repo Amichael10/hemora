@@ -13,8 +13,15 @@ const Splash = lazy(() => import("@/pages/splash"));
 const Onboarding = lazy(() => import("@/pages/onboarding"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Crisis = lazy(() => import("@/pages/crisis"));
+const CrisisInsights = lazy(() => import("@/pages/crisis-insights"));
+const CrisisShare = lazy(() => import("@/pages/crisis-share"));
+const CrisisDetail = lazy(() => import("@/pages/crisis-detail"));
 const Meds = lazy(() => import("@/pages/meds"));
+const MedForm = lazy(() => import("@/pages/med-form"));
+const MedDetail = lazy(() => import("@/pages/med-detail"));
 const Records = lazy(() => import("@/pages/records"));
+const RecordForm = lazy(() => import("@/pages/record-form"));
+const RecordDetail = lazy(() => import("@/pages/record-detail"));
 const Directory = lazy(() => import("@/pages/directory"));
 const DirectoryDetail = lazy(() => import("@/pages/directory-detail"));
 const Emergency = lazy(() => import("@/pages/emergency"));
@@ -26,20 +33,15 @@ const Login = lazy(() => import("@/pages/login"));
 const Signup = lazy(() => import("@/pages/signup"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ResetPassword = lazy(() => import("@/pages/reset-password"));
-const MedForm = lazy(() => import("@/pages/med-form"));
-const MedDetail = lazy(() => import("@/pages/med-detail"));
-const RecordForm = lazy(() => import("@/pages/record-form"));
-const RecordDetail = lazy(() => import("@/pages/record-detail"));
-const CrisisDetail = lazy(() => import("@/pages/crisis-detail"));
-const CrisisInsights = lazy(() => import("@/pages/crisis-insights"));
-const CrisisShare = lazy(() => import("@/pages/crisis-share"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Contacts = lazy(() => import("@/pages/contacts"));
 const Notifications = lazy(() => import("@/pages/notifications"));
+const NotificationSettings = lazy(() => import("@/pages/notification-settings"));
 const AmbulancePage = lazy(() => import("@/pages/ambulance"));
 const HospitalChecklist = lazy(() => import("@/pages/hospital-checklist"));
 const GenotypeChecker = lazy(() => import("@/pages/genotype-checker"));
 const Family = lazy(() => import("@/pages/family"));
+const FamilyAdd = lazy(() => import("@/pages/family-add"));
 const SchoolLetter = lazy(() => import("@/pages/school-letter"));
 const Resources = lazy(() => import("@/pages/resources"));
 const ResourceDetail = lazy(() => import("@/pages/resource-detail"));
@@ -47,6 +49,16 @@ const Brand = lazy(() => import("@/pages/brand"));
 const Admin = lazy(() => import("@/pages/admin"));
 const BlogIndex = lazy(() => import("@/pages/blog"));
 const BlogPost = lazy(() => import("@/pages/blog-post"));
+const Vitals = lazy(() => import("@/pages/vitals"));
+const Hydration = lazy(() => import("@/pages/hydration"));
+const VitalsForm = lazy(() => import("@/pages/vitals-form"));
+const Transfusion = lazy(() => import("@/pages/transfusion"));
+const TransfusionForm = lazy(() => import("@/pages/transfusion-form"));
+const TransfusionDetail = lazy(() => import("@/pages/transfusion-detail"));
+const TransfusionHistory = lazy(() => import("@/pages/transfusion-history"));
+const IronMonitoring = lazy(() => import("@/pages/iron-monitoring"));
+const Appointments = lazy(() => import("@/pages/appointments"));
+const AppointmentForm = lazy(() => import("@/pages/appointments-form"));
 
 // Helper for Info pages
 const About = lazy(() => import("@/pages/info").then(m => ({ default: m.About })));
@@ -102,6 +114,16 @@ function Routes() {
         <Route path="/records/new" component={protect(RecordForm)} />
         <Route path="/records/:id/edit" component={protect(RecordForm)} />
         <Route path="/records/:id" component={protect(RecordDetail)} />
+        <Route path="/vitals" component={protect(Vitals)} />
+        <Route path="/hydration" component={protect(Hydration)} />
+        <Route path="/vitals/new" component={protect(VitalsForm)} />
+        <Route path="/transfusion" component={protect(Transfusion)} />
+        <Route path="/transfusion/new" component={protect(TransfusionForm)} />
+        <Route path="/transfusion/:id" component={protect(TransfusionDetail)} />
+        <Route path="/transfusion/history" component={protect(TransfusionHistory)} />
+        <Route path="/iron-monitoring" component={protect(IronMonitoring)} />
+        <Route path="/appointments" component={protect(Appointments)} />
+        <Route path="/appointments/new" component={protect(AppointmentForm)} />
         <Route path="/directory" component={protect(Directory)} />
         <Route path="/directory/:id" component={protect(DirectoryDetail)} />
         {/* Emergency is intentionally NOT protected — first-time / unauthenticated
@@ -112,11 +134,13 @@ function Routes() {
         <Route path="/profile/edit" component={protect(ProfileEdit)} />
         <Route path="/settings" component={protect(Settings)} />
         <Route path="/settings/contacts" component={protect(Contacts)} />
-        <Route path="/settings/notifications" component={protect(Notifications)} />
+        <Route path="/notifications" component={protect(Notifications)} />
+        <Route path="/settings/notifications" component={protect(NotificationSettings)} />
         <Route path="/settings/ambulance" component={protect(AmbulancePage)} />
         <Route path="/settings/hospital-checklist" component={protect(HospitalChecklist)} />
         <Route path="/genotype-checker" component={GenotypeChecker} />
         <Route path="/family" component={protect(Family)} />
+        <Route path="/family/add" component={protect(FamilyAdd)} />
         <Route path="/school-letter" component={protect(SchoolLetter)} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/:id" component={ResourceDetail} />

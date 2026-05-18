@@ -5,6 +5,7 @@ import { localDayKey } from "@/lib/datetime";
 export type CrisisLogRow = {
   id: string;
   occurredAt: string;
+  crisisType: string;
   painLevel: string;
   painLocations: string[];
   triggers: string[];
@@ -22,6 +23,7 @@ function mapCrisisRow(r: Record<string, unknown>): CrisisLogRow {
   return {
     id: String(r.id),
     occurredAt: String(r.occurred_at),
+    crisisType: String(r.crisis_type ?? "pain"),
     painLevel: String(r.pain_level ?? "").trim() || "unspecified",
     painLocations: asStringArray(r.pain_locations),
     triggers: asStringArray(r.triggers),
@@ -45,7 +47,7 @@ export async function fetchRecentCrisisLogs(
 ): Promise<CrisisLogRow[]> {
   const { data, error } = await supabase
     .from("crisis_logs")
-    .select("id,occurred_at,pain_level,pain_locations,triggers,what_helped,hospital_visit")
+    .select("id,occurred_at,crisis_type,pain_level,pain_locations,triggers,what_helped,hospital_visit")
     .eq("user_id", userId)
     .order("occurred_at", { ascending: false })
     .limit(limit);
@@ -61,7 +63,7 @@ export async function fetchCrisisLogById(
 ): Promise<CrisisLogRow | null> {
   const { data, error } = await supabase
     .from("crisis_logs")
-    .select("id,occurred_at,pain_level,pain_locations,triggers,what_helped,hospital_visit")
+    .select("id,occurred_at,crisis_type,pain_level,pain_locations,triggers,what_helped,hospital_visit")
     .eq("user_id", userId)
     .eq("id", id)
     .maybeSingle();
@@ -72,6 +74,7 @@ export async function fetchCrisisLogById(
 }
 
 export type CreateCrisisLogInput = {
+  crisisType: string;
   painLevel: string;
   painLocations: string[];
   triggers: string[];
@@ -89,6 +92,7 @@ export async function insertCrisisLog(
     .from("crisis_logs")
     .insert({
       user_id: userId,
+      crisis_type: input.crisisType,
       pain_level: input.painLevel,
       pain_locations: input.painLocations,
       triggers: input.triggers,
@@ -96,7 +100,7 @@ export async function insertCrisisLog(
       hospital_visit: input.hospitalVisit,
       occurred_at: input.occurredAt ?? new Date().toISOString(),
     })
-    .select("id,occurred_at,pain_level,pain_locations,triggers,what_helped,hospital_visit")
+    .select("id,occurred_at,crisis_type,pain_level,pain_locations,triggers,what_helped,hospital_visit")
     .single();
 
   if (error) throw new Error(error.message);

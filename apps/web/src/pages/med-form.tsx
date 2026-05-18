@@ -104,7 +104,7 @@ export default function MedForm() {
   const [matchEdit, editParams] = useRoute("/meds/:id/edit");
   const id = matchEdit ? editParams?.id : undefined;
   const isEdit = !!id;
-  const { profileId } = useProfile();
+  const { profileId, activeProfileId } = useProfile();
   const { toast } = useToast();
 
   const { data: med, isLoading } = useGetMedication(id);
@@ -146,10 +146,15 @@ export default function MedForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!activeProfileId) return;
     const reminderTime = to24h(hour, minute, period);
     const refillNum = parseInt(refillDays, 10);
     const baseData = {
-      name, dose, frequency, reminderTime, notes,
+      name, 
+      dose, 
+      frequency, 
+      reminderTime, 
+      notes,
       status: CreateMedicationBodyStatus.ongoing,
       reminderEnabled: true,
       refillReminderDays: refillNum > 0 ? refillNum : null,
@@ -157,12 +162,24 @@ export default function MedForm() {
       nextRefillDate: nextRefillDate || null,
     };
     if (isEdit) {
-      updateMed.mutate({ id, data: baseData }, {
+      updateMed.mutate({ 
+        id, 
+        data: { 
+          ...baseData, 
+          familyMemberId: activeProfileId 
+        } 
+      }, {
         onSuccess: () => { toast({ title: "Medication updated" }); setLocation("/meds"); },
         onError: (e: any) => toast({ title: "Couldn't save", description: e?.message, variant: "destructive" }),
       });
     } else {
-      createMed.mutate({ data: { ...baseData, profileId } }, {
+      createMed.mutate({ 
+        data: { 
+          ...baseData, 
+          profileId, 
+          familyMemberId: activeProfileId 
+        } 
+      }, {
         onSuccess: () => {
           toast({ title: "Medication added" });
           maybeAskToEnableNotifications("first-med");

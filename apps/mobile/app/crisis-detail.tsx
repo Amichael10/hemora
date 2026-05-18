@@ -12,7 +12,11 @@ import { fetchCrisisLogById, type CrisisLogRow } from "@/lib/crisisScreenData";
 import { getSupabase } from "@/lib/supabase";
 import { ClockCircleBold, HospitalBold } from "@/components/icons/solar";
 
-function painEmojiSource(level: string) {
+function painEmojiSource(level: string, type: string) {
+  if (type !== "pain") {
+    // Return a generic medical icon or specific one if we want
+    return require("@/assets/images/emoji-mild.png"); 
+  }
   switch (level.toLowerCase()) {
     case "mild":
       return require("@/assets/images/emoji-mild.png");
@@ -27,7 +31,18 @@ function painEmojiSource(level: string) {
   }
 }
 
-function painBar(level: string): string {
+const CRISIS_TYPE_LABELS: Record<string, string> = {
+  pain: "Pain (VOC)",
+  acs: "Chest / Breathing",
+  stroke: "Stroke Signs",
+  splenic: "Spleen / Abdomen",
+  fever: "Fever",
+  priapism: "Priapism",
+  aplastic: "Extreme Fatigue",
+};
+
+function painBar(level: string, type: string): string {
+  if (type !== "pain") return Brand.red; // Emergency colors
   switch (level.toLowerCase()) {
     case "mild":
       return "#22c55e";
@@ -118,15 +133,25 @@ export default function CrisisDetailScreen() {
         ) : row ? (
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
             <View style={[styles.card, { borderColor: t.tabBorder, backgroundColor: t.surface }]}>
-              <View style={[styles.accent, { backgroundColor: painBar(row.painLevel) }]} />
+              <View style={[styles.accent, { backgroundColor: painBar(row.painLevel, row.crisisType) }]} />
               <View style={styles.cardInner}>
                 <View style={styles.rowTop}>
                   <View style={[styles.emojiWrap, { borderColor: t.tabBorder }]}>
-                    <Image source={painEmojiSource(row.painLevel)} style={styles.emoji} resizeMode="contain" />
+                    <Image source={painEmojiSource(row.painLevel, row.crisisType)} style={styles.emoji} resizeMode="contain" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.painTitle, { color: t.text, fontFamily: Fonts.serifSemi }]}>
-                      {row.painLevel} pain
+                    <View style={styles.typeRow}>
+                      <Text style={[styles.painTitle, { color: t.text, fontFamily: Fonts.serifSemi }]}>
+                        {CRISIS_TYPE_LABELS[row.crisisType] ?? row.crisisType}
+                      </Text>
+                      {row.crisisType !== "pain" && (
+                        <View style={styles.emergencyBadge}>
+                          <Text style={styles.emergencyBadgeTxt}>EMERGENCY</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[styles.painLevel, { color: t.textMuted, fontFamily: Fonts.sans }]}>
+                      {row.painLevel} intensity
                     </Text>
                     <View style={styles.timeRow}>
                       <ClockCircleBold color={t.textMuted} size={12} />
@@ -204,7 +229,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   emoji: { width: 36, height: 36 },
-  painTitle: { fontSize: 17, textTransform: "capitalize" },
+  typeRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  emergencyBadge: { backgroundColor: Brand.red, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  emergencyBadgeTxt: { color: "#fff", fontSize: 9, fontFamily: Fonts.sansBold },
+  painTitle: { fontSize: 17 },
+  painLevel: { fontSize: 13, textTransform: "capitalize", marginTop: 2 },
   timeRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },
   timeText: { fontSize: 12 },
   section: { marginTop: 14 },

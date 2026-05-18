@@ -982,6 +982,101 @@ function AnalyticsTab() {
           </Button>
         </div>
       </div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xl font-serif font-black text-[#1A1A1A]">Recent Global Activity</h4>
+          <Badge className="bg-blue-100 text-blue-700 border-none px-3 py-1 rounded-full text-[10px] font-black tracking-widest">LIVE FEED</Badge>
+        </div>
+        <div className="bg-white rounded-[2.5rem] border border-border/40 overflow-hidden shadow-sm">
+          <GlobalActivityFeed />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GlobalActivityFeed() {
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const [{ data: crises }, { data: meds }, { data: vitals }, { data: transfusions }, { data: appointments }] = await Promise.all([
+        supabase.from("crisis_logs").select("*, profiles(full_name)").order("created_at", { ascending: false }).limit(5),
+        supabase.from("medications").select("*, profiles(full_name)").order("updated_at", { ascending: false }).limit(5),
+        supabase.from("health_vitals").select("*, profiles(full_name)").order("created_at", { ascending: false }).limit(5),
+        supabase.from("transfusions").select("*, profiles(full_name)").order("created_at", { ascending: false }).limit(5),
+        supabase.from("appointments").select("*, profiles(full_name)").order("created_at", { ascending: false }).limit(5),
+      ]);
+
+      const combined = [
+        ...(crises || []).map(c => ({ ...c, type: 'crisis', time: c.created_at })),
+        ...(meds || []).map(m => ({ ...m, type: 'med', time: m.updated_at })),
+        ...(vitals || []).map(v => ({ ...v, type: 'vitals', time: v.created_at })),
+        ...(transfusions || []).map(t => ({ ...t, type: 'transfusion', time: t.created_at })),
+        ...(appointments || []).map(a => ({ ...a, type: 'appointment', time: a.created_at })),
+      ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 12);
+
+      setActivities(combined);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  if (loading) return <div className="p-12 text-center text-sm text-muted-foreground animate-pulse">Synchronizing global event stream...</div>;
+
+  return (
+    <div className="divide-y divide-border/20">
+      {activities.map((a, i) => (
+        <div key={i} className="flex items-center gap-6 p-6 hover:bg-stone-50 transition-colors">
+          <div className={cn(
+            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-black/5",
+            a.type === 'crisis' ? "bg-red-50 text-red-500" : 
+            a.type === 'vitals' ? "bg-amber-50 text-amber-500" :
+            a.type === 'transfusion' ? "bg-blue-50 text-blue-500" :
+            a.type === 'appointment' ? "bg-green-50 text-green-500" :
+            "bg-stone-50 text-stone-500"
+          )}>
+            {a.type === 'crisis' ? <Bell className="w-6 h-6" /> : 
+             a.type === 'vitals' ? <BarChart3 className="w-6 h-6" /> :
+             a.type === 'transfusion' ? <Stethoscope className="w-6 h-6" /> :
+             a.type === 'appointment' ? <CalendarLinear className="w-6 h-6" /> :
+             <Globe className="w-6 h-6" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-sm font-bold text-[#1A1A1A]">{a.profiles?.full_name || "Anonymous User"}</span>
+              <span className={cn(
+                "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md",
+                a.type === 'crisis' ? "bg-red-100 text-red-700" :
+                a.type === 'vitals' ? "bg-amber-100 text-amber-700" :
+                a.type === 'transfusion' ? "bg-blue-100 text-blue-700" :
+                a.type === 'appointment' ? "bg-green-100 text-green-700" :
+                "bg-stone-100 text-muted-foreground"
+              )}>
+                {a.type === 'crisis' ? "Crisis Log" : 
+                 a.type === 'med' ? "Medication Update" :
+                 a.type === 'vitals' ? "Vitals Recorded" :
+                 a.type === 'transfusion' ? "Transfusion" :
+                 a.type === 'appointment' ? "Appointment" :
+                 "Activity"}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground truncate">
+              {a.type === 'crisis' ? `Reported ${a.pain_level} pain in ${a.pain_locations?.join(', ') || 'unspecified area'}` : 
+               a.type === 'med' ? `Tracking ${a.name} (${a.dosage})` :
+               a.type === 'vitals' ? `Recorded Temp: ${a.temperature}°C, SpO2: ${a.spo2}%` :
+               a.type === 'transfusion' ? `Log: ${a.units} units (${a.blood_type}) at ${a.hospital}` :
+               a.type === 'appointment' ? `Scheduled: ${a.title} with ${a.doctor}` :
+               "System interaction logged."}
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-[10px] font-black text-[#A8324A] uppercase tracking-widest mb-1">{new Date(a.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            <div className="text-[10px] text-muted-foreground font-medium">{new Date(a.time).toLocaleDateString()}</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

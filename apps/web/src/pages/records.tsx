@@ -34,7 +34,7 @@ import {
 } from "solar-icon-set";
 
 export default function Records() {
-  const { profileId } = useProfile();
+  const { profileId, activeProfileId } = useProfile();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("all");
   const queryClient = useQueryClient();
@@ -42,8 +42,8 @@ export default function Records() {
   const [open, setOpen] = useState(false);
 
   const { data: records, isLoading } = useListCareRecords(
-    { profileId },
-    { query: { queryKey: getListCareRecordsQueryKey({ profileId }), enabled: !!profileId } }
+    { familyMemberId: activeProfileId },
+    { query: { queryKey: ["care-records", activeProfileId], enabled: !!activeProfileId } }
   );
 
   const createRecord = useCreateCareRecord();
@@ -74,11 +74,11 @@ export default function Records() {
   const handleAddRecord = (e: React.FormEvent) => {
     e.preventDefault();
     createRecord.mutate({
-      data: { profileId, documentTitle: title, hospitalClinic: hospital, type, status: CreateCareRecordBodyStatus.saved, dateOfRecord: new Date().toISOString() }
+      data: { profileId, familyMemberId: activeProfileId, documentTitle: title, hospitalClinic: hospital, type, status: CreateCareRecordBodyStatus.saved, dateOfRecord: new Date().toISOString() }
     }, {
       onSuccess: () => {
         toast({ title: "Record added" });
-        queryClient.invalidateQueries({ queryKey: getListCareRecordsQueryKey({ profileId }) });
+        queryClient.invalidateQueries({ queryKey: ["care-records", activeProfileId] });
         setOpen(false);
         setTitle(""); setHospital("");
       }

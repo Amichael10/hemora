@@ -52,7 +52,65 @@ import {
   HeartPulse2Linear as HeartbeatOutline,
 } from "solar-icon-set";
 
-type Step = "entry" | "pain" | "location" | "triggers" | "relief" | "hospital" | "success" | "history";
+type Step = "entry" | "type" | "pain" | "location" | "triggers" | "relief" | "hospital" | "success" | "history";
+
+const CRISIS_TYPES = [
+  {
+    key: "pain",
+    label: "Pain (VOC)",
+    caption: "Vaso-occlusive pain crisis",
+    color: "#C92A3A",
+    icon: HeartbeatFilled,
+  },
+  {
+    key: "acs",
+    label: "Chest / Breathing",
+    caption: "Acute Chest Syndrome signs",
+    color: "#8C2A3A",
+    icon: AccidentFilled,
+    emergency: true,
+  },
+  {
+    key: "stroke",
+    label: "Stroke Signs",
+    caption: "Weakness, speech issues, etc.",
+    color: "#8C2A3A",
+    icon: AccidentFilled,
+    emergency: true,
+  },
+  {
+    key: "splenic",
+    label: "Spleen / Abdomen",
+    caption: "Splenic sequestration signs",
+    color: "#C97A4A",
+    icon: AccidentFilled,
+    emergency: true,
+  },
+  {
+    key: "fever",
+    label: "Fever",
+    caption: "Temperature above 38°C",
+    color: "#C9A24A",
+    icon: HeartbeatFilled,
+    emergency: true,
+  },
+  {
+    key: "priapism",
+    label: "Priapism",
+    caption: "Persistent painful erection",
+    color: "#C97A4A",
+    icon: AccidentFilled,
+    emergency: true,
+  },
+  {
+    key: "aplastic",
+    label: "Extreme Fatigue",
+    caption: "Aplastic crisis signs",
+    color: "#5C7A9B",
+    icon: HeartCardiogramFilled,
+    emergency: true,
+  },
+] as const;
 
 function StepDots({
   current,
@@ -65,7 +123,7 @@ function StepDots({
   onDark?: boolean;
   onStepClick?: (stepIndex: number) => void;
 }) {
-  const activeBg = onDark ? "bg-white" : "bg-primary";
+  const activeBg = onDark ? "bg-white" : "bg-foreground";
   const inactiveBg = onDark ? "bg-white/30" : "bg-muted";
   return (
     <div className="flex gap-2 mb-8 justify-center">
@@ -88,19 +146,21 @@ function StepDots({
 }
 
 export default function Crisis() {
-  const { profileId } = useProfile();
+  const { profileId, activeProfileId, familyMembers } = useProfile();
+  const activeMember = familyMembers.find(m => m.id === activeProfileId);
   const [, setLocation] = useLocation();
   const [step, setStep] = useState<Step>("history");
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const { data: logs, isLoading: isLoadingLogs } = useListCrisisLogs(
-    { profileId },
-    { query: { queryKey: getListCrisisLogsQueryKey({ profileId }), enabled: !!profileId } }
+    { familyMemberId: activeProfileId },
+    { query: { queryKey: ["crisis-logs", activeProfileId], enabled: !!activeProfileId } }
   );
 
   const { data: profile } = useGetProfile(profileId, { query: { queryKey: ["profile", profileId], enabled: !!profileId } });
   const createLog = useCreateCrisisLog();
+  const [crisisType, setCrisisType] = useState<string>("pain");
   const [painLevel, setPainLevel] = useState<CrisisLogPainLevel | null>(null);
   const [locations, setLocations] = useState<string[]>([]);
   const [triggers, setTriggers] = useState<string[]>([]);
@@ -108,13 +168,14 @@ export default function Crisis() {
   const [hospitalVisit, setHospitalVisit] = useState<boolean | null>(null);
   const [otherLocationText, setOtherLocationText] = useState("");
   const [otherTriggerText, setOtherTriggerText] = useState("");
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
 
-  const FLOW_STEPS: Step[] = ["pain", "location", "triggers", "relief", "hospital"];
+  const FLOW_STEPS: Step[] = ["type", "pain", "location", "triggers", "relief", "hospital"];
   const goToStep = (idx: number) => {
     const target = FLOW_STEPS[idx];
     if (target) setStep(target);
   };
-  const flowStepHideNav = ["pain", "location", "triggers", "relief", "hospital"].includes(step);
+  const flowStepHideNav = ["type", "pain", "location", "triggers", "relief", "hospital"].includes(step);
 
   const toggleArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setter(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
@@ -129,14 +190,26 @@ export default function Crisis() {
       ? [...triggers.filter(t => t !== "Other"), `Other: ${otherTriggerText.trim()}`]
       : triggers;
     createLog.mutate(
-      { data: { profileId, occurredAt: new Date().toISOString(), painLevel, painLocations: finalLocations, triggers: finalTriggers, whatHelped, hospitalVisit: hospitalVisit || false } },
+      { 
+        data: { 
+          profileId, 
+          familyMemberId: activeProfileId,
+          occurredAt: new Date().toISOString(), 
+          crisisType, 
+          painLevel: painLevel ?? CrisisLogPainLevel.mild, 
+          painLocations: finalLocations, 
+          triggers: finalTriggers, 
+          whatHelped, 
+          hospitalVisit: hospitalVisit || false 
+        } 
+      },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListCrisisLogsQueryKey({ profileId }) });
+          queryClient.invalidateQueries({ queryKey: ["crisis-logs", activeProfileId] });
           toast({ title: "Log saved", description: "Thanks for tracking — it helps you see patterns." });
           maybeAskToEnableNotifications("first-crisis");
           // reset + go back to history
-          setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText(""); setOtherTriggerText("");
+          setCrisisType("pain"); setPainLevel(null); setLocations([]); setTriggers([]); setWhatHelped([]); setHospitalVisit(null); setOtherLocationText(""); setOtherTriggerText("");
           setStep("history");
         },
         onError: (e: any) => toast({ title: "Couldn't save log", description: e?.message ?? "Please try again", variant: "destructive" }),
@@ -184,21 +257,148 @@ export default function Crisis() {
               <button
                 onClick={() => setStep("history")}
                 aria-label="Back"
-                className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-foreground bg-secondary hover:bg-secondary/80 transition-colors"
+                className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-secondary shadow-md hover:bg-secondary/90 transition-all active:scale-95"
               >
                 <ChevronLeft size={18} />
               </button>
-              <div className="w-20 h-20 bg-accent/10 text-accent rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+              <div className="w-20 h-20 bg-foreground/10 text-foreground rounded-2xl flex items-center justify-center mb-8 shadow-sm">
                 <HealthIcon outline={HeartCardiogramOutline} filled={HeartCardiogramFilled} width="40" height="40" />
               </div>
-              <h1 className="h-display text-primary mb-3">
+              {activeMember && (
+                <Badge variant="outline" className="mb-4 h-7 px-3 text-[10px] uppercase tracking-wider font-bold border-foreground/20 text-foreground bg-foreground/5">
+                  Recording for: {activeMember.fullName}
+                </Badge>
+              )}
+              <h1 className="h-display text-foreground mb-3">
                 You're doing your best.<br />We're here with you.
               </h1>
               <p className="body-md mb-12">Log what you're feeling so we can help you track patterns.</p>
               <div className="w-full space-y-3">
-                <Button size="xl" className="w-full" onClick={() => setStep("pain")} data-testid="btn-start-log">Start log</Button>
+                <Button size="xl" className="w-full" onClick={() => setStep("type")} data-testid="btn-start-log">Start log</Button>
                 <Button size="xl" variant="outline" className="w-full border-accent/30 text-accent hover:bg-accent/5" onClick={() => setLocation("/emergency")} data-testid="btn-urgent-care">Need urgent care?</Button>
               </div>
+            </motion.div>
+          )}
+
+          {step === "type" && (
+            <motion.div
+              key="type"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col px-6 pt-10 pb-8 relative"
+              style={{ backgroundColor: CRISIS_TYPES.find(c => c.key === crisisType)?.color ?? "#3D6B6B" }}
+            >
+              <button
+                type="button"
+                onClick={() => setStep("history")}
+                className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <StepDots current={1} total={6} onDark onStepClick={goToStep} />
+
+              <h2 className="font-serif text-[1.75rem] font-semibold text-center text-white tracking-[-0.5px] leading-[1.15] mb-2">
+                What kind of crisis<br />is this?
+              </h2>
+              <p className="text-center text-white/75 text-sm mb-8">
+                Different crises need different care.
+              </p>
+
+              <div className="flex-1 overflow-y-auto space-y-3 px-1 mb-8">
+                {CRISIS_TYPES.map((type) => {
+                  const on = crisisType === type.key;
+                  return (
+                    <button
+                      key={type.key}
+                      onClick={() => setCrisisType(type.key)}
+                      className={`w-full flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
+                        on ? "bg-white/20 border-white/40 shadow-md" : "bg-white/5 border-white/10"
+                      }`}
+                    >
+                      <div className="flex items-center gap-4 text-left">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: type.color }}>
+                           <type.icon color="#fff" size={20} />
+                        </div>
+                        <div>
+                          <p className={`font-semibold ${on ? "text-white" : "text-white/80"}`}>{type.label}</p>
+                          <p className={`text-xs ${on ? "text-white/70" : "text-white/50"}`}>{type.caption}</p>
+                        </div>
+                      </div>
+                      {on && <Check color="#fff" size={20} />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Button
+                size="xl"
+                className="w-full bg-white text-foreground hover:bg-white/95 shadow-lg"
+                onClick={() => {
+                  const typeCfg = CRISIS_TYPES.find(c => c.key === crisisType);
+                  if (typeCfg?.emergency) {
+                    setShowEmergencyModal(true);
+                  } else if (crisisType === "pain") {
+                    setStep("pain");
+                  } else {
+                    setPainLevel(CrisisLogPainLevel.severe);
+                    setStep("location");
+                  }
+                }}
+              >
+                Continue
+              </Button>
+
+              {/* Emergency Warning Dialog */}
+              <AnimatePresence>
+                {showEmergencyModal && (
+                  <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+                    <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.9, opacity: 0 }}
+                      className="w-full max-w-sm bg-card rounded-[2rem] p-8 shadow-2xl"
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-16 h-16 bg-destructive rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-destructive/20">
+                          <AccidentFilled color="#fff" size={32} />
+                        </div>
+                        <h3 className="font-serif text-2xl font-bold mb-3 tracking-tight">Urgent Medical Attention Needed</h3>
+                        <p className="text-muted-foreground mb-8 leading-relaxed">
+                          The signs you've selected are serious and require immediate professional care. 
+                          Please don't delay.
+                        </p>
+                        
+                        <div className="w-full space-y-3">
+                          <Button 
+                            variant="destructive" 
+                            size="xl" 
+                            className="w-full h-14 text-base font-bold rounded-2xl"
+                            onClick={() => {
+                              setShowEmergencyModal(false);
+                              setLocation("/emergency");
+                            }}
+                          >
+                            View Emergency Plan
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="lg" 
+                            className="w-full text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setShowEmergencyModal(false);
+                              setPainLevel(CrisisLogPainLevel.severe);
+                              setStep("location");
+                            }}
+                          >
+                            Continue Logging Anyway
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
 
@@ -227,7 +427,7 @@ export default function Crisis() {
               >
                 <button
                   type="button"
-                  onClick={() => setStep("history")}
+                  onClick={() => setStep("type")}
                   aria-label="Back"
                   className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
                 >
@@ -242,7 +442,7 @@ export default function Crisis() {
                   className="absolute inset-0 -z-10 pointer-events-none"
                   style={{ backgroundColor: bgColor }}
                 />
-                <StepDots current={1} total={5} onDark onStepClick={goToStep} />
+                <StepDots current={2} total={6} onDark onStepClick={goToStep} />
 
                 <h2 className="font-serif text-[1.75rem] font-semibold text-center text-white tracking-[-0.5px] leading-[1.15] mb-2">
                   How severe is<br />the pain right now?
@@ -347,7 +547,7 @@ export default function Crisis() {
 
           {step === "location" && (
             <motion.div key="location" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
-              <StepDots current={2} total={5} onStepClick={goToStep} />
+              <StepDots current={3} total={6} onStepClick={goToStep} />
               <h2 className="h-page text-center mb-2">Where does it hurt?</h2>
               <p className="text-center body-md mb-4">Tap the area on the body</p>
               <div className="flex-1 flex items-start justify-center">
@@ -397,13 +597,13 @@ export default function Crisis() {
                 />
                 <button
                   type="button"
-                  onClick={() => setStep("location")}
+                  onClick={() => setStep(crisisType === "pain" ? "pain" : "type")}
                   aria-label="Back"
                   className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors backdrop-blur-sm z-20"
                 >
                   <ChevronLeft size={18} />
                 </button>
-                <StepDots current={3} total={5} onDark onStepClick={goToStep} />
+                <StepDots current={4} total={6} onDark onStepClick={goToStep} />
                 <h2 className="font-serif text-[1.75rem] font-semibold text-center text-white tracking-[-0.5px] leading-[1.15] mb-2">
                   Any known triggers?
                 </h2>
@@ -539,7 +739,7 @@ export default function Crisis() {
                 >
                   <ChevronLeft size={18} />
                 </button>
-                <StepDots current={4} total={5} onDark onStepClick={goToStep} />
+                <StepDots current={5} total={6} onDark onStepClick={goToStep} />
                 <h2 className="font-serif text-[1.75rem] font-semibold text-center text-white tracking-[-0.5px] leading-[1.15] mb-2">
                   What has helped so far?
                 </h2>
@@ -617,7 +817,7 @@ export default function Crisis() {
 
           {step === "hospital" && (
             <motion.div key="hospital" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 p-6 pt-12">
-              <StepDots current={5} total={5} onStepClick={goToStep} />
+              <StepDots current={6} total={6} onStepClick={goToStep} />
               <h2 className="h-page text-center mb-8">Did this require a hospital visit?</h2>
               <div className="space-y-3 mb-auto">
                 <Button size="xl" variant={hospitalVisit === true ? "default" : "outline"} className="w-full justify-between" onClick={() => setHospitalVisit(true)}>
@@ -641,9 +841,16 @@ export default function Crisis() {
             <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col flex-1 p-6">
               {/* Header */}
               <div className="flex items-start justify-between mb-1">
-                <div>
-                  <h1 className="h-page">Crisis</h1>
-                  <p className="text-sm text-muted-foreground mt-1">You're not alone. We're here to help.</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h1 className="h-page">Crisis</h1>
+                    {activeMember && (
+                      <Badge variant="outline" className="h-5 px-1.5 text-[9px] uppercase tracking-tighter font-black border-foreground/20 text-foreground bg-foreground/5">
+                        {activeMember.fullName}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">You're not alone. We're here to help.</p>
                 </div>
                 {logs && logs.length > 0 && (
                   <div className="flex gap-2 mt-1">
@@ -783,13 +990,15 @@ export default function Crisis() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between gap-2 mb-1">
                                 <p className="font-serif font-semibold text-foreground capitalize tracking-tight">
-                                  {log.painLevel} pain
+                                  {log.crisisType === "pain"
+                                    ? `${log.painLevel} pain`
+                                    : CRISIS_TYPES.find((c) => c.key === log.crisisType)?.label ?? log.crisisType}
                                 </p>
                                 <Badge
                                   variant="outline"
-                                  className={`border-none text-[10px] px-2 py-0.5 font-medium ${getPainColor(log.painLevel)}`}
+                                  className={`border-none text-[10px] px-2 py-0.5 font-bold tracking-tight ${log.crisisType === "pain" ? getPainColor(log.painLevel) : "bg-secondary text-white"}`}
                                 >
-                                  {log.painLevel}
+                                  {log.crisisType}
                                 </Badge>
                               </div>
                               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3">

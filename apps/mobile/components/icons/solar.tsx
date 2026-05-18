@@ -23,6 +23,8 @@ import {
   UsersGroupRounded as UsersGroupRoundedBoldIcon,
   Bookmark as BookmarkBoldIcon,
   Folder2 as Folder2BoldIcon,
+  DangerTriangle as DangerTriangleBoldIcon,
+  Thermometer as ThermometerBoldIcon,
 } from "@solar-icons/react-native/Bold";
 import {
   AddCircle as AddCircleLinearIcon,
@@ -56,6 +58,10 @@ import {
   TestTube as TestTubeLinearIcon,
   UploadSquare as UploadSquareLinearIcon,
   UsersGroupRounded as UsersGroupRoundedLinearIcon,
+  Thermometer as ThermometerLinearIcon,
+  InfoCircle as InfoCircleLinearIcon,
+  History as HistoryLinearIcon,
+  ClockCircle as ClockCircleLinearIcon,
 } from "@solar-icons/react-native/Linear";
 
 export type SolarIconProps = {
@@ -106,6 +112,7 @@ export const AltArrowRightLinear = bind(AltArrowRightLinearIcon);
 export const PillBold = bind(PillBoldIcon);
 export const PillLinear = bind(PillLinearIcon);
 export const HeartPulseLinear = bind(HeartPulseLinearIcon);
+export const HeartPulseBold = bind(HeartPulseBoldIcon);
 export const DocumentTextLinear = bind(DocumentTextLinearIcon);
 export const AddCircleBold = bind(AddCircleBoldIcon);
 export const AddCircleLinear = bind(AddCircleLinearIcon);
@@ -140,6 +147,15 @@ export const SquareArrowRightUpLinear = bind(SquareArrowRightUpLinearIcon);
 export const GlobalLinear = bind(GlobalLinearIcon);
 export const CloseCircleLinear = bind(CloseCircleLinearIcon);
 export const AddIcon = bind(AddCircleLinearIcon);
+
+/** Vitals & Fever Logger */
+export const ThermometerLinear = bind(ThermometerLinearIcon);
+export const ThermometerBold = bind(ThermometerBoldIcon);
+export const InfoCircleLinear = bind(InfoCircleLinearIcon);
+export const HistoryLinear = bind(HistoryLinearIcon);
+export const DangerTriangleBold = bind(DangerTriangleBoldIcon);
+export const ClockCircleLinear = bind(ClockCircleLinearIcon);
+export const ChevronLeftLinear = bind(AltArrowLeftLinearIcon);
 
 /** Small “+” actions (meds header, etc.) */
 export const PlusLinear = bind(AddSquareLinearIcon);

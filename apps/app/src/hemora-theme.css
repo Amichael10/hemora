@@ -182,61 +182,7 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-.dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-
-  --opaque-button-border-intensity: 9;  /* In terms of percentages */
-
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
-
-  --background: 184 35% 8%;
-  --foreground: 38 40% 92%;
-  --primary: 347 60% 52%;
-  --primary-foreground: 42 65% 95%;
-  --secondary: 184 30% 16%;
-  --secondary-foreground: 38 40% 92%;
-  --muted: 184 25% 14%;
-  --muted-foreground: 38 18% 70%;
-  --accent: 36 55% 60%;
-  --accent-foreground: 184 35% 10%;
-  --destructive: 347 60% 52%;
-  --destructive-foreground: 42 65% 95%;
-  --card: 184 30% 12%;
-  --card-foreground: 38 40% 92%;
-  --card-border: 184 22% 22%;
-  --border: 184 22% 22%;
-  --input: 184 22% 22%;
-  --ring: 36 55% 60%;
-  --popover: 184 30% 12%;
-  --popover-foreground: 38 40% 92%;
-  --popover-border: 184 22% 22%;
-  --sidebar: 184 35% 10%;
-  --sidebar-foreground: 38 40% 92%;
-  --sidebar-border: 184 30% 16%;
-  --sidebar-primary: 36 55% 60%;
-  --sidebar-primary-foreground: 184 35% 10%;
-  --sidebar-accent: 184 30% 18%;
-  --sidebar-accent-foreground: 38 40% 92%;
-  --sidebar-ring: 36 55% 60%;
-  --chart-1: 36 55% 60%;
-  --chart-2: 184 30% 50%;
-  --chart-3: 347 60% 52%;
-  --chart-4: 38 30% 75%;
-  --chart-5: 184 25% 35%;
-
-  --shadow-2xs: rgba(0,0,0,0.04) 0px 1px 4px;
-  --shadow-xs:  rgba(16,24,40,0.05) 0px 1px 4px;
-  --shadow-sm:  rgba(0,0,0,0.04) 0px 2px 8px, rgba(0,0,0,0.03) 0px 1px 2px;
-  --shadow:     rgba(0,0,0,0.05) 0px 4px 16px, rgba(0,0,0,0.03) 0px 1px 4px;
-  --shadow-md:  rgba(0,0,0,0.06) 0px 4px 24px, rgba(0,0,0,0.04) 0px 2px 8px;
-  --shadow-lg:  rgba(0,0,0,0.07) 0px 8px 32px, rgba(0,0,0,0.04) 0px 4px 12px;
-  --shadow-xl:  rgba(0,0,0,0.09) 0px 16px 48px, rgba(0,0,0,0.05) 0px 8px 16px;
-  --shadow-2xl: rgba(0,0,0,0.14) 0px 24px 64px;
-
-}
+/* .dark theme removed per Hemora brand guidelines */
 
 @layer base {
   * {

@@ -20,9 +20,79 @@ import { Fonts } from "@/constants/typography";
 import { insertMedicationLog } from "@/lib/dashboardHomeData";
 import { fetchMedicationDetail, medicationDetailGrid } from "@/lib/medicationDetailData";
 import { getSupabase } from "@/lib/supabase";
+import { bottleForMedication } from "@/lib/medBottle";
+import { Image } from "expo-image";
 
 const WEEK = ["M", "T", "W", "T", "F", "S", "S"];
-const DAYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
+function MonthCalendar({ logs, medId, t }: { logs: any[]; medId: string; t: any }) {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = (firstDay.getDay() + 6) % 7; // Mon-first
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const dayStatus = useMemo(() => {
+    const map = new Map<number, "taken" | "skipped" | "missed">();
+    for (const l of logs) {
+      const d = new Date(l.taken_at ?? l.scheduled_at);
+      if (d.getFullYear() === year && d.getMonth() === month) {
+        const day = d.getDate();
+        if (l.status === "taken") map.set(day, "taken");
+        else if (!map.has(day)) map.set(day, l.status);
+      }
+    }
+    return map;
+  }, [logs, medId, year, month]);
+
+  const cells: Array<{ day?: number; status?: string; isToday?: boolean }> = [];
+  for (let i = 0; i < startOffset; i++) cells.push({});
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({
+      day: d,
+      status: dayStatus.get(d),
+      isToday: d === today.getDate(),
+    });
+  }
+
+  return (
+    <View>
+      <View style={styles.calHead}>
+        {WEEK.map((w, i) => (
+          <Text key={i} style={[styles.calDow, { color: t.textMuted }]}>{w}</Text>
+        ))}
+      </View>
+      <View style={styles.calRow}>
+        {cells.map((c, i) => (
+          <View key={i} style={styles.calCell}>
+            {c.day && (
+              <View
+                style={[
+                  styles.calDayBox,
+                  c.status === "taken" && { backgroundColor: "#d1fae5", borderColor: "#a7f3d0", borderWidth: 1 },
+                  c.status === "skipped" && { backgroundColor: "#fef3c7", borderColor: "#fde68a", borderWidth: 1 },
+                  c.status === "missed" && { backgroundColor: "#fee2e2", borderColor: "#fecaca", borderWidth: 1 },
+                  c.isToday && { borderColor: Brand.red, borderWidth: 2 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.calNum,
+                    { color: c.status ? (c.status === "taken" ? "#065f46" : c.status === "skipped" ? "#92400e" : "#991b1b") : t.text },
+                    c.isToday && { color: Brand.red, fontFamily: Fonts.sansBold }
+                  ]}
+                >
+                  {c.day}
+                </Text>
+              </View>
+            )}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 export default function MedicationDetailScreen() {
   const scheme = useColorScheme() ?? "light";
@@ -127,21 +197,27 @@ export default function MedicationDetailScreen() {
             <>
               <View style={[styles.heroCard, { borderColor: t.tabBorder }]}>
                 <View style={styles.heroTop}>
-                  <View style={[styles.photoPh, { backgroundColor: `${Brand.red}18` }]} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.medTitle, { color: Brand.tealDeep }]}>{subtitle}</Text>
-                    <View style={styles.badgeRow}>
-                      <View style={[styles.badgeSoft, { backgroundColor: "#e0f2f1" }]}>
-                        <View style={[styles.dot, { backgroundColor: "#0d9488" }]} />
-                        <Text style={[styles.badgeSoftText, { color: "#0f766e" }]}>
-                          {m.reminderEnabled ? "Reminders on" : "Reminders off"}
-                        </Text>
-                      </View>
-                      <View style={[styles.badgeDark, { backgroundColor: Brand.tealDeep }]}>
-                        <Text style={styles.badgeDarkText}>{statusLabel}</Text>
-                      </View>
+                <View style={[styles.photoPh, { backgroundColor: `${Brand.red}12` }]}>
+                  <Image
+                    source={bottleForMedication(m.name)}
+                    style={{ width: 56, height: 56 }}
+                    contentFit="contain"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.medTitle, { color: Brand.tealDeep }]}>{m.name}</Text>
+                  <View style={styles.badgeRow}>
+                    <View style={[styles.badgeSoft, { backgroundColor: "#e0f2f1" }]}>
+                      <View style={[styles.dot, { backgroundColor: "#0d9488" }]} />
+                      <Text style={[styles.badgeSoftText, { color: "#0f766e" }]}>
+                        {m.reminderEnabled ? "Reminders on" : "Reminders off"}
+                      </Text>
+                    </View>
+                    <View style={[styles.badgeDark, { backgroundColor: m.status === "active" ? "#065f46" : Brand.tealDeep }]}>
+                      <Text style={styles.badgeDarkText}>{statusLabel}</Text>
                     </View>
                   </View>
+                </View>
                 </View>
                 <View style={styles.grid}>
                   {grid.map(([k, v]) => (
@@ -198,25 +274,31 @@ export default function MedicationDetailScreen() {
                 <Text style={[styles.adEyebrow, { color: Brand.tealDeep }]}>ADHERENCE THIS MONTH</Text>
                 <Text style={[styles.adBig, { color: Brand.red }]}>{adherencePct}%</Text>
                 <Text style={[styles.adSub, { color: t.textMuted }]}>
-                  {takenM} of {expectedM} expected doses (approx. once daily)
+                  {takenM} of {expectedM} doses taken
                 </Text>
                 <View style={[styles.divider, { backgroundColor: `${Brand.red}22` }]} />
-                <View style={styles.calHead}>
-                  {WEEK.map((d, i) => (
-                    <Text key={`${d}-${i}`} style={[styles.calDow, { color: t.textMuted }]}>
-                      {d}
-                    </Text>
-                  ))}
-                </View>
-                <View style={styles.calRow}>
-                  {DAYS.map((d) => (
-                    <View key={d} style={styles.calCell}>
-                      <View style={d === "10" ? styles.calHi : undefined}>
-                        <Text style={[styles.calNum, { color: d === "10" ? Brand.red : t.text }]}>{d}</Text>
+                <MonthCalendar logs={payload?.logs ?? []} medId={id} t={t} />
+              </View>
+
+              <View style={[styles.recentCard, { borderColor: t.tabBorder, backgroundColor: "#fcfbf7" }]}>
+                <Text style={[styles.adEyebrow, { color: Brand.tealDeep, marginBottom: 12 }]}>RECENT DOSES</Text>
+                {payload?.logs?.length === 0 ? (
+                  <Text style={{ color: t.textMuted, textAlign: "center", paddingVertical: 12 }}>No doses logged yet.</Text>
+                ) : (
+                  payload?.logs?.slice(0, 5).map((l: any, i: number) => {
+                    const d = new Date(l.taken_at ?? l.scheduled_at);
+                    return (
+                      <View key={l.id} style={[styles.recentRow, i < 4 && { borderBottomWidth: 1, borderBottomColor: "#eee" }]}>
+                        <Text style={[styles.recentDate, { color: t.text }]}>
+                          {d.toLocaleDateString(undefined, { month: "short", day: "numeric" })}, {d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </Text>
+                        <Text style={[styles.recentStatus, { color: l.status === "taken" ? "#065f46" : Brand.red }]}>
+                          {l.status === "taken" ? "Taken" : "Skipped"}
+                        </Text>
                       </View>
-                    </View>
-                  ))}
-                </View>
+                    );
+                  })
+                )}
               </View>
             </>
           )}
@@ -306,18 +388,20 @@ const styles = StyleSheet.create({
   adBig: { fontFamily: Fonts.serif, fontSize: 44, marginTop: 8, letterSpacing: -1 },
   adSub: { fontSize: 13, marginTop: 4, fontFamily: Fonts.sans },
   divider: { height: 1, marginVertical: 16 },
-  calHead: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8, paddingHorizontal: 4 },
-  calDow: { width: 28, textAlign: "center", fontSize: 11, fontFamily: Fonts.sansBold },
+  calHead: { flexDirection: "row", justifyContent: "space-between", marginBottom: 12, paddingHorizontal: 4 },
+  calDow: { width: 32, textAlign: "center", fontSize: 11, fontFamily: Fonts.sansBold },
   calRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  calCell: { width: 32, alignItems: "center" },
-  calHi: {
-    borderWidth: 2,
-    borderColor: Brand.red,
-    borderRadius: 999,
-    width: 28,
-    height: 28,
+  calCell: { width: "11.6%", alignItems: "center", marginBottom: 8 },
+  calDayBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
-  calNum: { fontFamily: Fonts.sansBold, fontSize: 13 },
+  calNum: { fontSize: 11, fontFamily: Fonts.sansMedium },
+  recentCard: { borderRadius: 22, borderWidth: 1, padding: 18, marginTop: 14 },
+  recentRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 10 },
+  recentDate: { fontSize: 13, fontFamily: Fonts.sans },
+  recentStatus: { fontSize: 13, fontFamily: Fonts.sansBold },
 });

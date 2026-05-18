@@ -197,7 +197,9 @@ export default function Family() {
                 ))}
               </div>
             )}
-            <AddMemberDialog />
+            <Link href="/family/add">
+              <Button size="lg" className="w-full"><PlusIcon size={16} /> Add family member</Button>
+            </Link>
           </TabsContent>
           <TabsContent value="risk" className="mt-4 space-y-4">
             <p className="text-sm text-muted-foreground">Pick two members to see possible outcomes for each pregnancy.</p>

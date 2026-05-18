@@ -110,13 +110,15 @@ export default function MedDetail() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/meds/:id");
   const id = params?.id;
-  const { profileId } = useProfile();
+  const { profileId, activeProfileId, familyMembers } = useProfile();
   const { toast } = useToast();
+
+  const activeMember = familyMembers.find(m => m.id === activeProfileId);
 
   const { data: med, isLoading } = useGetMedication(id);
   const { data: logs } = useListMedicationLogs(
-    { profileId },
-    { query: { queryKey: getListMedicationLogsQueryKey({ profileId }), enabled: !!profileId } }
+    { familyMemberId: activeProfileId },
+    { query: { queryKey: ["medication-logs", activeProfileId], enabled: !!activeProfileId } }
   );
   const createLog = useCreateMedicationLog();
 
@@ -178,13 +180,18 @@ export default function MedDetail() {
         title={med.name}
         back="/meds"
         right={
-          <button
-            onClick={() => setLocation(`/meds/${id}/edit`)}
-            aria-label="Edit"
-            className="w-9 h-9 rounded-full flex items-center justify-center text-foreground bg-card border border-border/60 hover:bg-muted transition-colors"
-          >
-            <EditIcon size={16} />
-          </button>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="h-7 px-2 text-[10px] uppercase tracking-wider font-bold border-foreground/20 text-foreground bg-foreground/5">
+              {activeMember?.fullName || "Self"}
+            </Badge>
+            <button
+              onClick={() => setLocation(`/meds/${id}/edit`)}
+              aria-label="Edit"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-foreground bg-card border border-border/60 hover:bg-muted transition-colors"
+            >
+              <EditIcon size={16} />
+            </button>
+          </div>
         }
       />
 
@@ -250,7 +257,7 @@ export default function MedDetail() {
         <div className="grid grid-cols-2 gap-3">
           <Card className="border-none shadow-sm">
             <CardContent className="p-4">
-              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
+              <div className="w-9 h-9 rounded-full bg-foreground/10 text-foreground flex items-center justify-center mb-2">
                 <BellIcon size={16} />
               </div>
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Reminder</p>
@@ -259,7 +266,7 @@ export default function MedDetail() {
           </Card>
           <Card className="border-none shadow-sm">
             <CardContent className="p-4">
-              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
+              <div className="w-9 h-9 rounded-full bg-foreground/10 text-foreground flex items-center justify-center mb-2">
                 <RefillIcon size={16} />
               </div>
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Refill reminder</p>

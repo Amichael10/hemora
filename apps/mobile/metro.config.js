@@ -12,8 +12,8 @@ const config = getDefaultConfig(projectRoot);
 /** `@solar-icons/react-native` ships `.mjs` chunks; Metro must resolve them (see Bold.mjs → …/Tuning2.mjs). */
 config.resolver.sourceExts = [...new Set([...config.resolver.sourceExts, "mjs"])];
 
-config.watchFolders = [appsRoot];
-config.resolver.disableHierarchicalLookup = true;
+config.watchFolders = [appsRoot, path.resolve(workspaceRoot, "node_modules")];
+config.resolver.disableHierarchicalLookup = false;
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
@@ -38,5 +38,8 @@ config.resolver.extraNodeModules = {
   ...config.resolver.extraNodeModules,
   semver: resolveSemver7(),
 };
+
+config.resolver.unstable_enableSymlinks = true;
+config.resolver.unstable_enablePackageExports = true;
 
 module.exports = config;

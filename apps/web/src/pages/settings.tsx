@@ -23,6 +23,7 @@ import {
   HeartPulseLinear as AmbulanceIcon,
   ClipboardCheckLinear as ChecklistIcon,
   SettingsLinear as AdminIcon,
+  UsersGroupTwoRoundedLinear as UsersRound,
 } from "solar-icon-set";
 
 function getInitials(name?: string | null) {
@@ -89,6 +90,7 @@ export default function Settings() {
 
         <Group>
           <Row icon={<UserIcon size={16} />} label="Profile" href="/profile" />
+          <Row icon={<UsersRound size={16} />} label="Family management" href="/family" />
           <Row icon={<PhoneIcon size={16} />} label="Emergency contacts" href="/settings/contacts" />
           <Row icon={<AmbulanceIcon size={16} />} label="Ambulance number" href="/settings/ambulance" />
           <Row icon={<ChecklistIcon size={16} />} label="Hospital checklist" href="/settings/hospital-checklist" />

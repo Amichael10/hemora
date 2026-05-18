@@ -20,11 +20,36 @@ export type DashboardCrisis = {
   painLocations: string[];
 };
 
+export type DashboardProfile = {
+  fullName: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
+  genotype: string | null;
+  country: string | null;
+  setupFor: string | null;
+  avatarUrl: string | null;
+};
+
+export type DashboardAppointment = {
+  id: string;
+  title: string;
+  appointmentAt: string;
+  status: string;
+};
+
 export type DashboardHomePayload = {
   medications: DashboardMedication[];
   logs: DashboardLog[];
   latestCrisis: DashboardCrisis | null;
   recordCount: number;
+  profile: DashboardProfile | null;
+  nextAppointments: DashboardAppointment[];
+  latestTransfusion: string | null;
+  latestVitals: {
+    temp: number | null;
+    oxygen: number | null;
+    occurredAt: string | null;
+  } | null;
 };
 
 function mapMedicationRow(r: {
@@ -49,33 +74,63 @@ export async function fetchDashboardHome(
 ): Promise<DashboardHomePayload> {
   const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
 
-  const [medsRes, logsRes, crisisRes, countRes] = await Promise.all([
-    supabase
-      .from("medications")
-      .select("id,name,dose,reminder_time,status")
-      .eq("user_id", userId)
-      .or("status.eq.ongoing,status.eq.active")
-      .order("reminder_time", { ascending: true }),
-    supabase
-      .from("medication_logs")
-      .select("medication_id,status,taken_at")
-      .eq("user_id", userId)
-      .gte("taken_at", weekAgo),
-    supabase
-      .from("crisis_logs")
-      .select("occurred_at,pain_level,pain_locations")
-      .eq("user_id", userId)
-      .order("occurred_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase.from("care_records").select("id", { count: "exact", head: true }).eq("user_id", userId),
-  ]);
+  const [medsRes, logsRes, crisisRes, countRes, profileRes, apptsRes, transfusionRes, vitalsRes] =
+    await Promise.all([
+      supabase
+        .from("medications")
+        .select("id,name,dose,reminder_time,status")
+        .eq("user_id", userId)
+        .or("status.eq.ongoing,status.eq.active")
+        .order("reminder_time", { ascending: true }),
+      supabase
+        .from("medication_logs")
+        .select("medication_id,status,taken_at")
+        .eq("user_id", userId)
+        .gte("taken_at", weekAgo),
+      supabase
+        .from("crisis_logs")
+        .select("occurred_at,pain_level,pain_locations")
+        .eq("user_id", userId)
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.from("care_records").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase
+        .from("profiles")
+        .select("full_name,date_of_birth,gender,genotype,country,setup_for,avatar_url")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      supabase
+        .from("appointments")
+        .select("id,title,appointment_at,status")
+        .eq("user_id", userId)
+        .gte("appointment_at", new Date().toISOString())
+        .order("appointment_at", { ascending: true })
+        .limit(3),
+      supabase
+        .from("transfusion_logs")
+        .select("occurred_at")
+        .eq("user_id", userId)
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("vitals_logs")
+        .select("type,value,occurred_at")
+        .eq("user_id", userId)
+        .order("occurred_at", { ascending: false })
+        .limit(5),
+    ]);
 
   const err =
     medsRes.error?.message ||
     logsRes.error?.message ||
     crisisRes.error?.message ||
-    countRes.error?.message;
+    countRes.error?.message ||
+    profileRes.error?.message ||
+    apptsRes.error?.message ||
+    transfusionRes.error?.message ||
+    vitalsRes.error?.message;
   if (err) throw new Error(err);
 
   type MedRow = {
@@ -109,11 +164,41 @@ export async function fetchDashboardHome(
     };
   }
 
+  const nextAppointments: DashboardAppointment[] = (apptsRes.data ?? []).map((r: any) => ({
+    id: r.id,
+    title: r.title,
+    appointmentAt: r.appointment_at,
+    status: r.status,
+  }));
+
+  let latestVitals: DashboardHomePayload["latestVitals"] = null;
+  if (vitalsRes.data && vitalsRes.data.length > 0) {
+    const tempRow = vitalsRes.data.find((r: any) => r.type === "temperature");
+    const oxyRow = vitalsRes.data.find((r: any) => r.type === "spo2");
+    latestVitals = {
+      temp: tempRow?.value ?? null,
+      oxygen: oxyRow?.value ?? null,
+      occurredAt: vitalsRes.data[0]?.occurred_at ?? null,
+    };
+  }
+
   return {
     medications,
     logs,
     latestCrisis,
     recordCount: countRes.count ?? 0,
+    profile: profileRes.data ? {
+      fullName: profileRes.data.full_name,
+      dateOfBirth: profileRes.data.date_of_birth,
+      gender: profileRes.data.gender,
+      genotype: profileRes.data.genotype,
+      country: profileRes.data.country,
+      setupFor: profileRes.data.setup_for,
+      avatarUrl: profileRes.data.avatar_url,
+    } : null,
+    nextAppointments,
+    latestTransfusion: (transfusionRes.data as any)?.occurred_at ?? null,
+    latestVitals,
   };
 }
 

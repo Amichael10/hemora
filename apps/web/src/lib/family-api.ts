@@ -29,9 +29,13 @@ export const useFamilyMembers = () =>
   useQuery({
     queryKey: ["family_members"],
     queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return [];
       const { data, error } = await supabase
         .from("family_members" as any)
         .select("*")
+        .eq("user_id", u.user.id)
+        .order("is_self", { ascending: false })
         .order("created_at", { ascending: true });
       if (error) throw error;
       return (data ?? []).map(map);

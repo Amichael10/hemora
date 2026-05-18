@@ -34,6 +34,9 @@ import {
   CheckCircleBold as Check,
   ChartLinear as Chart,
   BookLinear as Book,
+  StethoscopeLinear as Stethoscope,
+  TestTubeBold as Transfusion,
+  CalendarLinear as Calendar,
 } from "solar-icon-set";
 
 function getGreeting() {
@@ -150,6 +153,22 @@ export default function Dashboard() {
   const adherencePct = summary?.overallAdherencePercent ?? 0;
   const nextMed = summary?.nextMedication;
   const recentCrisis = summary?.recentCrisisLog;
+  const latestVitals = summary?.latestVitals;
+  const latestTransfusion = summary?.latestTransfusion;
+
+  const vitalsSummary = useMemo(() => {
+    if (!latestVitals) return "None logged";
+    const parts = [];
+    if (latestVitals.temp) parts.push(`${latestVitals.temp}°C`);
+    if (latestVitals.oxygen) parts.push(`${latestVitals.oxygen}% SpO2`);
+    return parts.length > 0 ? parts.join(" · ") : "None logged";
+  }, [latestVitals]);
+
+  const transfusionSummary = useMemo(() => {
+    if (!latestTransfusion) return "None logged";
+    return new Date(latestTransfusion).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  }, [latestTransfusion]);
+
   const firstName = profile?.fullName.split(" ")[0] || "Friend";
 
   const sortedMeds = useMemo(() => {
@@ -281,41 +300,9 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-
-          {/* Quick actions row */}
-          <div className="mt-5 grid grid-cols-3 gap-3">
-            <button
-              onClick={() => {
-                posthog.capture('dashboard_quick_action_clicked', { action: 'log_crisis' });
-                setLocation("/crisis");
-              }}
-              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
-            >
-              <HeartPulse size={20} />
-              <span className="text-[12px] font-semibold">Log crisis</span>
-            </button>
-            <button
-              onClick={() => {
-                posthog.capture('dashboard_quick_action_clicked', { action: 'add_medication' });
-                setLocation("/meds");
-              }}
-              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
-            >
-              <Pill size={20} />
-              <span className="text-[12px] font-semibold">Add medication</span>
-            </button>
-            <button
-              onClick={() => {
-                posthog.capture('dashboard_quick_action_clicked', { action: 'resources' });
-                setLocation("/resources");
-              }}
-              className="rounded-2xl bg-white text-primary py-3 px-2 flex flex-col items-center gap-1.5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.18)] active:scale-[0.98] transition-transform"
-            >
-              <Book size={20} />
-              <span className="text-[12px] font-semibold">Resources</span>
-            </button>
-          </div>
         </section>
+
+
 
         {/* ── WHITE SHEET ────────────────────────────────── */}
         <motion.div
@@ -348,6 +335,87 @@ export default function Dashboard() {
               <ArrowRight size={14} />
             </motion.button>
           )}
+
+          {/* Quick Actions */}
+          <motion.section variants={itemVariants}>
+            <div className="flex items-end justify-between mb-3">
+              <p className="eyebrow">Quick actions</p>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => {
+                  posthog.capture('dashboard_quick_action_clicked', { action: 'log_crisis' });
+                  setLocation("/crisis");
+                }}
+                className="rounded-2xl border border-border/50 bg-card p-3 flex flex-col items-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                  <HeartPulse size={20} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground text-center leading-tight">Log crisis</span>
+              </button>
+              <button
+                onClick={() => {
+                  posthog.capture('dashboard_quick_action_clicked', { action: 'add_medication' });
+                  setLocation("/meds");
+                }}
+                className="rounded-2xl border border-border/50 bg-card p-3 flex flex-col items-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <Pill size={20} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground text-center leading-tight">Add med</span>
+              </button>
+              <button
+                onClick={() => {
+                  posthog.capture('dashboard_quick_action_clicked', { action: 'fever' });
+                  setLocation("/vitals/new?type=temperature");
+                }}
+                className="rounded-2xl border border-border/50 bg-card p-3 flex flex-col items-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                  <Stethoscope size={20} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground text-center leading-tight">Log vitals</span>
+              </button>
+              <button
+                onClick={() => {
+                  posthog.capture('dashboard_quick_action_clicked', { action: 'appointments' });
+                  setLocation("/appointments/new");
+                }}
+                className="rounded-2xl border border-border/50 bg-card p-3 flex flex-col items-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#193B3F]/10 flex items-center justify-center text-[#193B3F]">
+                  <Calendar size={20} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground text-center leading-tight">Meet Dr.</span>
+              </button>
+              <button
+                onClick={() => {
+                  posthog.capture('dashboard_quick_action_clicked', { action: 'transfusion' });
+                  setLocation("/transfusion/new");
+                }}
+                className="rounded-2xl border border-border/50 bg-card p-3 flex flex-col items-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#A8324A]/10 flex items-center justify-center text-[#A8324A]">
+                  <Transfusion size={20} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground text-center leading-tight">Transfused</span>
+              </button>
+              <button
+                onClick={() => {
+                  posthog.capture('dashboard_quick_action_clicked', { action: 'resources' });
+                  setLocation("/resources");
+                }}
+                className="rounded-2xl border border-border/50 bg-card p-3 flex flex-col items-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#193B3F]/10 flex items-center justify-center text-[#193B3F]">
+                  <Book size={20} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground text-center leading-tight">Resources</span>
+              </button>
+            </div>
+          </motion.section>
 
           {/* Personalised tools — horizontal slider */}
           <motion.section variants={itemVariants} className="-mx-5">
@@ -516,7 +584,40 @@ export default function Dashboard() {
             )}
           </motion.section>
 
-          {/* Recent activity */}
+          {/* Upcoming appointment */}
+          {summary?.nextAppointment && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-end justify-between mb-3">
+                <p className="eyebrow">Upcoming appointment</p>
+                <Link
+                  href="/appointments"
+                  className="text-[12px] font-semibold text-primary inline-flex items-center gap-0.5 hover:underline"
+                >
+                  View calendar <ArrowRight size={12} />
+                </Link>
+              </div>
+              <Link
+                href="/appointments"
+                className="w-full flex items-center gap-4 p-4 rounded-[24px] bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <Calendar size={24} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-bold text-foreground truncate">
+                    {summary.nextAppointment.title}
+                  </p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">
+                    {new Date(summary.nextAppointment.scheduledAt).toLocaleString([], { 
+                      weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    })}
+                  </p>
+                </div>
+                <ArrowRight size={16} className="text-primary/40 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.section>
+          )}
+
           <motion.section variants={itemVariants}>
             <p className="eyebrow mb-3">Recent</p>
             <div className="grid grid-cols-2 gap-3">
@@ -544,7 +645,59 @@ export default function Dashboard() {
                     </p>
                   </>
                 ) : (
-                  <p className="font-serif font-semibold text-[15px] text-foreground mt-1">None logged</p>
+                  <p className="font-serif font-semibold text-[15px] text-foreground mt-1 text-muted-foreground/50">None logged</p>
+                )}
+              </Link>
+
+              <Link
+                href="/vitals"
+                className="p-4 rounded-2xl bg-card border border-border/60 hover:border-amber-500/40 transition-colors"
+                data-testid="btn-vitals-strip"
+              >
+                <div className="w-9 h-9 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center mb-3">
+                  <Stethoscope size={16} />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
+                  Fever/Vitals
+                </p>
+                {loadingSummary ? (
+                  <Skeleton className="h-5 w-20 mt-1.5" />
+                ) : (
+                  <>
+                    <p className={`font-serif font-semibold text-[15px] mt-1 ${latestVitals ? "text-foreground" : "text-muted-foreground/50"}`}>
+                      {vitalsSummary}
+                    </p>
+                    {latestVitals?.occurredAt && (
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {new Date(latestVitals.occurredAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                      </p>
+                    )}
+                  </>
+                )}
+              </Link>
+
+              <Link
+                href="/transfusion"
+                className="p-4 rounded-2xl bg-card border border-border/60 hover:border-red-500/40 transition-colors"
+                data-testid="btn-transfusion-strip"
+              >
+                <div className="w-9 h-9 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mb-3">
+                  <Transfusion size={16} />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
+                  Transfusion
+                </p>
+                {loadingSummary ? (
+                  <Skeleton className="h-5 w-20 mt-1.5" />
+                ) : (
+                  <>
+                    <p className={`font-serif font-semibold text-[15px] mt-1 ${latestTransfusion ? "text-foreground" : "text-muted-foreground/50"}`}>
+                      {latestTransfusion ? transfusionSummary : "None logged"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {latestTransfusion ? "Last session" : "No recent logs"}
+                    </p>
+                  </>
                 )}
               </Link>
 

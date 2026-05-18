@@ -1,7 +1,18 @@
-# Fallback if EAS resolves ignores from apps/mobile (sibling paths)
+# Ignore local node_modules
 node_modules/
-../web/node_modules/**
-../app/dist/**
-../app/android/**
-../app/ios/**
-../../.claude/**
+
+# Ignore other apps in monorepo
+../web/node_modules/
+../app/node_modules/
+../web/dist/
+../app/dist/
+
+# Ignore root node_modules (EAS will reinstall)
+../../node_modules/
+
+# Ignore other potentially large files
+../../.git/
+../../.pnpm-store/
+../../.bun/
+../../.claude/
+../../scratch/

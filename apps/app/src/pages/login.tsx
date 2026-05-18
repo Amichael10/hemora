@@ -17,12 +17,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const redirectUrl =
-    typeof window !== "undefined" ? authRedirectUrl() : "";
-  const isDev =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" ||
-      window.location.hostname.startsWith("127."));
 
   if (user) {
     setTimeout(() => setLocation("/dashboard"), 0);
@@ -52,7 +46,7 @@ export default function Login() {
     <div className="min-h-[100dvh] w-full bg-secondary flex justify-center">
       <div className="w-full max-w-[430px] bg-background min-h-[100dvh] flex flex-col p-6 pt-16">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex-1 flex flex-col justify-center">
-          <h1 className="font-serif text-[28px] text-primary font-semibold tracking-[-0.5px] text-center">Welcome back</h1>
+          <h1 className="font-serif text-[28px] text-foreground font-semibold tracking-[-0.5px] text-center">Welcome back</h1>
           <p className="mt-2 text-sm text-muted-foreground text-center">Sign in to continue your care.</p>
 
           <form onSubmit={handleEmail} className="mt-10 space-y-3">
@@ -65,7 +59,7 @@ export default function Login() {
               <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" autoComplete="current-password" />
             </div>
             <div className="flex justify-end">
-              <Link href="/forgot-password" className="text-xs text-primary font-medium hover:underline">
+              <Link href="/forgot-password" className="text-xs text-foreground font-medium hover:underline opacity-80">
                 Forgot password?
               </Link>
             </div>
@@ -84,19 +78,7 @@ export default function Login() {
             <FaGoogle className="w-[18px] h-[18px]" /> Continue with Google
           </Button>
 
-          {isDev && redirectUrl && (
-            <div className="mt-6 p-3 rounded-md border border-dashed border-border bg-muted/40">
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                Auth diagnostics (dev only)
-              </p>
-              <p className="text-xs font-mono break-all text-foreground/80">
-                {redirectUrl}
-              </p>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Add this URL to your Supabase Dashboard → Authentication → URL Configuration → Additional Redirect URLs.
-              </p>
-            </div>
-          )}
+          
         </motion.div>
 
         <p className="text-sm text-center text-muted-foreground pb-4 py-[12px]">

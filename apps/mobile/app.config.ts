@@ -76,11 +76,22 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundColor: "#f4ead8",
       },
     },
+    plugins: [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/brand/app-icon.png",
+          "color": "#c0392b"
+        }
+      ]
+    ],
     extra: {
       ...existingExtra,
       ...(supabaseUrl ? { supabaseUrl } : {}),
       ...(supabaseAnonKey ? { supabaseAnonKey } : {}),
       ...(authRedirectUrl ? { authRedirectUrl } : {}),
+      posthogKey: process.env.EXPO_PUBLIC_POSTHOG_KEY,
+      posthogHost: process.env.EXPO_PUBLIC_POSTHOG_HOST,
     },
   };
 };

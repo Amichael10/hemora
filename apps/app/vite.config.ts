@@ -33,6 +33,11 @@ export default defineConfig({
     },
   },
   ssr: {
-    noExternal: true,
+    noExternal: [
+      "@tanstack/react-start",
+      "@tanstack/react-router",
+      "lucide-react",
+      "recharts",
+    ],
   },
 });

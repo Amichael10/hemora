@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense, ComponentType } from "react";
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfileProvider } from "@/context/ProfileContext";
@@ -10,12 +10,18 @@ import { useAuth } from "@/context/AuthContext";
 
 // Lazy load pages
 const Splash = lazy(() => import("@/pages/splash"));
-const Landing = lazy(() => import("@/pages/landing"));
 const Onboarding = lazy(() => import("@/pages/onboarding"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Crisis = lazy(() => import("@/pages/crisis"));
+const CrisisInsights = lazy(() => import("@/pages/crisis-insights"));
+const CrisisShare = lazy(() => import("@/pages/crisis-share"));
+const CrisisDetail = lazy(() => import("@/pages/crisis-detail"));
 const Meds = lazy(() => import("@/pages/meds"));
+const MedForm = lazy(() => import("@/pages/med-form"));
+const MedDetail = lazy(() => import("@/pages/med-detail"));
 const Records = lazy(() => import("@/pages/records"));
+const RecordForm = lazy(() => import("@/pages/record-form"));
+const RecordDetail = lazy(() => import("@/pages/record-detail"));
 const Directory = lazy(() => import("@/pages/directory"));
 const DirectoryDetail = lazy(() => import("@/pages/directory-detail"));
 const Emergency = lazy(() => import("@/pages/emergency"));
@@ -27,18 +33,15 @@ const Login = lazy(() => import("@/pages/login"));
 const Signup = lazy(() => import("@/pages/signup"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ResetPassword = lazy(() => import("@/pages/reset-password"));
-const MedForm = lazy(() => import("@/pages/med-form"));
-const MedDetail = lazy(() => import("@/pages/med-detail"));
-const RecordForm = lazy(() => import("@/pages/record-form"));
-const RecordDetail = lazy(() => import("@/pages/record-detail"));
-const CrisisDetail = lazy(() => import("@/pages/crisis-detail"));
-const CrisisInsights = lazy(() => import("@/pages/crisis-insights"));
-const CrisisShare = lazy(() => import("@/pages/crisis-share"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Contacts = lazy(() => import("@/pages/contacts"));
 const Notifications = lazy(() => import("@/pages/notifications"));
+const NotificationSettings = lazy(() => import("@/pages/notification-settings"));
+const AmbulancePage = lazy(() => import("@/pages/ambulance"));
+const HospitalChecklist = lazy(() => import("@/pages/hospital-checklist"));
 const GenotypeChecker = lazy(() => import("@/pages/genotype-checker"));
 const Family = lazy(() => import("@/pages/family"));
+const FamilyAdd = lazy(() => import("@/pages/family-add"));
 const SchoolLetter = lazy(() => import("@/pages/school-letter"));
 const Resources = lazy(() => import("@/pages/resources"));
 const ResourceDetail = lazy(() => import("@/pages/resource-detail"));
@@ -46,7 +49,16 @@ const Brand = lazy(() => import("@/pages/brand"));
 const Admin = lazy(() => import("@/pages/admin"));
 const BlogIndex = lazy(() => import("@/pages/blog"));
 const BlogPost = lazy(() => import("@/pages/blog-post"));
-const Blog = lazy(() => import("@/pages/blog"));
+const Vitals = lazy(() => import("@/pages/vitals"));
+const Hydration = lazy(() => import("@/pages/hydration"));
+const VitalsForm = lazy(() => import("@/pages/vitals-form"));
+const Transfusion = lazy(() => import("@/pages/transfusion"));
+const TransfusionForm = lazy(() => import("@/pages/transfusion-form"));
+const TransfusionDetail = lazy(() => import("@/pages/transfusion-detail"));
+const TransfusionHistory = lazy(() => import("@/pages/transfusion-history"));
+const IronMonitoring = lazy(() => import("@/pages/iron-monitoring"));
+const Appointments = lazy(() => import("@/pages/appointments"));
+const AppointmentForm = lazy(() => import("@/pages/appointments-form"));
 
 // Helper for Info pages
 const About = lazy(() => import("@/pages/info").then(m => ({ default: m.About })));
@@ -55,34 +67,16 @@ const Privacy = lazy(() => import("@/pages/info").then(m => ({ default: m.Privac
 const Terms = lazy(() => import("@/pages/info").then(m => ({ default: m.Terms })));
 
 /**
- * Host-based routing:
- * - app.hemora.xyz → always lands users inside the app (dashboard).
- *   Marketing routes (/, /about, /help, etc.) are redirected to /dashboard.
- * - Other hosts (hemora.xyz, www.hemora.xyz, staging.hemora.xyz, previews)
- *   keep the marketing landing page as the default.
+ * This project is the app shell only (app.hemora.xyz + Capacitor mobile build).
+ * The marketing landing page is served at hemora.xyz / www.hemora.xyz / staging.hemora.xyz.
+ *
+ * Therefore: the root path "/" here always sends users into the app — to the
+ * dashboard if authenticated, otherwise to /login (handled by RequireAuth).
  */
-const APP_HOST_PREFIX = "app.";
-const MARKETING_PATHS = new Set([
-  "/",
-  "/about",
-  "/help",
-  "/privacy",
-  "/terms",
-]);
-
-function HostRedirect() {
-  const [location, setLocation] = useLocation();
+function RootRedirect() {
   const { user, loading } = useAuth();
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (loading) return;
-    const host = window.location.hostname;
-    const isAppHost = host.startsWith(APP_HOST_PREFIX);
-    if (isAppHost && MARKETING_PATHS.has(location)) {
-      setLocation(user ? "/dashboard" : "/login");
-    }
-  }, [location, setLocation, user, loading]);
-  return null;
+  if (loading) return <HemoraLoader />;
+  return <Redirect to={user ? "/dashboard" : "/login"} />;
 }
 
 const protect = <P extends object>(Component: ComponentType<P>) => {
@@ -99,7 +93,7 @@ function Routes() {
   return (
     <Suspense fallback={<HemoraLoader />}>
       <Switch>
-        <Route path="/" component={Landing} />
+        <Route path="/" component={RootRedirect} />
         <Route path="/welcome" component={Splash} />
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/login" component={Login} />
@@ -120,16 +114,33 @@ function Routes() {
         <Route path="/records/new" component={protect(RecordForm)} />
         <Route path="/records/:id/edit" component={protect(RecordForm)} />
         <Route path="/records/:id" component={protect(RecordDetail)} />
-        <Route path="/directory" component={Directory} />
-        <Route path="/directory/:id" component={DirectoryDetail} />
-        <Route path="/emergency" component={protect(Emergency)} />
+        <Route path="/vitals" component={protect(Vitals)} />
+        <Route path="/hydration" component={protect(Hydration)} />
+        <Route path="/vitals/new" component={protect(VitalsForm)} />
+        <Route path="/transfusion" component={protect(Transfusion)} />
+        <Route path="/transfusion/new" component={protect(TransfusionForm)} />
+        <Route path="/transfusion/detail" component={protect(TransfusionDetail)} />
+        <Route path="/transfusion/history" component={protect(TransfusionHistory)} />
+        <Route path="/iron-monitoring" component={protect(IronMonitoring)} />
+        <Route path="/appointments" component={protect(Appointments)} />
+        <Route path="/appointments/new" component={protect(AppointmentForm)} />
+        <Route path="/directory" component={protect(Directory)} />
+        <Route path="/directory/:id" component={protect(DirectoryDetail)} />
+        {/* Emergency is intentionally NOT protected — first-time / unauthenticated
+            users tapping "Need urgent care?" must always reach the ambulance
+            number and crisis guidance. */}
+        <Route path="/emergency" component={Emergency} />
         <Route path="/profile" component={protect(Profile)} />
         <Route path="/profile/edit" component={protect(ProfileEdit)} />
         <Route path="/settings" component={protect(Settings)} />
         <Route path="/settings/contacts" component={protect(Contacts)} />
-        <Route path="/settings/notifications" component={protect(Notifications)} />
+        <Route path="/notifications" component={protect(Notifications)} />
+        <Route path="/settings/notifications" component={protect(NotificationSettings)} />
+        <Route path="/settings/ambulance" component={protect(AmbulancePage)} />
+        <Route path="/settings/hospital-checklist" component={protect(HospitalChecklist)} />
         <Route path="/genotype-checker" component={GenotypeChecker} />
         <Route path="/family" component={protect(Family)} />
+        <Route path="/family/add" component={protect(FamilyAdd)} />
         <Route path="/school-letter" component={protect(SchoolLetter)} />
         <Route path="/resources" component={Resources} />
         <Route path="/resources/:id" component={ResourceDetail} />
@@ -158,7 +169,6 @@ export default function AppRouter() {
       <ProfileProvider>
         <TooltipProvider>
           <WouterRouter>
-            <HostRedirect />
             <Routes />
           </WouterRouter>
           <Toaster />

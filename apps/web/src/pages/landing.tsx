@@ -123,13 +123,13 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition">Features</a>
           <a href="#how" className="hover:text-foreground transition">How it works</a>
-          <a href="https://app.hemora.xyz/resources" className="hover:text-foreground transition">Resources</a>
+          <a href="/resources" className="hover:text-foreground transition">Resources</a>
           <a href="#stories" className="hover:text-foreground transition">Stories</a>
           <a href="#faq" className="hover:text-foreground transition">FAQ</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild><a href="https://app.hemora.xyz">Sign in</a></Button>
-          <Button size="sm" asChild><a href="https://app.hemora.xyz">Get started</a></Button>
+          <Button variant="ghost" size="sm" asChild><a href="/login">Sign in</a></Button>
+          <Button size="sm" asChild><a href="/signup">Get started</a></Button>
         </div>
       </div>
     </header>
@@ -297,7 +297,7 @@ function Hero() {
                 className="rounded-full px-10 shadow-xl hover:scale-[1.02] transition-transform"
                 onClick={() => posthog.capture('landing_log_crisis_clicked')}
               >
-                <a href="https://app.hemora.xyz/crisis">
+                <a href="/crisis">
                   Log a crisis <HeartPulse size={20} className="ml-2" />
                 </a>
               </Button>
@@ -590,7 +590,7 @@ function ResourcesPreview() {
             </p>
             <div className="mt-7">
               <Button asChild size="lg" className="rounded-full">
-                <a href="https://app.hemora.xyz/resources">Open the library <ArrowRight size={16} /></a>
+                <a href="/resources">Open the library <ArrowRight size={16} /></a>
               </Button>
             </div>
           </div>
@@ -753,7 +753,7 @@ function Download() {
                 <span className="ml-2 text-[10px] uppercase tracking-wider bg-white/20 text-white px-2 py-0.5 rounded-full">Soon</span>
               </Button>
               <Button size="lg" className="bg-accent text-secondary hover:bg-accent/90" asChild>
-                <a href="https://app.hemora.xyz">Install web app <ArrowRight size={16} /></a>
+                <a href="/">Install web app <ArrowRight size={16} /></a>
               </Button>
             </div>
             <p className="relative mt-4 text-white/70 text-sm">iOS and Android apps coming soon.</p>

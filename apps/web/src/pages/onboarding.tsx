@@ -15,9 +15,11 @@ import {
   UsersGroupTwoRoundedBold as Users,
   UsersGroupRoundedBold as UsersRound,
   StarsBold as Sparkles,
+  CheckCircleBold as Check,
 } from "solar-icon-set";
 import { FaGoogle } from "react-icons/fa";
 import { useCreateProfile, CreateProfileBodySetupFor } from "@workspace/api-client-react";
+import { useCreateFamilyMember } from "@/lib/family-api";
 import { COUNTRIES, statesFor } from "@workspace/regions";
 import {
   Select,
@@ -61,7 +63,8 @@ export default function Onboarding() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createProfile = useCreateProfile();
-  const { setProfileId } = useProfile();
+  const createFamilyMember = useCreateFamilyMember();
+  const { setProfileId, setActiveProfileId } = useProfile();
   const { user, signInWithGoogle, signUpWithPassword } = useAuth();
 
   const initialStep = (() => {
@@ -103,6 +106,7 @@ export default function Onboarding() {
       setData((d) => (d.fullName ? d : { ...d, fullName: googleName }));
     }
   }, [user]);
+
   const [data, setData] = useState<FormData>({
     setupFor: CreateProfileBodySetupFor.myself,
     fullName: "",
@@ -117,9 +121,9 @@ export default function Onboarding() {
   const back = () => { setDirection(-1); setStep((s) => Math.max(s - 1, 0)); };
   const update = <K extends keyof FormData>(k: K, v: FormData[K]) => setData((d) => ({ ...d, [k]: v }));
 
-  const handleFinish = () => {
-    createProfile.mutate(
-      {
+  const handleFinish = async () => {
+    try {
+      const profile = await createProfile.mutateAsync({
         data: {
           ...data,
           dateOfBirth: data.dateOfBirth || null,
@@ -130,15 +134,47 @@ export default function Onboarding() {
           supabaseUserId: user?.id ?? null,
           email: user?.email ?? null,
         },
-      },
-      {
-        onSuccess: (newProfile) => {
-          setProfileId(newProfile.id);
-          setLocation("/dashboard");
-        },
-        onError: () => toast({ title: "Something went wrong", description: "Please try again in a moment.", variant: "destructive" }),
+      });
+
+      const isSelf = data.setupFor === CreateProfileBodySetupFor.myself;
+      
+      // 1. Ensure a "Self" member exists for the primary account holder
+      const userMeta = user?.user_metadata || {};
+      const userName = userMeta.full_name || userMeta.name || "Me";
+      
+      const selfMember = await createFamilyMember.mutateAsync({
+        fullName: isSelf ? data.fullName : userName,
+        relationship: "Self",
+        isSelf: true,
+        genotype: isSelf ? data.scdStatus : null,
+      });
+
+      // 2. If setting up for someone else, create that dependent member
+      let targetMember = selfMember;
+      if (!isSelf) {
+        const relationship = data.setupFor === CreateProfileBodySetupFor.my_child ? "child" : 
+                            data.setupFor === CreateProfileBodySetupFor.someone_i_care_for ? "dependent" : 
+                            data.setupFor === CreateProfileBodySetupFor.partner_and_i ? "partner" : "other";
+
+        targetMember = await createFamilyMember.mutateAsync({
+          fullName: data.fullName,
+          dateOfBirth: data.dateOfBirth || null,
+          relationship: relationship,
+          genotype: data.scdStatus,
+          isSelf: false
+        });
       }
-    );
+
+      setProfileId(profile.id);
+      setActiveProfileId(targetMember.id);
+      setLocation("/dashboard");
+    } catch (err) {
+      toast({ 
+        title: "Something went wrong", 
+        description: "Please try again in a moment.", 
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleGoogle = async () => {
@@ -150,7 +186,6 @@ export default function Onboarding() {
         setAuthError(error);
         toast({ title: "Couldn't start Google sign-in", description: error, variant: "destructive" });
       }
-      // On success, browser redirects away; no further action needed.
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unexpected error";
       setAuthError(msg);
@@ -179,7 +214,6 @@ export default function Onboarding() {
         toast({ title: "Couldn't create account", description: error, variant: "destructive" });
         return;
       }
-      // Auto-confirm is on; the auth listener sets `user` and useEffect advances to step 1.
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unexpected error";
       setAuthError(msg);
@@ -198,10 +232,6 @@ export default function Onboarding() {
   const canAdvance = (() => {
     if (step === 1) return !!data.setupFor;
     if (step === 2) return data.fullName.trim().length >= 2;
-    if (step === 3) return true; // dob optional
-    if (step === 4) return true; // gender optional
-    if (step === 5) return true; // scd optional
-    if (step === 6) return true; // country/state optional
     return true;
   })();
 
@@ -214,7 +244,7 @@ export default function Onboarding() {
           <div className="flex items-center justify-between px-5 pt-12 pb-2 z-10">
             <button
               onClick={back}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors text-primary"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors text-foreground"
               aria-label="Back"
               data-testid="btn-onboarding-back"
             >
@@ -228,7 +258,7 @@ export default function Onboarding() {
                   animate={{
                     width: s === step ? 22 : 6,
                     height: 6,
-                    backgroundColor: s <= step ? "var(--primary)" : "var(--border)",
+                    backgroundColor: s <= step ? "var(--foreground)" : "var(--border)",
                     opacity: s <= step ? (s === step ? 1 : 0.4) : 0.5,
                   }}
                   transition={{ duration: 0.3 }}
@@ -266,12 +296,14 @@ export default function Onboarding() {
                     animate={{ opacity: 0.9, scale: 1 }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                   />
-                  <h1 className="font-serif text-[1.875rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px] max-w-[300px]">
+                  <h1 className="font-serif text-[1.875rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px] max-w-[300px]">
                     Welcome to your family's companion.
                   </h1>
                   <p className="mt-4 text-muted-foreground text-sm leading-relaxed max-w-[280px]">
                     A gentle place to track care, log moments, and find support — together.
                   </p>
+                  
+
                 </div>
 
                 <div className="space-y-2.5 mt-8">
@@ -279,7 +311,7 @@ export default function Onboarding() {
                     <>
                       <Button
                         variant="outline"
-                        className="w-full h-[3.25rem] text-[15px] border-primary/20 hover:bg-primary/5 text-primary flex items-center justify-start px-5 gap-4 rounded-2xl"
+                        className="w-full h-[3.25rem] text-[15px] border-foreground/20 hover:bg-foreground/5 text-foreground flex items-center justify-start px-5 gap-4 rounded-2xl"
                         onClick={() => toast({ title: "Phone sign-in coming soon", description: "Please continue with email or Google for now." })}
                         data-testid="button-auth-phone"
                       >
@@ -288,7 +320,7 @@ export default function Onboarding() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full h-[3.25rem] text-[15px] border-primary/20 hover:bg-primary/5 text-primary flex items-center justify-start px-5 gap-4 rounded-2xl"
+                        className="w-full h-[3.25rem] text-[15px] border-foreground/20 hover:bg-foreground/5 text-foreground flex items-center justify-start px-5 gap-4 rounded-2xl"
                         onClick={() => setAuthMode("email")}
                         data-testid="button-auth-email"
                       >
@@ -297,7 +329,7 @@ export default function Onboarding() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full h-[3.25rem] text-[15px] border-primary/20 hover:bg-primary/5 text-primary flex items-center justify-start px-5 gap-4 rounded-2xl"
+                        className="w-full h-[3.25rem] text-[15px] border-foreground/20 hover:bg-foreground/5 text-foreground flex items-center justify-start px-5 gap-4 rounded-2xl"
                         onClick={handleGoogle}
                         disabled={authBusy}
                         data-testid="button-auth-google"
@@ -318,7 +350,7 @@ export default function Onboarding() {
                         placeholder="you@example.com"
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
-                        className="h-[3.25rem] text-[15px] rounded-2xl border-primary/20 px-5"
+                        className="h-[3.25rem] text-[15px] rounded-2xl border-foreground/20 px-5"
                         data-testid="input-auth-email"
                       />
                       <Input
@@ -328,12 +360,12 @@ export default function Onboarding() {
                         value={passwordInput}
                         onChange={(e) => setPasswordInput(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") handleEmailSubmit(); }}
-                        className="h-[3.25rem] text-[15px] rounded-2xl border-primary/20 px-5"
+                        className="h-[3.25rem] text-[15px] rounded-2xl border-foreground/20 px-5"
                         data-testid="input-auth-password"
                         minLength={8}
                       />
                       <Button
-                        className="w-full h-[3.25rem] text-[15px] rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="w-full h-[3.25rem] text-[15px] rounded-2xl bg-foreground text-white hover:bg-foreground/90"
                         onClick={handleEmailSubmit}
                         disabled={authBusy}
                         data-testid="button-auth-email-send"
@@ -341,33 +373,16 @@ export default function Onboarding() {
                         {authBusy ? "Creating…" : "Create account"}
                       </Button>
                       {authError && (
-                        <p
-                          className="text-xs text-destructive text-center px-2"
-                          data-testid="text-auth-error"
-                        >
+                        <p className="text-xs text-destructive text-center px-2" data-testid="text-auth-error">
                           {authError}
                         </p>
                       )}
                       <button
-                        className="w-full text-xs text-muted-foreground hover:text-primary pt-1"
+                        className="w-full text-xs text-muted-foreground hover:text-foreground pt-1"
                         onClick={() => { setAuthMode("choose"); setEmailInput(""); setPasswordInput(""); setAuthError(null); }}
                       >
                         Use a different method
                       </button>
-                    </div>
-                  )}
-
-                  {isDev && redirectUrl && (
-                    <div className="mt-4 p-3 rounded-md border border-dashed border-border bg-muted/40 text-left">
-                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                        Auth diagnostics (dev only)
-                      </p>
-                      <p className="text-xs font-mono break-all text-foreground/80">
-                        {redirectUrl}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-1">
-                        Ensure this URL is added to your Supabase project's auth redirect allow-list.
-                      </p>
                     </div>
                   )}
                 </div>
@@ -391,8 +406,8 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step One</p>
-                  <h2 className="font-serif text-[1.625rem] text-primary font-semibold leading-[1.2] tracking-[-0.5px]">
+                  <p className="text-xs uppercase tracking-[2px] text-foreground/50 font-semibold mb-3">Step One</p>
+                  <h2 className="font-serif text-[1.625rem] text-foreground font-semibold leading-[1.2] tracking-[-0.5px]">
                     Who are you setting up Kindred for?
                   </h2>
                 </div>
@@ -406,9 +421,9 @@ export default function Onboarding() {
                         onClick={() => { update("setupFor", opt.id); setTimeout(next, 220); }}
                         className="w-full text-left rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 border"
                         style={{
-                          background: selected ? "var(--primary)" : "var(--background)",
-                          borderColor: selected ? "var(--primary)" : "var(--border)",
-                          color: selected ? "var(--primary-foreground)" : "var(--foreground)",
+                          background: selected ? "var(--secondary)" : "var(--background)",
+                          borderColor: selected ? "var(--secondary)" : "var(--border)",
+                          color: selected ? "var(--secondary-foreground)" : "var(--foreground)",
                           transform: selected ? "scale(1.01)" : "scale(1)",
                         }}
                         data-testid={`option-setup-${opt.id}`}
@@ -417,7 +432,8 @@ export default function Onboarding() {
                           className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
                           style={{
                             background: selected ? "rgba(255,255,255,0.15)" : "var(--secondary)",
-                            color: selected ? "#fff" : "var(--primary)",
+                            color: "#fff",
+                            border: `2px solid ${selected ? "#fff" : "transparent"}`,
                           }}
                         >
                           <opt.Icon size={20} />
@@ -450,8 +466,8 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-10">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Two</p>
-                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
+                  <p className="text-xs uppercase tracking-[2px] text-foreground/50 font-semibold mb-3">Step Two</p>
+                  <h2 className="font-serif text-[1.75rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px]">
                     {data.setupFor === CreateProfileBodySetupFor.myself ? "What should we call you?" :
                      data.setupFor === CreateProfileBodySetupFor.my_child ? "What's your child's name?" :
                      "What's their name?"}
@@ -468,7 +484,7 @@ export default function Onboarding() {
                     value={data.fullName}
                     onChange={(e) => update("fullName", e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter" && canAdvance) next(); }}
-                    className="h-14 text-lg font-serif border-0 border-b-2 border-primary/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary placeholder:text-muted-foreground/40 placeholder:font-sans placeholder:text-base bg-transparent"
+                    className="h-14 text-lg font-serif border-0 border-b-2 border-foreground/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-foreground placeholder:text-muted-foreground/40 placeholder:font-sans placeholder:text-base bg-transparent"
                     data-testid="input-full-name"
                   />
                 </div>
@@ -496,8 +512,8 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-10">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Three</p>
-                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
+                  <p className="text-xs uppercase tracking-[2px] text-foreground/50 font-semibold mb-3">Step Three</p>
+                  <h2 className="font-serif text-[1.75rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px]">
                     When {data.setupFor === CreateProfileBodySetupFor.myself ? "were you" : "were they"} born?
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -511,7 +527,7 @@ export default function Onboarding() {
                     autoFocus
                     value={data.dateOfBirth}
                     onChange={(e) => update("dateOfBirth", e.target.value)}
-                    className="h-14 text-lg font-serif border-0 border-b-2 border-primary/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary bg-transparent"
+                    className="h-14 text-lg font-serif border-0 border-b-2 border-foreground/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-foreground bg-transparent"
                     data-testid="input-dob"
                   />
                 </div>
@@ -548,8 +564,8 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-10">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Four</p>
-                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
+                  <p className="text-xs uppercase tracking-[2px] text-foreground/50 font-semibold mb-3">Step Four</p>
+                  <h2 className="font-serif text-[1.75rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px]">
                     {data.setupFor === CreateProfileBodySetupFor.myself ? "How do you identify?" : "How do they identify?"}
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -567,9 +583,9 @@ export default function Onboarding() {
                         onClick={() => { update("gender", g); setTimeout(next, 220); }}
                         className="rounded-2xl p-4 text-sm font-semibold transition-all border text-center"
                         style={{
-                          background: selected ? "var(--primary)" : "var(--background)",
-                          borderColor: selected ? "var(--primary)" : "var(--border)",
-                          color: selected ? "var(--primary-foreground)" : "var(--foreground)",
+                          background: selected ? "var(--secondary)" : "var(--background)",
+                          borderColor: selected ? "var(--secondary)" : "var(--border)",
+                          color: selected ? "var(--secondary-foreground)" : "var(--foreground)",
                         }}
                         data-testid={`option-gender-${g.toLowerCase().replace(/\s+/g, "-")}`}
                       >
@@ -593,8 +609,8 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Five</p>
-                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
+                  <p className="text-xs uppercase tracking-[2px] text-foreground/50 font-semibold mb-3">Step Five</p>
+                  <h2 className="font-serif text-[1.75rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px]">
                     Sickle cell genotype
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -612,9 +628,9 @@ export default function Onboarding() {
                         onClick={() => update("scdStatus", g)}
                         className="px-4 py-2.5 rounded-full text-sm font-semibold transition-all border"
                         style={{
-                          background: selected ? "var(--primary)" : "var(--background)",
-                          borderColor: selected ? "var(--primary)" : "var(--border)",
-                          color: selected ? "var(--primary-foreground)" : "var(--foreground)",
+                          background: selected ? "var(--secondary)" : "var(--background)",
+                          borderColor: selected ? "var(--secondary)" : "var(--border)",
+                          color: selected ? "var(--secondary-foreground)" : "var(--foreground)",
                         }}
                         data-testid={`option-scd-${g.toLowerCase().replace(/\s+/g, "-").replace(/[()]/g, "")}`}
                       >
@@ -628,7 +644,7 @@ export default function Onboarding() {
 
                 <Button
                   onClick={next}
-                  className="w-full h-14 rounded-2xl text-base font-semibold shadow-sm gap-2"
+                  className="w-full h-14 rounded-2xl text-base font-semibold mt-6 shadow-sm gap-2"
                   data-testid="btn-step-scd-continue"
                 >
                   Continue <ArrowRight size={16} />
@@ -648,8 +664,8 @@ export default function Onboarding() {
                 className="flex-1 flex flex-col px-6 pt-2 pb-6"
               >
                 <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[2px] text-primary/50 font-semibold mb-3">Step Six</p>
-                  <h2 className="font-serif text-[1.75rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px]">
+                  <p className="text-xs uppercase tracking-[2px] text-foreground/50 font-semibold mb-3">Step Six</p>
+                  <h2 className="font-serif text-[1.75rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px]">
                     Where are you based?
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -659,7 +675,7 @@ export default function Onboarding() {
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs uppercase tracking-[1.5px] text-primary/50 font-semibold mb-2 block">
+                    <label className="text-xs uppercase tracking-[1.5px] text-foreground/50 font-semibold mb-2 block">
                       Country
                     </label>
                     <Select
@@ -670,7 +686,7 @@ export default function Onboarding() {
                       }}
                     >
                       <SelectTrigger
-                        className="h-12 rounded-2xl border-primary/20 bg-background text-[15px]"
+                        className="h-12 rounded-2xl border-foreground/20 bg-background text-[15px]"
                         data-testid="select-onboarding-country"
                       >
                         <SelectValue placeholder="Select your country" />
@@ -686,7 +702,7 @@ export default function Onboarding() {
                   </div>
 
                   <div>
-                    <label className="text-xs uppercase tracking-[1.5px] text-primary/50 font-semibold mb-2 block">
+                    <label className="text-xs uppercase tracking-[1.5px] text-foreground/50 font-semibold mb-2 block">
                       State / Region
                     </label>
                     <Select
@@ -695,7 +711,7 @@ export default function Onboarding() {
                       disabled={!data.country || statesFor(data.country).length === 0}
                     >
                       <SelectTrigger
-                        className="h-12 rounded-2xl border-primary/20 bg-background text-[15px]"
+                        className="h-12 rounded-2xl border-foreground/20 bg-background text-[15px]"
                         data-testid="select-onboarding-state"
                       >
                         <SelectValue placeholder={data.country ? "Select your state or region" : "Pick a country first"} />
@@ -753,13 +769,13 @@ export default function Onboarding() {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
                     className="mb-8 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
-                    style={{ background: "linear-gradient(140deg, #39839F 0%, #256680 100%)" }}
+                    style={{ background: "var(--gradient-brand)" }}
                   >
                     <Sparkles size={22} className="text-white" />
                   </motion.div>
 
-                  <p className="text-xs uppercase tracking-[3px] text-primary/50 font-semibold mb-3">All set</p>
-                  <h2 className="font-serif text-[2rem] text-primary font-semibold leading-[1.15] tracking-[-0.5px] max-w-[320px]">
+                  <p className="text-xs uppercase tracking-[3px] text-foreground/50 font-semibold mb-3">All set</p>
+                  <h2 className="font-serif text-[2rem] text-foreground font-semibold leading-[1.15] tracking-[-0.5px] max-w-[320px]">
                     Welcome, {data.fullName.split(" ")[0] || "friend"}.
                   </h2>
                   <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-[300px]">

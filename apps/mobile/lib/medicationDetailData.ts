@@ -21,6 +21,7 @@ export type MedicationDetailPayload = {
   takenThisMonth: number;
   expectedThisMonth: number;
   adherencePct: number;
+  logs: any[];
 };
 
 export async function fetchMedicationDetail(
@@ -75,6 +76,7 @@ export async function fetchMedicationDetail(
     takenThisMonth,
     expectedThisMonth,
     adherencePct,
+    logs: logs ?? [],
   };
 }
 

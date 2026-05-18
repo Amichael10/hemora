@@ -145,12 +145,45 @@ export default function Meds() {
             ))}
           </div>
         ) : meds?.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <div className="text-primary/20 flex justify-center mb-4">
-              <HealthIcon outline={MedicinesOutline} filled={MedicinesFilled} width="48" height="48" />
+          <div className="mt-2">
+            <div className="surface-soft p-8 text-center rounded-[32px] border border-border/50 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+              <div className="mx-auto w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-teal-500/10 relative z-10"
+                   style={{ background: "var(--gradient-teal)" }}>
+                <HealthIcon
+                  outline={MedicinesOutline}
+                  filled={MedicinesFilled}
+                  width="36"
+                  height="36"
+                  active
+                  className="text-white"
+                />
+              </div>
+              <h3 className="h-card mb-2">No medications added</h3>
+              <p className="p-muted mb-8 max-w-[260px] mx-auto">
+                Keep track of your daily routine, including Hydroxurea or folic acid, to maintain your health and prevent crisis.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 mb-8 text-left relative z-10">
+                {[
+                  { icon: <BlisterOutline size={14} />, label: "Track Doses" },
+                  { icon: <Plus size={14} />, label: "Set Reminders" },
+                  { icon: <MedicinesOutline size={14} />, label: "Refill Alerts" },
+                  { icon: <ChevronRight size={14} />, label: "Adherence" },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 p-3 rounded-2xl bg-white/50 border border-white/20">
+                    <div className="w-6 h-6 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-600">
+                      {item.icon}
+                    </div>
+                    <span className="text-[11px] font-medium text-foreground/80">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Button size="lg" className="w-full shadow-md bg-teal-600 hover:bg-teal-700" onClick={() => setLocation("/meds/new")}>
+                <Plus size={18} className="mr-2" /> Add Medication
+              </Button>
             </div>
-            <p className="text-sm mb-4">No medications added yet.</p>
-            <Button variant="soft" onClick={() => setLocation("/meds/new")}>Add Medication</Button>
           </div>
         ) : (
           <div>

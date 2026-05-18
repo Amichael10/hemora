@@ -100,16 +100,16 @@ function AdherenceReport({ logs, isLoading }: { logs: any[] | undefined; isLoadi
 }
 
 export default function Meds() {
-  const { profileId } = useProfile();
+  const { profileId, activeProfileId } = useProfile();
   const [, setLocation] = useLocation();
 
   const { data: meds, isLoading: isLoadingMeds } = useListMedications(
-    { profileId },
-    { query: { queryKey: getListMedicationsQueryKey({ profileId }), enabled: !!profileId } }
+    { familyMemberId: activeProfileId },
+    { query: { queryKey: ["medications", activeProfileId], enabled: !!activeProfileId } }
   );
   const { data: medLogs, isLoading: isLoadingLogs } = useListMedicationLogs(
-    { profileId },
-    { query: { queryKey: getListMedicationLogsQueryKey({ profileId }), enabled: !!profileId } }
+    { familyMemberId: activeProfileId },
+    { query: { queryKey: ["medication-logs", activeProfileId], enabled: !!activeProfileId } }
   );
 
   return (

@@ -2,21 +2,30 @@ import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { Bell } from "lucide-react-native";
 import {
   ActivityIndicator,
   Alert,
   Pressable,
+  Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  Dimensions,
 } from "react-native";
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+const Genotype3D = require("@/assets/images/genotype-3d.png");
+const Family3D = require("@/assets/images/family-3d.png");
+const Directory3D = require("@/assets/images/directory-3d.png");
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   AddCircleBold,
   AltArrowRightLinear,
+  CalendarLinear,
   ChartLinear,
   ClockCircleBold,
   DocumentTextLinear,
@@ -25,6 +34,8 @@ import {
   PillBold,
   PillLinear,
   SettingsLinear,
+  StethoscopeLinear,
+  TestTubeBold,
 } from "@/components/icons/solar";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useAuth } from "@/context/AuthContext";
@@ -36,10 +47,10 @@ import {
   type DashboardHomePayload,
   type DashboardMedication,
 } from "@/lib/dashboardHomeData";
-import { formatReminder, formatShortDateNoYear, isLocalToday } from "@/lib/datetime";
+import { formatReminder, formatShortDate, formatShortDateNoYear, isLocalToday } from "@/lib/datetime";
 import { getSupabase } from "@/lib/supabase";
 
-const GRADIENT_COLORS = [Brand.tealDeep, Brand.teal, "#33595c"] as const;
+const GRADIENT_COLORS = ["#0f2837", "#204b57", "#336d7a"] as const;
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -85,6 +96,14 @@ function deriveFromPayload(data: DashboardHomePayload) {
     crisisSub = `${pain} · ${loc}`;
   }
 
+  const missingFields: string[] = [];
+  if (data.profile) {
+    if (!data.profile.dateOfBirth) missingFields.push("date of birth");
+    if (!data.profile.gender) missingFields.push("gender");
+    if (!data.profile.genotype) missingFields.push("genotype");
+    if (!data.profile.country) missingFields.push("location");
+  }
+
   return {
     doneToday,
     totalToday,
@@ -95,6 +114,15 @@ function deriveFromPayload(data: DashboardHomePayload) {
     crisisTitle,
     crisisSub,
     recordCount: data.recordCount,
+    profile: data.profile,
+    missingFields,
+    vitalsTitle: data.latestVitals ? (data.latestVitals.occurredAt ? formatShortDateNoYear(data.latestVitals.occurredAt) : "Recently") : "None logged",
+    vitalsSub: data.latestVitals ? [
+      data.latestVitals.temp ? `${data.latestVitals.temp}°C` : null,
+      data.latestVitals.oxygen ? `${data.latestVitals.oxygen}%` : null,
+    ].filter(Boolean).join(" · ") || "Logged" : "Tap Vitals to log",
+    transfusionTitle: data.latestTransfusion ? formatShortDateNoYear(data.latestTransfusion) : "None logged",
+    transfusionSub: data.latestTransfusion ? "Blood transfusion" : "Tap Transfusion to log",
   };
 }
 
@@ -103,13 +131,14 @@ export function DashboardHome() {
   const scheme = useColorScheme() ?? "light";
   const t = Theme[scheme];
   const { user } = useAuth();
-  const [hideStats, setHideStats] = useState(false);
   const [data, setData] = useState<DashboardHomePayload | null>(null);
+  const [hideStats, setHideStats] = useState(false);
   const [busy, setBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [configError, setConfigError] = useState(false);
   const [markingId, setMarkingId] = useState<string | null>(null);
+  const [activeToolIndex, setActiveToolIndex] = useState(0);
   const everLoaded = useRef(false);
 
   const load = useCallback(
@@ -206,8 +235,13 @@ export function DashboardHome() {
   const nextMed = derived?.nextMed ?? null;
   const crisisTitle = derived?.crisisTitle ?? "—";
   const crisisSub = derived?.crisisSub ?? "";
+  const vitalsTitle = derived?.vitalsTitle ?? "—";
+  const vitalsSub = derived?.vitalsSub ?? "";
+  const transfusionTitle = derived?.transfusionTitle ?? "—";
+  const transfusionSub = derived?.transfusionSub ?? "";
   const recordCount = derived?.recordCount ?? 0;
   const medications = data?.medications ?? [];
+  const nextAppointments = data?.nextAppointments ?? [];
 
   return (
     <ScrollView
@@ -236,9 +270,14 @@ export function DashboardHome() {
               <Text style={[styles.nameLine, { fontFamily: Fonts.serif }]}>{firstName}</Text>
             </View>
           </Pressable>
-          <Pressable onPress={() => router.push("/settings")} style={styles.iconBtn} accessibilityLabel="Settings">
-            <SettingsLinear color="#fff" size={18} />
-          </Pressable>
+          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+            <Pressable onPress={() => router.push("/notifications" as any)} style={styles.iconBtn} accessibilityLabel="Notifications">
+              <Bell size={18} color="#fff" />
+            </Pressable>
+            <Pressable onPress={() => router.push("/settings")} style={styles.iconBtn} accessibilityLabel="Settings">
+              <SettingsLinear color="#fff" size={18} />
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.careBlock}>
@@ -257,6 +296,15 @@ export function DashboardHome() {
               <EyeClosedLinear color="rgba(255,255,255,0.9)" size={18} />
             </Pressable>
           </View>
+        </View>
+
+        <View style={styles.progressContainer}>
+          <View
+            style={[
+              styles.progressBar,
+              { width: `${totalToday ? (doneToday / totalToday) * 100 : 0}%` },
+            ]}
+          />
         </View>
 
         <View style={styles.statRow}>
@@ -303,6 +351,40 @@ export function DashboardHome() {
             <Text style={[styles.quickLabel, { fontFamily: Fonts.sansBold }]}>Records</Text>
           </Pressable>
         </View>
+
+        <View style={[styles.quickRow, { marginTop: 12 }]}>
+          <Pressable
+            onPress={() => router.push("/vitals-log" as any)}
+            style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.92 }]}
+          >
+            <StethoscopeLinear color={Brand.red} size={20} />
+            <Text style={[styles.quickLabel, { fontFamily: Fonts.sansBold }]}>Fever/Vitals</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/transfusion-log" as any)}
+            style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.92 }]}
+          >
+            <TestTubeBold color={Brand.red} size={20} />
+            <Text style={[styles.quickLabel, { fontFamily: Fonts.sansBold }]}>Transfusion</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/appointment-log" as any)}
+            style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.92 }]}
+          >
+            <CalendarLinear color={Brand.red} size={20} />
+            <Text style={[styles.quickLabel, { fontFamily: Fonts.sansBold }]}>Schedule</Text>
+          </Pressable>
+        </View>
+
+        <View style={[styles.quickRow, { marginTop: 12 }]}>
+          <Pressable
+            onPress={() => router.push("/hydration" as any)}
+            style={({ pressed }) => [styles.quickBtn, pressed && { opacity: 0.92 }]}
+          >
+            <StethoscopeLinear color={Brand.red} size={20} />
+            <Text style={[styles.quickLabel, { fontFamily: Fonts.sansBold }]}>Hydration</Text>
+          </Pressable>
+        </View>
       </LinearGradient>
 
       <View style={[styles.sheet, { backgroundColor: t.surface }]}>
@@ -332,25 +414,94 @@ export function DashboardHome() {
           </View>
         ) : null}
 
-        <View style={styles.toolsGrid}>
+        {derived?.missingFields.length ? (
           <Pressable
-            onPress={() => router.push("/meds")}
-            style={[styles.toolHalf, { borderColor: t.tabBorder, backgroundColor: t.surface }]}
+            onPress={() => router.push("/settings")}
+            style={[styles.profileBanner, { borderColor: `${Brand.teal}44`, backgroundColor: `${Brand.teal}08` }]}
           >
-            <Text style={[styles.toolTitle, { color: t.text, fontFamily: Fonts.sansBold }]}>Genotype checker</Text>
-            <Text style={[styles.toolSub, { color: t.textMuted, fontFamily: Fonts.sans }]}>
-              See pregnancy outcomes for any pairing.
-            </Text>
+            <View style={[styles.bannerIcon, { backgroundColor: `${Brand.teal}15` }]}>
+              <AddCircleBold color={Brand.teal} size={18} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.bannerTitle, { color: t.text, fontFamily: Fonts.sansBold }]}>Finish your profile</Text>
+              <Text style={[styles.bannerSub, { color: t.textMuted, fontFamily: Fonts.sans }]} numberOfLines={1}>
+                Add your {derived.missingFields.slice(0, 2).join(" & ")}...
+              </Text>
+            </View>
+            <AltArrowRightLinear color={t.textMuted} size={14} />
           </Pressable>
-          <Pressable
-            onPress={() => router.push("/directory")}
-            style={[styles.toolHalf, { borderColor: t.tabBorder, backgroundColor: t.surface }]}
+        ) : null}
+
+        <View>
+          <Text style={[styles.sectionEyebrow, styles.sectionEyebrowAccent, { marginBottom: 12 }]}>Tools for you</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={SCREEN_WIDTH * 0.82}
+            decelerationRate="fast"
+            contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+            onScroll={(e) => {
+              const x = e.nativeEvent.contentOffset.x;
+              const index = Math.round(x / (SCREEN_WIDTH * 0.82));
+              if (index !== activeToolIndex) setActiveToolIndex(index);
+            }}
+            scrollEventThrottle={16}
+            style={{ marginHorizontal: -20 }}
           >
-            <Text style={[styles.toolTitle, { color: t.text, fontFamily: Fonts.sansBold }]}>Family tree</Text>
-            <Text style={[styles.toolSub, { color: t.textMuted, fontFamily: Fonts.sans }]}>
-              Add relatives and check shared risk.
-            </Text>
-          </Pressable>
+            {[
+              {
+                title: "Genotype checker",
+                sub: "See pregnancy outcomes for any pairing.",
+                img: Genotype3D,
+                bg: "#f5ead6",
+                onPress: () => router.push("/meds"), // Update these routes if they exist
+              },
+              {
+                title: "Family tree",
+                sub: "Add relatives and check shared risk.",
+                img: Family3D,
+                bg: "#e7efe6",
+                onPress: () => router.push("/directory"),
+              },
+              {
+                title: "Directory",
+                sub: "Find specialists near you.",
+                img: Directory3D,
+                bg: "#f3e3e3",
+                onPress: () => router.push("/directory"),
+              },
+            ].map((tool, i) => (
+              <Pressable
+                key={i}
+                onPress={tool.onPress}
+                style={[styles.toolCard, { backgroundColor: tool.bg }]}
+              >
+                <View style={styles.toolCardImage}>
+                  <Image source={tool.img} style={styles.toolImage} resizeMode="contain" />
+                </View>
+                <View style={{ flex: 1, paddingRight: 10 }}>
+                  <Text style={[styles.toolTitle, { color: "#1a1a1a", fontFamily: Fonts.sansBold }]}>{tool.title}</Text>
+                  <Text style={[styles.toolSub, { color: "#4a4a4a", fontFamily: Fonts.sans }]} numberOfLines={2}>
+                    {tool.sub}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+          <View style={styles.dotsRow}>
+            {[0, 1, 2].map((i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  {
+                    backgroundColor: i === activeToolIndex ? Brand.teal : t.tabBorder,
+                    width: i === activeToolIndex ? 16 : 6,
+                  },
+                ]}
+              />
+            ))}
+          </View>
         </View>
 
         <Pressable
@@ -485,6 +636,35 @@ export function DashboardHome() {
             })
           )}
         </View>
+        
+        <Text style={[styles.sectionEyebrow, styles.sectionEyebrowAccent, { marginTop: 10 }]}>Upcoming Appointments</Text>
+        <View style={{ gap: 10 }}>
+          {nextAppointments.length === 0 ? (
+            <Text style={[styles.emptyHint, { color: t.textMuted, fontFamily: Fonts.sans }]}>
+              No upcoming appointments — schedule one above.
+            </Text>
+          ) : (
+            nextAppointments.map((appt) => (
+              <View
+                key={appt.id}
+                style={[styles.scheduleRow, { borderColor: t.tabBorder, backgroundColor: "#fff" }]}
+              >
+                <View style={[styles.scheduleIcon, { backgroundColor: `${Brand.teal}22` }]}>
+                  <CalendarLinear color={Brand.teal} size={18} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.scheduleTime, { color: Brand.teal, fontFamily: Fonts.sansBold }]}>
+                    {formatShortDate(appt.appointmentAt)}
+                  </Text>
+                  <Text style={[styles.scheduleName, { color: t.text, fontFamily: Fonts.serif }]} numberOfLines={1}>
+                    {appt.title}
+                  </Text>
+                </View>
+                <AltArrowRightLinear color={t.textMuted} size={14} />
+              </View>
+            ))
+          )}
+        </View>
 
         <Text style={[styles.sectionEyebrow, styles.sectionEyebrowAccent, { marginTop: 10 }]}>Recent</Text>
         <View style={styles.recentRow}>
@@ -502,11 +682,40 @@ export function DashboardHome() {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => router.push("/records")}
+            onPress={() => router.push("/vitals-log" as any)}
+            style={[styles.recentCard, { borderColor: t.tabBorder, backgroundColor: "#fff" }]}
+          >
+            <View style={[styles.recentIcon, { backgroundColor: `${Brand.teal}14` }]}>
+              <StethoscopeLinear color={Brand.teal} size={16} />
+            </View>
+            <Text style={[styles.recentEyebrow, { color: t.textMuted, fontFamily: Fonts.sansBold }]}>Fever/Vitals</Text>
+            <Text style={[styles.recentTitle, { color: t.text, fontFamily: Fonts.serif }]}>{vitalsTitle}</Text>
+            <Text style={[styles.recentSub, { color: t.textMuted, fontFamily: Fonts.sans }]} numberOfLines={2}>
+              {vitalsSub}
+            </Text>
+          </Pressable>
+        </View>
+
+        <View style={[styles.recentRow, { marginTop: 12 }]}>
+          <Pressable
+            onPress={() => router.push("/transfusion-log" as any)}
             style={[styles.recentCard, { borderColor: t.tabBorder, backgroundColor: "#fff" }]}
           >
             <View style={[styles.recentIcon, { backgroundColor: `${Brand.red}14` }]}>
-              <DocumentTextLinear color={Brand.red} size={16} />
+              <TestTubeBold color={Brand.red} size={16} />
+            </View>
+            <Text style={[styles.recentEyebrow, { color: t.textMuted, fontFamily: Fonts.sansBold }]}>Transfusion</Text>
+            <Text style={[styles.recentTitle, { color: t.text, fontFamily: Fonts.serif }]}>{transfusionTitle}</Text>
+            <Text style={[styles.recentSub, { color: t.textMuted, fontFamily: Fonts.sans }]} numberOfLines={2}>
+              {transfusionSub}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/records")}
+            style={[styles.recentCard, { borderColor: t.tabBorder, backgroundColor: "#fff" }]}
+          >
+            <View style={[styles.recentIcon, { backgroundColor: `${Brand.teal}14` }]}>
+              <DocumentTextLinear color={Brand.teal} size={16} />
             </View>
             <Text style={[styles.recentEyebrow, { color: t.textMuted, fontFamily: Fonts.sansBold }]}>Records</Text>
             <Text style={[styles.recentTitle, { color: t.text, fontFamily: Fonts.serif }]}>{recordCount}</Text>
@@ -559,6 +768,18 @@ const styles = StyleSheet.create({
   doseRow: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginTop: 4 },
   doseBig: { fontSize: 36, color: "#fff", letterSpacing: -1 },
   doseLabel: { fontSize: 14, color: "rgba(255,255,255,0.82)" },
+  progressContainer: {
+    height: 6,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 3,
+    marginTop: 12,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 3,
+  },
   statRow: { flexDirection: "row", gap: 12, marginTop: 22 },
   statCard: {
     flex: 1,
@@ -609,16 +830,55 @@ const styles = StyleSheet.create({
   retryText: { fontSize: 13, color: Brand.red },
   emptyHint: { fontSize: 12, lineHeight: 18, paddingVertical: 4 },
   handle: { width: 40, height: 4, borderRadius: 2, alignSelf: "center", marginBottom: 4 },
-  toolsGrid: { flexDirection: "row", gap: 12 },
-  toolHalf: {
-    flex: 1,
+  toolTitle: { fontSize: 14 },
+  toolSub: { fontSize: 11, marginTop: 4, lineHeight: 16 },
+  profileBanner: {
     borderRadius: 16,
     borderWidth: 1,
+    borderStyle: "dashed",
     padding: 14,
-    minHeight: 88,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
-  toolTitle: { fontSize: 13 },
-  toolSub: { fontSize: 11, marginTop: 6, lineHeight: 16 },
+  bannerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bannerTitle: { fontSize: 13 },
+  bannerSub: { fontSize: 11, marginTop: 2 },
+  toolCard: {
+    width: SCREEN_WIDTH * 0.78,
+    height: 110,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 4,
+    paddingRight: 14,
+  },
+  toolCardImage: {
+    width: 100,
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  toolImage: {
+    width: 80,
+    height: 80,
+  },
+  dotsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: 12,
+  },
+  dot: {
+    height: 6,
+    borderRadius: 3,
+  },
   resourcesRow: {
     borderRadius: 16,
     borderWidth: 1,

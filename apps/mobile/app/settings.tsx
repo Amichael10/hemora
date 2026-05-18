@@ -1,6 +1,7 @@
 import { Stack, router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Bell } from "lucide-react-native";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import { useAuth } from "@/context/AuthContext";
@@ -28,6 +29,20 @@ export default function SettingsScreen() {
           <Text style={[styles.label, { color: t.textMuted }]}>Signed in as</Text>
           <Text style={[styles.email, { color: t.text }]}>{user?.email ?? "—"}</Text>
         </View>
+
+        {/* Notifications link */}
+        <Pressable
+          onPress={() => router.push("/notifications" as any)}
+          style={({ pressed }) => [
+            styles.row,
+            { backgroundColor: pressed ? `${t.teal}15` : t.surface, borderColor: t.tabBorder },
+          ]}
+        >
+          <Bell size={18} color={t.teal} />
+          <Text style={[styles.rowLabel, { color: t.text }]}>Notifications</Text>
+          <Text style={[styles.rowArrow, { color: t.textMuted }]}>›</Text>
+        </Pressable>
+
         <Pressable
           onPress={() => void signOut().then(() => router.replace("/login"))}
           style={({ pressed }) => [
@@ -48,6 +63,16 @@ const styles = StyleSheet.create({
   card: { borderRadius: 16, borderWidth: 1, padding: 18 },
   label: { fontSize: 12, fontWeight: "600", marginBottom: 6 },
   email: { fontSize: 16, fontWeight: "600" },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+  },
+  rowLabel: { flex: 1, fontSize: 15, fontWeight: "600" },
+  rowArrow: { fontSize: 20, lineHeight: 22 },
   button: { alignSelf: "flex-start", paddingVertical: 14, paddingHorizontal: 22, borderRadius: 12 },
   buttonLabel: { fontSize: 15, fontWeight: "700" },
   build: { fontSize: 11, marginTop: 8 },

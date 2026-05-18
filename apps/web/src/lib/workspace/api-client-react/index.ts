@@ -100,6 +100,30 @@ const mapEC = (r: any) => ({
   id: r.id, fullName: r.full_name ?? r.name, name: r.name,
   phone: r.phone, relationship: r.relationship,
 });
+const mapVitals = (r: any) => ({
+  id: r.id, type: r.type, value: r.value, unit: r.unit,
+  occurredAt: r.occurred_at, notes: r.notes ?? null,
+  createdAt: r.created_at,
+});
+const mapTransfusion = (r: any) => ({
+  id: r.id, occurredAt: r.occurred_at, unitsCount: r.units_count ?? 1,
+  transfusionType: r.transfusion_type ?? 'simple',
+  reactionLogged: r.reaction_logged ?? false,
+  reactionDetails: r.reaction_details ?? null,
+  hospitalId: r.hospital_id ?? null,
+  hemoglobinPre: r.hemoglobin_pre ?? null,
+  hemoglobinPost: r.hemoglobin_post ?? null,
+  notes: r.notes ?? null,
+  createdAt: r.created_at,
+});
+const mapAppointment = (r: any) => ({
+  id: r.id, title: r.title, description: r.description ?? null,
+  appointmentAt: r.appointment_at,
+  providerId: r.provider_id ?? null,
+  status: r.status ?? "scheduled",
+  notes: r.notes ?? null,
+  createdAt: r.created_at,
+});
 
 // ---- Query-key helpers ----
 const k = (name: string) => (...args: any[]) => [name, ...args];
@@ -111,6 +135,9 @@ export const getListProvidersQueryKey = k("providers");
 export const getListEmergencyContactsQueryKey = k("emergency-contacts");
 export const getGetProfileQueryKey = k("profile");
 export const getGetDashboardSummaryQueryKey = k("dashboard-summary");
+export const getListVitalsLogsQueryKey = k("vitals-logs");
+export const getListTransfusionLogsQueryKey = k("transfusion-logs");
+export const getListAppointmentsQueryKey = k("appointments");
 
 // ---- Profile direct fetch ----
 export async function getProfileByUser(userId: string): Promise<any> {
@@ -139,15 +166,46 @@ function useList<T>(table: string, mapRow: (r: any) => T, args: any, opts: any, 
 
 // ---- Lists ----
 export const useListMedications = (args: any, opts?: any) =>
-  useList("medications", mapMed, args, opts);
+  useList("medications", mapMed, args, opts, (q) => {
+    if (args?.familyMemberId) return q.eq("family_member_id", args.familyMemberId);
+    return q;
+  });
 export const useListMedicationLogs = (args: any, opts?: any) =>
-  useList("medication_logs", mapMedLog, args, opts);
+  useList("medication_logs", mapMedLog, args, opts, (q) => {
+    if (args?.familyMemberId) return q.eq("family_member_id", args.familyMemberId);
+    return q;
+  });
 export const useListCrisisLogs = (args: any, opts?: any) =>
-  useList("crisis_logs", mapCrisis, args, opts, (q) => q.order("occurred_at", { ascending: false }));
+  useList("crisis_logs", mapCrisis, args, opts, (q) => {
+    let query = q.order("occurred_at", { ascending: false });
+    if (args?.familyMemberId) query = query.eq("family_member_id", args.familyMemberId);
+    return query;
+  });
 export const useListCareRecords = (args: any, opts?: any) =>
-  useList("care_records", mapRecord, args, opts);
+  useList("care_records", mapRecord, args, opts, (q) => {
+    if (args?.familyMemberId) return q.eq("family_member_id", args.familyMemberId);
+    return q;
+  });
 export const useListEmergencyContacts = (args: any, opts?: any) =>
   useList("emergency_contacts", mapEC, args, opts);
+export const useListVitalsLogs = (args: any, opts?: any) =>
+  useList("vitals_logs", mapVitals, args, opts, (q) => {
+    let query = q.order("occurred_at", { ascending: false });
+    if (args?.familyMemberId) query = query.eq("family_member_id", args.familyMemberId);
+    return query;
+  });
+export const useListTransfusionLogs = (args: any, opts?: any) =>
+  useList("transfusion_logs", mapTransfusion, args, opts, (q) => {
+    let query = q.order("occurred_at", { ascending: false });
+    if (args?.familyMemberId) query = query.eq("family_member_id", args.familyMemberId);
+    return query;
+  });
+export const useListAppointments = (args: any, opts?: any) =>
+  useList("appointments", mapAppointment, args, opts, (q) => {
+    let query = q.order("appointment_at", { ascending: true });
+    if (args?.familyMemberId) query = query.eq("family_member_id", args.familyMemberId);
+    return query;
+  });
 export const useListProviders = (args: any, opts?: any) => {
   const enabled = opts?.query?.enabled ?? true;
   const queryKey = opts?.query?.queryKey ?? ["providers", args];
@@ -229,17 +287,28 @@ export const useGetDashboardSummary = (arg?: any, opts?: any) => {
     queryKey: opts?.query?.queryKey ?? ["dashboard-summary", arg],
     enabled,
     queryFn: async () => {
-      const [{ data: meds }, { data: crisis }, { data: logs }] = await Promise.all([
-        supabase.from("medications").select("*").eq("status", "ongoing").limit(1),
-        supabase.from("crisis_logs").select("*").order("occurred_at", { ascending: false }).limit(1),
-        supabase.from("medication_logs").select("*").gte("taken_at", new Date(Date.now() - 7 * 86400000).toISOString()),
+      const [{ data: meds }, { data: crisis }, { data: logs }, { data: vitals }, { data: transfusions }] = await Promise.all([
+        supabase.from("medications").select("*").eq("status", "ongoing").eq("family_member_id", arg).limit(1),
+        supabase.from("crisis_logs").select("*").eq("family_member_id", arg).order("occurred_at", { ascending: false }).limit(1),
+        supabase.from("medication_logs").select("*").eq("family_member_id", arg).gte("taken_at", new Date(Date.now() - 7 * 86400000).toISOString()),
+        supabase.from("vitals_logs").select("*").eq("family_member_id", arg).order("occurred_at", { ascending: false }).limit(5),
+        supabase.from("transfusion_logs").select("*").eq("family_member_id", arg).order("occurred_at", { ascending: false }).limit(1),
       ]);
       const taken = (logs ?? []).filter((l: any) => l.status === "taken").length;
       const total = (logs ?? []).length;
+
+      const latestVitals = vitals && vitals.length > 0 ? {
+        temp: vitals.find((r: any) => r.type === "temperature")?.value ?? null,
+        oxygen: vitals.find((r: any) => r.type === "spo2")?.value ?? null,
+        occurredAt: vitals[0]?.occurred_at ?? null,
+      } : null;
+
       return {
         overallAdherencePercent: total ? Math.round((taken / total) * 100) : 0,
         nextMedication: meds?.[0] ? mapMed(meds[0]) : null,
         recentCrisisLog: crisis?.[0] ? mapCrisis(crisis[0]) : null,
+        latestVitals,
+        latestTransfusion: transfusions?.[0]?.occurred_at ?? null,
       };
     },
   }) as UseQueryResult<any, Error>;
@@ -258,7 +327,8 @@ export const useCreateMedication = () => {
     mutationFn: async ({ data }: any) => {
       const user_id = await getUserId();
       const { data: row, error } = await supabase.from("medications").insert({
-        user_id, name: data.name, dose: data.dose, frequency: data.frequency,
+        user_id, family_member_id: data.familyMemberId,
+        name: data.name, dose: data.dose, frequency: data.frequency,
         reminder_time: data.reminderTime, reminder_enabled: data.reminderEnabled ?? true,
         status: data.status ?? "ongoing", notes: data.notes ?? null,
         refill_reminder_days: data.refillReminderDays ?? null,
@@ -279,6 +349,7 @@ export const useCreateMedicationLog = () => {
       const user_id = await getUserId();
       const { data: row, error } = await supabase.from("medication_logs").insert({
         user_id, medication_id: data.medicationId,
+        family_member_id: data.familyMemberId,
         status: data.status ?? "taken",
         scheduled_at: data.scheduledAt ?? new Date().toISOString(),
         taken_at: data.scheduledAt ?? new Date().toISOString(),
@@ -297,7 +368,8 @@ export const useCreateCrisisLog = () => {
     mutationFn: async ({ data }: any) => {
       const user_id = await getUserId();
       const { data: row, error } = await supabase.from("crisis_logs").insert({
-        user_id, pain_level: data.painLevel,
+        user_id, family_member_id: data.familyMemberId,
+        pain_level: data.painLevel,
         pain_locations: data.painLocations ?? [],
         triggers: data.triggers ?? [],
         what_helped: data.whatHelped ?? [],
@@ -317,7 +389,7 @@ export const useCreateCareRecord = () => {
     mutationFn: async ({ data }: any) => {
       const user_id = await getUserId();
       const { data: row, error } = await supabase.from("care_records").insert({
-        user_id,
+        user_id, family_member_id: data.familyMemberId,
         title: data.documentTitle ?? "Care Record",
         document_title: data.documentTitle,
         hospital_clinic: data.hospitalClinic,
@@ -331,6 +403,70 @@ export const useCreateCareRecord = () => {
       if (error) throw new ApiError(error.message);
       qc.invalidateQueries({ queryKey: ["care-records"] });
       return mapRecord(row);
+    },
+  }) as UseMutationResult<any, Error, any>;
+};
+
+export const useCreateVitalsLog = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ data }: any) => {
+      const user_id = await getUserId();
+      const { data: row, error } = await supabase.from("vitals_logs").insert({
+        user_id, family_member_id: data.familyMemberId,
+        type: data.type, value: data.value, unit: data.unit,
+        occurred_at: data.occurredAt ?? new Date().toISOString(),
+        notes: data.notes ?? null,
+      }).select().single();
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: ["vitals-logs"] });
+      qc.invalidateQueries({ queryKey: ["dashboard-summary"] });
+      return mapVitals(row);
+    },
+  }) as UseMutationResult<any, Error, any>;
+};
+
+export const useCreateTransfusionLog = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ data }: any) => {
+      const user_id = await getUserId();
+      const { data: row, error } = await supabase.from("transfusion_logs").insert({
+        user_id, family_member_id: data.familyMemberId,
+        occurred_at: data.occurredAt ?? new Date().toISOString(),
+        units_count: data.unitsCount ?? 1,
+        transfusion_type: data.transfusionType ?? 'simple',
+        reaction_logged: data.reactionLogged ?? false,
+        reaction_details: data.reactionDetails ?? null,
+        hospital_id: data.hospitalId ?? null,
+        hemoglobin_pre: data.hemoglobinPre ?? null,
+        hemoglobin_post: data.hemoglobinPost ?? null,
+        notes: data.notes ?? null,
+      }).select().single();
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: ["transfusion-logs"] });
+      qc.invalidateQueries({ queryKey: ["dashboard-summary"] });
+      return mapTransfusion(row);
+    },
+  }) as UseMutationResult<any, Error, any>;
+};
+
+export const useCreateAppointment = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ data }: any) => {
+      const user_id = await getUserId();
+      const { data: row, error } = await supabase.from("appointments").insert({
+        user_id, family_member_id: data.familyMemberId,
+        title: data.title, description: data.description ?? null,
+        appointment_at: data.appointmentAt,
+        provider_id: data.providerId ?? null,
+        status: data.status ?? "scheduled",
+        notes: data.notes ?? null,
+      }).select().single();
+      if (error) throw new ApiError(error.message);
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      return mapAppointment(row);
     },
   }) as UseMutationResult<any, Error, any>;
 };

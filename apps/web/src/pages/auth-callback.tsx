@@ -50,11 +50,11 @@ export default function AuthCallback() {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center bg-secondary p-6">
         <div className="text-center space-y-4 max-w-sm">
-          <h2 className="font-serif text-xl text-primary">Couldn't finish signing you in</h2>
+          <h2 className="font-serif text-xl text-white">Couldn't finish signing you in</h2>
           <p className="text-sm text-muted-foreground" data-testid="text-callback-error">{error}</p>
           <div className="flex flex-col gap-2 pt-2">
             <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-white text-secondary hover:bg-white/90"
               onClick={() => setRetryKey((k) => k + 1)}
               data-testid="button-callback-retry"
             >
@@ -62,6 +62,7 @@ export default function AuthCallback() {
             </Button>
             <Button
               variant="outline"
+              className="border-white/30 text-white hover:bg-white/10"
               onClick={() => setLocation("/onboarding")}
               data-testid="button-callback-back"
             >
@@ -76,8 +77,8 @@ export default function AuthCallback() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-secondary">
       <div className="text-center space-y-3">
-        <div className="w-12 h-12 mx-auto rounded-full border-4 border-primary border-t-transparent animate-spin" />
-        <p className="text-muted-foreground text-sm">Signing you in…</p>
+        <div className="w-12 h-12 mx-auto rounded-full border-4 border-white/20 border-t-white animate-spin" />
+        <p className="text-white/70 text-sm">Signing you in…</p>
       </div>
     </div>
   );
