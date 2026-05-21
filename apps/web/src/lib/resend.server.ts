@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY || process.env.HEMORA_API_KEY);
+// Provide a dummy key if the env var is missing to prevent synchronous crashes on import during SSR
+const resend = new Resend(process.env.RESEND_API_KEY || process.env.HEMORA_API_KEY || "re_dummy");
 
 export { resend };
 
