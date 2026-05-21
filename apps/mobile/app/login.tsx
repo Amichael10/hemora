@@ -16,6 +16,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { Theme } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { getGoogleOAuthRedirectUrl, SUPABASE_REDIRECT_ALLOWLIST_HINT } from "@/lib/authRedirect";
+import { getSupabase } from "@/lib/supabase";
 
 export default function LoginScreen() {
   const scheme = useColorScheme() ?? "light";
@@ -33,9 +34,28 @@ export default function LoginScreen() {
     if (msg) setError(msg);
   }, [params.oauthError]);
 
-  if (ready && user) {
-    router.replace("/(tabs)");
-  }
+  // When auth resolves and we have a user, check if they need onboarding first
+  useEffect(() => {
+    if (!ready || !user) return;
+    void (async () => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        router.replace("/(tabs)");
+        return;
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (profile) {
+        router.replace("/(tabs)");
+      } else {
+        router.replace("/onboarding");
+      }
+    })();
+  }, [ready, user?.id]);
 
   const onSignIn = async () => {
     setError(null);

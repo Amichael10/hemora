@@ -67,7 +67,7 @@ function formatTime(t?: string | null) {
 }
 
 export default function Dashboard() {
-  const { profileId } = useProfile();
+  const { profileId, resolving, needsOnboarding } = useProfile();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -79,10 +79,10 @@ export default function Dashboard() {
 
   // 1. Force onboarding if no profile is found
   useEffect(() => {
-    if (!profileId) {
+    if (!resolving && needsOnboarding) {
       setLocation("/onboarding");
     }
-  }, [profileId, setLocation]);
+  }, [resolving, needsOnboarding, setLocation]);
 
   // Auto-advance the tools slider every 15s (pauses after user interaction)
   useEffect(() => {

@@ -1,4 +1,5 @@
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, Tabs, router } from "expo-router";
+import { useEffect } from "react";
 
 import {
   HeartPulse2Bold,
@@ -17,11 +18,30 @@ import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { BrandedSplash } from "@/components/BrandedSplash";
 import { Theme } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
+import { getSupabase } from "@/lib/supabase";
 
 export default function TabLayout() {
   const { ready, user } = useAuth();
   const colorScheme = useColorScheme() ?? "light";
   const t = Theme[colorScheme];
+
+  // Safety net: if user is authenticated but has no profile, redirect to onboarding
+  useEffect(() => {
+    if (!ready || !user) return;
+    void (async () => {
+      const supabase = getSupabase();
+      if (!supabase) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!profile) {
+        router.replace("/onboarding");
+      }
+    })();
+  }, [ready, user?.id]);
+
   if (!ready) return <BrandedSplash />;
   if (!user) return <Redirect href="/login" />;
 

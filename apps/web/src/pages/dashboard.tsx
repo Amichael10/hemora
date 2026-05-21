@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileAppShell } from "@/components/layout/MobileAppShell";
@@ -71,12 +71,19 @@ function formatTime(t?: string | null) {
 }
 
 export default function Dashboard() {
-  const { profileId, activeProfileId, setActiveProfileId, familyMembers } = useProfile();
+  const { profileId, activeProfileId, setActiveProfileId, familyMembers, resolving, needsOnboarding } = useProfile();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [markingTaken, setMarkingTaken] = useState<number | null>(null);
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+
+  // 1. Force onboarding if no profile is found
+  useEffect(() => {
+    if (!resolving && needsOnboarding) {
+      setLocation("/onboarding");
+    }
+  }, [resolving, needsOnboarding, setLocation]);
 
   const { data: profile, isLoading: loadingProfile } = useGetProfile(profileId, {
     query: { queryKey: ["/api/profiles", profileId], enabled: !!profileId },
