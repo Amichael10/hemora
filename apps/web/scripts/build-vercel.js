@@ -47,6 +47,12 @@ fs.writeFileSync(
   )
 );
 
+// package.json — tell Node to treat .js files (server.js) as ES modules
+fs.writeFileSync(
+  path.join(funcDir, "package.json"),
+  JSON.stringify({ type: "module" })
+);
+
 // Copy the server build into the function directory
 copyDir(distServer, funcDir);
 
