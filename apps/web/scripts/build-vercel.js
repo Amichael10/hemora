@@ -47,20 +47,22 @@ fs.writeFileSync(
   )
 );
 
-// Copy the server build into the function directory
-copyDir(distServer, funcDir);
+// Copy the server build into a dedicated subdirectory within the function directory.
+// This prevents Vercel's packaging from overwriting the package.json we need to set "type": "module"
+// on our server bundle and its generated chunks.
+const serverBuildDir = path.join(funcDir, "server-build");
+fs.mkdirSync(serverBuildDir, { recursive: true });
+copyDir(distServer, serverBuildDir);
 
-// Rename server.js to server.mjs so Node.js always treats it as an ES module
-// (Vercel overwrites package.json in /var/task, so "type": "module" gets lost)
-const oldPath = path.join(funcDir, "server.js");
-const newPath = path.join(funcDir, "server.mjs");
-if (fs.existsSync(oldPath)) {
-  fs.renameSync(oldPath, newPath);
-}
+// Write package.json inside the subdirectory to force ESM loading for all server files
+fs.writeFileSync(
+  path.join(serverBuildDir, "package.json"),
+  JSON.stringify({ type: "module" })
+);
 
 // index.mjs — wraps the fetch-API handler for Vercel's Node.js runtime
 const entry = `
-import server from "./server.mjs";
+import server from "./server-build/server.js";
 
 export default async function handler(req, res) {
   try {
