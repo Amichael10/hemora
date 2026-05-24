@@ -31,7 +31,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@tanstack/query-core"],
   },
-  ssr: {
-    noExternal: [/.*/],
-  },
 });
