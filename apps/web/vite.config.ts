@@ -9,7 +9,7 @@ import path from "node:path";
 const serverEnv = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "");
 Object.assign(process.env, serverEnv);
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     tanstackStart({
       server: { entry: "src/server.ts" },
@@ -31,4 +31,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@tanstack/query-core"],
   },
-});
+  ssr: {
+    noExternal: command === "build" ? [/.*/] : [],
+  },
+}));
