@@ -47,18 +47,20 @@ fs.writeFileSync(
   )
 );
 
-// package.json — tell Node to treat .js files (server.js) as ES modules
-fs.writeFileSync(
-  path.join(funcDir, "package.json"),
-  JSON.stringify({ type: "module" })
-);
-
 // Copy the server build into the function directory
 copyDir(distServer, funcDir);
 
+// Rename server.js to server.mjs so Node.js always treats it as an ES module
+// (Vercel overwrites package.json in /var/task, so "type": "module" gets lost)
+const oldPath = path.join(funcDir, "server.js");
+const newPath = path.join(funcDir, "server.mjs");
+if (fs.existsSync(oldPath)) {
+  fs.renameSync(oldPath, newPath);
+}
+
 // index.mjs — wraps the fetch-API handler for Vercel's Node.js runtime
 const entry = `
-import server from "./server.js";
+import server from "./server.mjs";
 
 export default async function handler(req, res) {
   try {
