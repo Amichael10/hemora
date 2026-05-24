@@ -15,7 +15,12 @@ import Lottie from "lottie-react";
 import meltingFace from "@/assets/lottie/1fae0.json";
 import { PostHogProvider } from "@/components/providers/PostHogProvider";
 import posthog from "posthog-js";
+import * as React from "react";
 import { useEffect } from "react";
+
+if (typeof window !== "undefined") {
+  (window as any).React = React;
+}
 
 function NotFoundComponent() {
   return (
