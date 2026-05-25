@@ -107,6 +107,11 @@ const config = {
   version: 3,
   routes: [
     {
+      src: "^/sitemap\\.xml$",
+      headers: { "content-type": "application/xml; charset=utf-8" },
+      continue: true,
+    },
+    {
       src: "^/_build/assets/(.*)$",
       dest: "/assets/$1",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
