@@ -101,16 +101,18 @@ export default async function handler(req, res) {
 fs.writeFileSync(path.join(funcDir, "index.mjs"), entry);
 console.log("   done.");
 
-// 3. Write config.json — routing
+// 3. Write config.json — routing & overrides
 console.log("📝 Writing .vercel/output/config.json ...");
 const config = {
   version: 3,
+  overrides: {
+    "sitemap.xml": {
+      headers: {
+        "content-type": "application/xml; charset=utf-8"
+      }
+    }
+  },
   routes: [
-    {
-      src: "^/sitemap\\.xml$",
-      headers: { "content-type": "application/xml; charset=utf-8" },
-      continue: true,
-    },
     {
       src: "^/_build/assets/(.*)$",
       dest: "/assets/$1",
