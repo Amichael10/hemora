@@ -3,5 +3,16 @@
   "framework": null,
   "buildCommand": "vite build && node scripts/build-vercel.js",
   "outputDirectory": ".vercel/output",
-  "installCommand": "pnpm install --frozen-lockfile"
+  "installCommand": "pnpm install --frozen-lockfile",
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        }
+      ]
+    }
+  ]
 }
